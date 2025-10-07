@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tower Ascension - Sci-Fi UI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1d29 0%, #2d3142 50%, #1a1d29 100%);
+            color: #c8d3e8;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .game-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Combat Area */
+        .combat-view {
+            flex: 1;
+            background: radial-gradient(circle at center, #1a2540 0%, #0d1128 100%);
+            position: relative;
+            border: 2px solid rgba(74, 144, 226, 0.4);
+            border-radius: 8px;
+            margin: 10px;
+            overflow: hidden;
+        }
+        
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(74, 144, 226, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(74, 144, 226, 0.08) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        
+        .player {
+            position: absolute;
+            bottom: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #5aa3f5, #4a90e2);
+            border-radius: 50%;
+            border: 3px solid #7bb5f8;
+            box-shadow: 0 0 25px rgba(74, 144, 226, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 25px rgba(74, 144, 226, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.2); }
+            50% { box-shadow: 0 0 40px rgba(74, 144, 226, 0.9), inset 0 0 25px rgba(255, 255, 255, 0.4); }
+        }
+        
+        .enemy {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border-radius: 50%;
+            border: 2px solid #ec7063;
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .enemy:nth-child(2) { top: 20%; left: 30%; animation-delay: 0.5s; }
+        .enemy:nth-child(3) { top: 30%; right: 25%; animation-delay: 1s; }
+        .enemy:nth-child(4) { top: 50%; left: 20%; animation-delay: 1.5s; }
+        .enemy:nth-child(5) { top: 40%; right: 30%; animation-delay: 2s; }
+        
+        /* HUD */
+        .hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .stat-panel {
+            background: linear-gradient(135deg, rgba(35, 40, 55, 0.95), rgba(25, 30, 45, 0.95));
+            border: 2px solid rgba(74, 144, 226, 0.4);
+            border-radius: 8px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .health-bar {
+            width: 250px;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #4a90e2;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        
+        .health-fill {
+            height: 100%;
+            width: 75%;
+            background: linear-gradient(90deg, #5aa3f5, #7bb5f8);
+            box-shadow: 0 0 15px rgba(74, 144, 226, 0.6);
+            transition: width 0.3s;
+        }
+        
+        .health-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            font-size: 14px;
+            color: #e8ecf4;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.9);
+        }
+        
+        .xp-bar {
+            width: 250px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #9b59b6;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .xp-fill {
+            height: 100%;
+            width: 45%;
+            background: linear-gradient(90deg, #9b59b6, #b177c9);
+            box-shadow: 0 0 12px rgba(155, 89, 182, 0.6);
+            transition: width 0.3s;
+        }
+        
+        .xp-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 11px;
+            font-weight: bold;
+            color: #e8ecf4;
+            text-shadow: 0 0 6px rgba(0, 0, 0, 0.9);
+        }
+        
+        .level-badge {
+            background: linear-gradient(135deg, #5aa3f5, #4a90e2);
+            border: 2px solid #7bb5f8;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(74, 144, 226, 0.6);
+            margin-bottom: 10px;
+        }
+        
+        .stats-info {
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+            padding: 3px 8px;
+            background: rgba(74, 144, 226, 0.1);
+            border-radius: 4px;
+        }
+        
+        .stat-label {
+            color: #8a9ab8;
+        }
+        
+        .stat-value {
+            color: #5aa3f5;
+            font-weight: bold;
+        }
+        
+        /* Skills Bar */
+        .skills-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            background: linear-gradient(135deg, rgba(35, 40, 55, 0.95), rgba(25, 30, 45, 0.95));
+            padding: 15px 25px;
+            border: 2px solid rgba(74, 144, 226, 0.4);
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .skill-slot {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(50, 60, 80, 0.5), rgba(40, 50, 70, 0.5));
+            border: 2px solid rgba(74, 144, 226, 0.4);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .skill-slot:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(74, 144, 226, 0.5);
+            border-color: #5aa3f5;
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.3), rgba(53, 122, 189, 0.3));
+        }
+        
+        .skill-icon {
+            font-size: 24px;
+            margin-bottom: 2px;
+        }
+        
+        .skill-key {
+            font-size: 10px;
+            color: #8a9ab8;
+            font-weight: bold;
+        }
+        
+        .skill-cooldown {
+            position: absolute;
+            bottom: 2px;
+            font-size: 10px;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        /* Resources Panel */
+        .resources-panel {
+            background: linear-gradient(135deg, rgba(35, 40, 55, 0.95), rgba(25, 30, 45, 0.95));
+            border: 2px solid rgba(74, 144, 226, 0.4);
+            border-radius: 8px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .resource-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            padding: 6px 10px;
+            background: rgba(74, 144, 226, 0.1);
+            border-radius: 6px;
+        }
+        
+        .resource-icon {
+            font-size: 18px;
+        }
+        
+        .resource-count {
+            color: #5aa3f5;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        /* Floor Info */
+        .floor-info {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(35, 40, 55, 0.95), rgba(25, 30, 45, 0.95));
+            border: 2px solid rgba(155, 89, 182, 0.5);
+            border-radius: 20px;
+            padding: 12px 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(155, 89, 182, 0.3);
+            text-align: center;
+        }
+        
+        .floor-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #b177c9;
+            text-shadow: 0 0 12px rgba(155, 89, 182, 0.6);
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+        
+        .floor-timer {
+            font-size: 14px;
+            color: #c8d3e8;
+        }
+        
+        /* Mini Map */
+        .minimap {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 150px;
+            height: 150px;
+            background: rgba(35, 40, 55, 0.95);
+            border: 2px solid rgba(74, 144, 226, 0.4);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .minimap-title {
+            text-align: center;
+            font-size: 10px;
+            padding: 5px;
+            border-bottom: 1px solid rgba(74, 144, 226, 0.3);
+            color: #8a9ab8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .minimap-content {
+            position: relative;
+            width: 100%;
+            height: calc(100% - 25px);
+            background: radial-gradient(circle at center, rgba(74, 144, 226, 0.15), transparent);
+        }
+        
+        .minimap-player {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: #5aa3f5;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(74, 144, 226, 1);
+        }
+        
+        .minimap-enemy {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #e74c3c;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(231, 76, 60, 1);
+        }
+        
+        .minimap-enemy:nth-child(2) { top: 30%; left: 40%; }
+        .minimap-enemy:nth-child(3) { top: 50%; right: 35%; }
+        .minimap-enemy:nth-child(4) { top: 70%; left: 30%; }
+        
+        /* Particles effect */
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #7bb5f8;
+            border-radius: 50%;
+            animation: particle-float 4s infinite;
+            opacity: 0.4;
+        }
+        
+        @keyframes particle-float {
+            0% { transform: translateY(0) scale(1); opacity: 0.4; }
+            50% { opacity: 0.7; }
+            100% { transform: translateY(-100px) scale(0); opacity: 0; }
+        }
+        
+        .particle:nth-child(1) { left: 20%; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 40%; animation-delay: 1s; }
+        .particle:nth-child(3) { left: 60%; animation-delay: 2s; }
+        .particle:nth-child(4) { left: 80%; animation-delay: 3s; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Combat View -->
+        <div class="combat-view">
+            <div class="grid-overlay"></div>
+            
+            <!-- Floating particles -->
+            <div class="particle" style="bottom: 10%;"></div>
+            <div class="particle" style="bottom: 15%;"></div>
+            <div class="particle" style="bottom: 20%;"></div>
+            <div class="particle" style="bottom: 5%;"></div>
+            
+            <!-- Player -->
+            <div class="player"></div>
+            
+            <!-- Enemies -->
+            <div class="enemy"></div>
+            <div class="enemy"></div>
+            <div class="enemy"></div>
+            <div class="enemy"></div>
+            
+            <!-- HUD -->
+            <div class="hud">
+                <!-- Left: Player Stats -->
+                <div class="stat-panel">
+                    <div class="level-badge">12</div>
+                    <div class="health-bar">
+                        <div class="health-fill"></div>
+                        <div class="health-text">750 / 1000</div>
+                    </div>
+                    <div class="xp-bar">
+                        <div class="xp-fill"></div>
+                        <div class="xp-text">Level 12 • 450 / 1000 XP</div>
+                    </div>
+                    <div class="stats-info">
+                        <div class="stat-line">
+                            <span class="stat-label">STR</span>
+                            <span class="stat-value">28</span>
+                        </div>
+                        <div class="stat-line">
+                            <span class="stat-label">DEX</span>
+                            <span class="stat-value">15</span>
+                        </div>
+                        <div class="stat-line">
+                            <span class="stat-label">INT</span>
+                            <span class="stat-value">12</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right: Resources -->
+                <div class="resources-panel">
+                    <div class="resource-item">
+                        <span class="resource-icon">💎</span>
+                        <span class="resource-count">342</span>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-icon">⚡</span>
+                        <span class="resource-count">58</span>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-icon">🔮</span>
+                        <span class="resource-count">12</span>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-icon">💰</span>
+                        <span class="resource-count">2,450</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Floor Info -->
+            <div class="floor-info">
+                <div class="floor-title">FLOOR 5: CYBER NEXUS</div>
+                <div class="floor-timer">⏱ Boss in 3:45</div>
+            </div>
+            
+            <!-- Skills Bar -->
+            <div class="skills-bar">
+                <div class="skill-slot">
+                    <div class="skill-icon">👊</div>
+                    <div class="skill-key">LMB</div>
+                </div>
+                <div class="skill-slot">
+                    <div class="skill-icon">⚔️</div>
+                    <div class="skill-key">RMB</div>
+                    <div class="skill-cooldown">2.5s</div>
+                </div>
+                <div class="skill-slot">
+                    <div class="skill-icon">🌀</div>
+                    <div class="skill-key">Q</div>
+                </div>
+                <div class="skill-slot">
+                    <div class="skill-icon">🛡️</div>
+                    <div class="skill-key">E</div>
+                    <div class="skill-cooldown">8.2s</div>
+                </div>
+                <div class="skill-slot">
+                    <div class="skill-icon">⚡</div>
+                    <div class="skill-key">R</div>
+                    <div class="skill-cooldown">45s</div>
+                </div>
+                <div class="skill-slot">
+                    <div class="skill-icon">💨</div>
+                    <div class="skill-key">SPACE</div>
+                </div>
+            </div>
+            
+            <!-- Minimap -->
+            <div class="minimap">
+                <div class="minimap-title">SECTOR MAP</div>
+                <div class="minimap-content">
+                    <div class="minimap-player"></div>
+                    <div class="minimap-enemy"></div>
+                    <div class="minimap-enemy"></div>
+                    <div class="minimap-enemy"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

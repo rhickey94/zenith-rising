@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tower Ascension - Hub Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1d29 0%, #2d3142 50%, #1a1d29 100%);
+            color: #c8d3e8;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .hub-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Top Bar */
+        .top-bar {
+            background: linear-gradient(180deg, rgba(45, 50, 70, 0.95), rgba(30, 35, 50, 0.95));
+            border-bottom: 2px solid #4a90e2;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .hub-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #e8ecf4;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .hub-icon {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.4);
+        }
+        
+        .player-info {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+        
+        .stat-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            border: 1px solid rgba(74, 144, 226, 0.3);
+        }
+        
+        .stat-icon {
+            color: #4a90e2;
+            font-size: 18px;
+        }
+        
+        .stat-value {
+            color: #a8b8d8;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        /* Left Sidebar - Navigation */
+        .nav-sidebar {
+            width: 220px;
+            background: linear-gradient(180deg, rgba(35, 40, 55, 0.95), rgba(25, 30, 45, 0.95));
+            border: 1px solid rgba(74, 144, 226, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .nav-section {
+            margin-bottom: 25px;
+        }
+        
+        .nav-header {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #6a7a9a;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .nav-button {
+            width: 100%;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, rgba(50, 60, 80, 0.6), rgba(40, 50, 70, 0.6));
+            border: 1px solid rgba(74, 144, 226, 0.3);
+            border-radius: 6px;
+            color: #b8c8e8;
+            cursor: pointer;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+        
+        .nav-button:hover {
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.3), rgba(53, 122, 189, 0.3));
+            border-color: #4a90e2;
+            transform: translateX(4px);
+        }
+        
+        .nav-button.active {
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.4), rgba(53, 122, 189, 0.4));
+            border-color: #4a90e2;
+            color: #e8ecf4;
+            box-shadow: 0 0 15px rgba(74, 144, 226, 0.3);
+        }
+        
+        .nav-button-icon {
+            font-size: 18px;
+        }
+        
+        /* Center Panel - Workshop */
+        .center-panel {
+            flex: 1;
+            background: linear-gradient(180deg, rgba(35, 40, 55, 0.95), rgba(25, 30, 45, 0.95));
+            border: 1px solid rgba(74, 144, 226, 0.3);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(74, 144, 226, 0.2);
+        }
+        
+        .panel-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #e8ecf4;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        
+        .panel-subtitle {
+            font-size: 13px;
+            color: #8a9ab8;
+            margin-top: 5px;
+        }
+        
+        /* Workshop Queue */
+        .queue-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6a7a9a;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .queue-item {
+            background: linear-gradient(135deg, rgba(40, 50, 70, 0.6), rgba(30, 40, 60, 0.6));
+            border: 1px solid rgba(74, 144, 226, 0.2);
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .queue-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .material-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(74, 144, 226, 0.4);
+        }
+        
+        .material-details {
+            flex: 1;
+        }
+        
+        .material-name {
+            font-size: 16px;
+            color: #e8ecf4;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .material-amount {
+            font-size: 13px;
+            color: #8a9ab8;
+        }
+        
+        .progress-section {
+            flex: 1;
+            max-width: 300px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a90e2, #5aa3f5);
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.6);
+            transition: width 0.3s;
+        }
+        
+        .time-remaining {
+            font-size: 12px;
+            color: #8a9ab8;
+            text-align: right;
+        }
+        
+        .collect-button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #5aa3f5, #4a90e2);
+            border: 1px solid #4a90e2;
+            border-radius: 6px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+        
+        .collect-button:hover {
+            background: linear-gradient(135deg, #6bb5ff, #5aa3f5);
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        /* Materials Grid */
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .material-card {
+            background: linear-gradient(135deg, rgba(40, 50, 70, 0.6), rgba(30, 40, 60, 0.6));
+            border: 1px solid rgba(74, 144, 226, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .material-card:hover {
+            border-color: #4a90e2;
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3);
+        }
+        
+        .material-card-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .material-card-name {
+            font-size: 13px;
+            color: #e8ecf4;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        
+        .material-card-count {
+            font-size: 18px;
+            color: #4a90e2;
+            font-weight: 700;
+        }
+        
+        /* Right Sidebar - Character */
+        .right-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, rgba(35, 40, 55, 0.95), rgba(25, 30, 45, 0.95));
+            border: 1px solid rgba(74, 144, 226, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .character-preview {
+            background: linear-gradient(135deg, rgba(40, 50, 70, 0.6), rgba(30, 40, 60, 0.6));
+            border: 1px solid rgba(74, 144, 226, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .character-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            box-shadow: 0 4px 20px rgba(74, 144, 226, 0.4);
+        }
+        
+        .character-name {
+            font-size: 18px;
+            color: #e8ecf4;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .character-class {
+            font-size: 13px;
+            color: #8a9ab8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stats-section {
+            margin-top: 20px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, rgba(40, 50, 70, 0.4), rgba(30, 40, 60, 0.4));
+            border: 1px solid rgba(74, 144, 226, 0.15);
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #8a9ab8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-number {
+            font-size: 16px;
+            color: #4a90e2;
+            font-weight: 700;
+        }
+        
+        .action-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #5aa3f5, #4a90e2);
+            border: 1px solid #4a90e2;
+            border-radius: 6px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+        
+        .action-button:hover {
+            background: linear-gradient(135deg, #6bb5ff, #5aa3f5);
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .action-button.secondary {
+            background: linear-gradient(135deg, rgba(50, 60, 80, 0.6), rgba(40, 50, 70, 0.6));
+            border-color: rgba(74, 144, 226, 0.4);
+        }
+        
+        .action-button.secondary:hover {
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.3), rgba(53, 122, 189, 0.3));
+        }
+        
+        /* Notification Badge */
+        .notification-badge {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border-radius: 12px;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="hub-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="hub-title">
+                <div class="hub-icon">🏛️</div>
+                Command Center
+            </div>
+            <div class="player-info">
+                <div class="stat-display">
+                    <span class="stat-icon">⭐</span>
+                    <span class="stat-value">Level 25</span>
+                </div>
+                <div class="stat-display">
+                    <span class="stat-icon">💰</span>
+                    <span class="stat-value">12,450</span>
+                </div>
+                <div class="stat-display">
+                    <span class="stat-icon">🏆</span>
+                    <span class="stat-value">Floor 7</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Navigation -->
+            <div class="nav-sidebar">
+                <div class="nav-section">
+                    <div class="nav-header">Facilities</div>
+                    <button class="nav-button active">
+                        <span class="nav-button-icon">⚙️</span>
+                        Workshop
+                        <span class="notification-badge">2</span>
+                    </button>
+                    <button class="nav-button">
+                        <span class="nav-button-icon">🔨</span>
+                        Blacksmith
+                    </button>
+                    <button class="nav-button">
+                        <span class="nav-button-icon">💎</span>
+                        Treasury
+                        <span class="notification-badge">!</span>
+                    </button>
+                    <button class="nav-button">
+                        <span class="nav-button-icon">📚</span>
+                        Research Lab
+                    </button>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-header">Character</div>
+                    <button class="nav-button">
+                        <span class="nav-button-icon">👤</span>
+                        Profile
+                    </button>
+                    <button class="nav-button">
+                        <span class="nav-button-icon">🎯</span>
+                        Skills
+                    </button>
+                    <button class="nav-button">
+                        <span class="nav-button-icon">🎒</span>
+                        Inventory
+                    </button>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-header">Mission</div>
+                    <button class="nav-button">
+                        <span class="nav-button-icon">🚀</span>
+                        Launch Run
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Center Panel - Workshop -->
+            <div class="center-panel">
+                <div class="panel-header">
+                    <div>
+                        <div class="panel-title">Workshop</div>
+                        <div class="panel-subtitle">Material refinement and processing</div>
+                    </div>
+                </div>
+                
+                <!-- Refinement Queue -->
+                <div class="queue-section">
+                    <div class="section-label">Active Refinements</div>
+                    
+                    <div class="queue-item">
+                        <div class="queue-info">
+                            <div class="material-icon">⚡</div>
+                            <div class="material-details">
+                                <div class="material-name">Concentrated Essence</div>
+                                <div class="material-amount">Processing 50 units</div>
+                            </div>
+                        </div>
+                        <div class="progress-section">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 65%"></div>
+                            </div>
+                            <div class="time-remaining">5m 23s remaining</div>
+                        </div>
+                    </div>
+                    
+                    <div class="queue-item">
+                        <div class="queue-info">
+                            <div class="material-icon">🔮</div>
+                            <div class="material-details">
+                                <div class="material-name">Purified Extract</div>
+                                <div class="material-amount">Processing 25 units</div>
+                            </div>
+                        </div>
+                        <div class="progress-section">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                            <div class="time-remaining">Complete!</div>
+                        </div>
+                        <button class="collect-button">Collect</button>
+                    </div>
+                </div>
+                
+                <!-- Raw Materials -->
+                <div class="queue-section">
+                    <div class="section-label">Available Materials</div>
+                    <div class="materials-grid">
+                        <div class="material-card">
+                            <div class="material-card-icon">💎</div>
+                            <div class="material-card-name">Essence Shards</div>
+                            <div class="material-card-count">342</div>
+                        </div>
+                        <div class="material-card">
+                            <div class="material-card-icon">🧬</div>
+                            <div class="material-card-name">Monster Parts</div>
+                            <div class="material-card-count">58</div>
+                        </div>
+                        <div class="material-card">
+                            <div class="material-card-icon">🏺</div>
+                            <div class="material-card-name">Ancient Fragments</div>
+                            <div class="material-card-count">12</div>
+                        </div>
+                        <div class="material-card">
+                            <div class="material-card-icon">⚡</div>
+                            <div class="material-card-name">Concentrated Essence</div>
+                            <div class="material-card-count">125</div>
+                        </div>
+                        <div class="material-card">
+                            <div class="material-card-icon">🔮</div>
+                            <div class="material-card-name">Purified Extract</div>
+                            <div class="material-card-count">42</div>
+                        </div>
+                        <div class="material-card">
+                            <div class="material-card-icon">⭐</div>
+                            <div class="material-card-name">Restored Relics</div>
+                            <div class="material-card-count">8</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Sidebar - Character Info -->
+            <div class="right-sidebar">
+                <div class="character-preview">
+                    <div class="character-avatar">⚔️</div>
+                    <div class="character-name">Commander Atlas</div>
+                    <div class="character-class">Vanguard • Level 25</div>
+                </div>
+                
+                <div class="section-label">Primary Stats</div>
+                <div class="stats-section">
+                    <div class="stat-row">
+                        <span class="stat-label">Strength</span>
+                        <span class="stat-number">42</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Dexterity</span>
+                        <span class="stat-number">28</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Intelligence</span>
+                        <span class="stat-number">18</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Vitality</span>
+                        <span class="stat-number">35</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Fortune</span>
+                        <span class="stat-number">22</span>
+                    </div>
+                </div>
+                
+                <button class="action-button">Launch Mission</button>
+                <button class="action-button secondary">Modify Loadout</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,620 @@
+# Godot C# Project Structure - Tower Ascension
+
+## Project Folder Structure
+
+```
+TowerAscension/
+├── project.godot
+├── .gitignore
+├── .godot/                          # Godot cache (auto-generated, ignore in git)
+│
+├── Assets/                          # All game assets
+│   ├── Audio/
+│   │   ├── Music/
+│   │   │   ├── Floor1Theme.ogg
+│   │   │   ├── BossTheme.ogg
+│   │   │   └── HubTheme.ogg
+│   │   └── SFX/
+│   │       ├── Attack/
+│   │       ├── Hits/
+│   │       ├── UI/
+│   │       └── Ambient/
+│   │
+│   ├── Sprites/
+│   │   ├── Characters/
+│   │   │   ├── Warrior/
+│   │   │   ├── Mage/
+│   │   │   └── Ranger/
+│   │   ├── Enemies/
+│   │   │   ├── Skeleton/
+│   │   │   ├── Bat/
+│   │   │   └── Bosses/
+│   │   ├── Items/
+│   │   │   ├── Weapons/
+│   │   │   ├── Armor/
+│   │   │   └── Consumables/
+│   │   ├── Effects/
+│   │   │   ├── Projectiles/
+│   │   │   ├── Explosions/
+│   │   │   └── Buffs/
+│   │   └── UI/
+│   │       ├── Icons/
+│   │       ├── Buttons/
+│   │       └── Panels/
+│   │
+│   ├── Tilesets/
+│   │   ├── Floor1.tres
+│   │   ├── Floor2.tres
+│   │   └── Hub.tres
+│   │
+│   └── Fonts/
+│       └── MainFont.ttf
+│
+├── Scenes/                          # All .tscn scene files
+│   ├── Main.tscn                    # Root scene, handles scene switching
+│   │
+│   ├── Hub/                         # Base/Hub scenes
+│   │   ├── Hub.tscn                 # Main hub scene
+│   │   ├── Blacksmith.tscn
+│   │   ├── Workshop.tscn
+│   │   ├── Treasury.tscn
+│   │   ├── Portal.tscn
+│   │   └── SkillLoadout.tscn
+│   │
+│   ├── Combat/                      # Combat/Run scenes
+│   │   ├── Floor.tscn               # Base floor scene (instanced for each floor)
+│   │   ├── Player.tscn
+│   │   └── HUD.tscn
+│   │
+│   ├── Enemies/
+│   │   ├── Skeleton.tscn
+│   │   ├── Bat.tscn
+│   │   ├── Lich.tscn
+│   │   └── Bosses/
+│   │       ├── Floor1Boss.tscn
+│   │       └── Floor2Boss.tscn
+│   │
+│   ├── Items/
+│   │   ├── DroppedItem.tscn         # Generic pickup visual
+│   │   └── Projectile.tscn
+│   │
+│   └── UI/
+│       ├── MainMenu.tscn
+│       ├── PauseMenu.tscn
+│       ├── LevelUpPanel.tscn
+│       ├── InventoryPanel.tscn
+│       └── DeathScreen.tscn
+│
+├── Scripts/                         # All C# scripts
+│   ├── Core/                        # Core systems
+│   │   ├── GameManager.cs           # Singleton - manages game state
+│   │   ├── SaveManager.cs           # Handles save/load
+│   │   ├── SceneManager.cs          # Scene transitions
+│   │   └── AudioManager.cs          # Music and SFX
+│   │
+│   ├── Player/
+│   │   ├── Player.cs                # Main player controller
+│   │   ├── PlayerStats.cs           # Stats component
+│   │   ├── PlayerMovement.cs        # Movement component
+│   │   ├── PlayerCombat.cs          # Combat component
+│   │   └── PlayerInventory.cs       # Inventory component
+│   │
+│   ├── Combat/
+│   │   ├── Health.cs                # Health component (used by player/enemies)
+│   │   ├── DamageDealer.cs          # Damage dealing component
+│   │   ├── Projectile.cs            # Projectile behavior
+│   │   └── HitBox.cs                # Collision detection component
+│   │
+│   ├── Enemies/
+│   │   ├── Enemy.cs                 # Base enemy class
+│   │   ├── EnemyAI.cs               # Base AI behavior
+│   │   ├── Skeleton.cs              # Specific enemy types
+│   │   ├── Bat.cs
+│   │   └── Boss.cs
+│   │
+│   ├── Skills/
+│   │   ├── Skill.cs                 # Base skill class
+│   │   ├── SkillManager.cs          # Manages active skills
+│   │   ├── SkillDatabase.cs         # All available skills
+│   │   └── Skills/                  # Individual skill implementations
+│   │       ├── Whirlwind.cs
+│   │       ├── Fireball.cs
+│   │       └── ChargedShot.cs
+│   │
+│   ├── Items/
+│   │   ├── Item.cs                  # Base item class
+│   │   ├── Equipment.cs             # Equippable items
+│   │   ├── Consumable.cs            # Consumable items
+│   │   ├── ItemDatabase.cs          # All available items
+│   │   └── LootDrop.cs              # Handles item drops
+│   │
+│   ├── Progression/
+│   │   ├── ExperienceManager.cs     # In-run leveling
+│   │   ├── CharacterLevel.cs        # Permanent character level
+│   │   ├── UpgradeSystem.cs         # In-run upgrade choices
+│   │   └── UpgradeDatabase.cs       # Available upgrades
+│   │
+│   ├── IdleSystems/
+│   │   ├── Workshop.cs              # Workshop idle processing
+│   │   ├── Treasury.cs              # Gold generation
+│   │   ├── MaterialRefinery.cs      # Material refinement logic
+│   │   └── IdleTimer.cs             # Tracks offline time
+│   │
+│   ├── Floor/
+│   │   ├── FloorManager.cs          # Controls floor state
+│   │   ├── WaveSpawner.cs           # Enemy spawning
+│   │   ├── FloorGenerator.cs        # Procedural layout (if needed)
+│   │   └── BossController.cs        # Boss encounter logic
+│   │
+│   ├── UI/
+│   │   ├── HUD.cs                   # In-game HUD
+│   │   ├── LevelUpUI.cs             # Level up choice panel
+│   │   ├── InventoryUI.cs           # Inventory display
+│   │   ├── WorkshopUI.cs            # Workshop interface
+│   │   ├── BlacksmithUI.cs          # Enhancement interface
+│   │   └── StatDisplay.cs           # Character stats panel
+│   │
+│   └── Utilities/
+│       ├── Constants.cs             # Game constants
+│       ├── Enums.cs                 # All enums (Rarity, DamageType, etc)
+│       ├── Extensions.cs            # C# extension methods
+│       └── MathHelpers.cs           # Math utility functions
+│
+├── Resources/                       # Godot resource files (.tres)
+│   ├── Items/
+│   │   ├── Weapons/
+│   │   │   ├── IronSword.tres
+│   │   │   └── WoodenBow.tres
+│   │   └── Armor/
+│   │       └── LeatherArmor.tres
+│   │
+│   ├── Skills/
+│   │   ├── Whirlwind.tres
+│   │   └── Fireball.tres
+│   │
+│   ├── Enemies/
+│   │   ├── SkeletonData.tres
+│   │   └── BatData.tres
+│   │
+│   └── Floors/
+│       ├── Floor1Config.tres
+│       └── Floor2Config.tres
+│
+└── Data/                            # JSON/configuration files
+	├── Items.json                   # Item definitions
+	├── Skills.json                  # Skill definitions
+	├── Enemies.json                 # Enemy stats
+	├── Upgrades.json                # Upgrade definitions
+	└── BalanceConfig.json           # Balance values
+```
+
+## Key C# Script Examples
+
+### GameManager.cs (Singleton Pattern)
+```csharp
+using Godot;
+using System;
+
+public partial class GameManager : Node
+{
+	public static GameManager Instance { get; private set; }
+	
+	// Game State
+	public PlayerData PlayerData { get; private set; }
+	public RunData CurrentRun { get; private set; }
+	public bool IsInRun { get; private set; }
+	
+	// References to systems
+	public SaveManager SaveManager { get; private set; }
+	public AudioManager AudioManager { get; private set; }
+	
+	public override void _Ready()
+	{
+		if (Instance != null)
+		{
+			QueueFree();
+			return;
+		}
+		Instance = this;
+		
+		// Initialize subsystems
+		SaveManager = GetNode<SaveManager>("SaveManager");
+		AudioManager = GetNode<AudioManager>("AudioManager");
+		
+		// Load player data
+		PlayerData = SaveManager.LoadPlayerData();
+	}
+	
+	public void StartRun(int floorNumber)
+	{
+		CurrentRun = new RunData();
+		IsInRun = true;
+		GetTree().ChangeSceneToFile($"res://Scenes/Combat/Floor.tscn");
+	}
+	
+	public void EndRun(bool victory)
+	{
+		IsInRun = false;
+		
+		// Process rewards, update player data
+		if (victory)
+		{
+			PlayerData.ProcessRunRewards(CurrentRun);
+		}
+		else
+		{
+			PlayerData.ProcessRunPenalty(CurrentRun);
+		}
+		
+		SaveManager.SavePlayerData(PlayerData);
+		GetTree().ChangeSceneToFile("res://Scenes/Hub/Hub.tscn");
+	}
+}
+```
+
+### PlayerStats.cs (Component Pattern)
+```csharp
+using Godot;
+using System;
+
+public partial class PlayerStats : Node
+{
+	// Base Stats
+	[Export] public int Strength { get; set; } = 10;
+	[Export] public int Dexterity { get; set; } = 10;
+	[Export] public int Intelligence { get; set; } = 10;
+	[Export] public int Vitality { get; set; } = 10;
+	[Export] public int Fortune { get; set; } = 10;
+	
+	// Derived Stats (calculated from base stats + gear)
+	public float PhysicalDamage => CalculatePhysicalDamage();
+	public float MagicalDamage => CalculateMagicalDamage();
+	public float AttackSpeed => CalculateAttackSpeed();
+	public float CritChance => CalculateCritChance();
+	public float CritDamage => CalculateCritDamage();
+	public int MaxHealth => CalculateMaxHealth();
+	public float HealthRegen => CalculateHealthRegen();
+	public float MovementSpeed => 300f; // Base value, modified by upgrades
+	
+	private Player _player;
+	
+	public override void _Ready()
+	{
+		_player = GetParent<Player>();
+		LoadStatsFromPlayerData();
+	}
+	
+	private void LoadStatsFromPlayerData()
+	{
+		var playerData = GameManager.Instance.PlayerData;
+		Strength = playerData.Strength;
+		Dexterity = playerData.Dexterity;
+		Intelligence = playerData.Intelligence;
+		Vitality = playerData.Vitality;
+		Fortune = playerData.Fortune;
+		
+		// Apply gear bonuses
+		ApplyEquipmentBonuses(playerData.Equipment);
+	}
+	
+	private float CalculatePhysicalDamage()
+	{
+		return 10 + (Strength * 2); // +2% per point
+	}
+	
+	private float CalculateMagicalDamage()
+	{
+		return 10 + (Intelligence * 2);
+	}
+	
+	private float CalculateAttackSpeed()
+	{
+		return 1.0f + (Dexterity * 0.01f); // +1% per point
+	}
+	
+	private float CalculateCritChance()
+	{
+		return Dexterity * 0.5f; // +0.5% per point
+	}
+	
+	private float CalculateCritDamage()
+	{
+		return 150f + (Fortune * 3f); // Base 150%, +3% per Fortune point
+	}
+	
+	private int CalculateMaxHealth()
+	{
+		return 100 + (Strength * 10) + (Vitality * 20);
+	}
+	
+	private float CalculateHealthRegen()
+	{
+		return Vitality * 0.5f;
+	}
+	
+	private void ApplyEquipmentBonuses(Equipment[] equipment)
+	{
+		// Apply stat bonuses from equipped items
+		foreach (var item in equipment)
+		{
+			if (item == null) continue;
+			
+			Strength += item.StrengthBonus;
+			Dexterity += item.DexterityBonus;
+			Intelligence += item.IntelligenceBonus;
+			Vitality += item.VitalityBonus;
+			Fortune += item.FortuneBonus;
+		}
+	}
+}
+```
+
+### Item.cs (Resource Pattern)
+```csharp
+using Godot;
+using System;
+
+[GlobalClass]
+public partial class Item : Resource
+{
+	[Export] public string ItemName { get; set; }
+	[Export] public string Description { get; set; }
+	[Export] public ItemType Type { get; set; }
+	[Export] public Rarity Rarity { get; set; }
+	[Export] public Texture2D Icon { get; set; }
+	
+	// Stat Bonuses
+	[Export] public int StrengthBonus { get; set; }
+	[Export] public int DexterityBonus { get; set; }
+	[Export] public int IntelligenceBonus { get; set; }
+	[Export] public int VitalityBonus { get; set; }
+	[Export] public int FortuneBonus { get; set; }
+	
+	// Enhancement
+	[Export] public int EnhancementLevel { get; set; } = 0;
+	[Export] public int MaxEnhancementLevel { get; set; } = 10;
+	
+	// Enchantments
+	[Export] public Enchantment[] Enchantments { get; set; } = new Enchantment[0];
+	[Export] public int EnchantmentSlots { get; set; } = 0;
+	
+	public int GetTotalStrength() => StrengthBonus * (1 + EnhancementLevel * 10 / 100);
+	public int GetTotalDexterity() => DexterityBonus * (1 + EnhancementLevel * 10 / 100);
+	// ... etc for other stats
+}
+
+public enum ItemType
+{
+	Weapon,
+	Armor,
+	Accessory,
+	Relic,
+	Consumable,
+	Material
+}
+
+public enum Rarity
+{
+	Common,
+	Uncommon,
+	Rare,
+	Epic,
+	Legendary
+}
+```
+
+### Workshop.cs (Idle System)
+```csharp
+using Godot;
+using System;
+using System.Collections.Generic;
+
+public partial class Workshop : Node
+{
+	private Queue<RefinementJob> _jobQueue = new Queue<RefinementJob>();
+	private RefinementJob _currentJob;
+	private DateTime _lastUpdateTime;
+	
+	[Export] public int MaxQueueSlots { get; set; } = 3;
+	[Export] public float RefinementSpeedMultiplier { get; set; } = 1.0f;
+	
+	[Signal]
+	public delegate void RefinementCompleteEventHandler(MaterialType material, int amount);
+	
+	public override void _Ready()
+	{
+		_lastUpdateTime = DateTime.Now;
+		LoadWorkshopState();
+		ProcessOfflineTime();
+	}
+	
+	public override void _Process(double delta)
+	{
+		if (_currentJob != null)
+		{
+			_currentJob.TimeRemaining -= (float)delta;
+			
+			if (_currentJob.TimeRemaining <= 0)
+			{
+				CompleteCurrentJob();
+				StartNextJob();
+			}
+		}
+		else if (_jobQueue.Count > 0)
+		{
+			StartNextJob();
+		}
+	}
+	
+	public bool AddRefinementJob(MaterialType rawMaterial, int amount)
+	{
+		if (_jobQueue.Count >= MaxQueueSlots)
+			return false;
+		
+		var job = new RefinementJob
+		{
+			RawMaterial = rawMaterial,
+			Amount = amount,
+			TimeRemaining = GetRefinementTime(rawMaterial) / RefinementSpeedMultiplier
+		};
+		
+		_jobQueue.Enqueue(job);
+		SaveWorkshopState();
+		return true;
+	}
+	
+	private void CompleteCurrentJob()
+	{
+		var refined = GetRefinedMaterial(_currentJob.RawMaterial);
+		GameManager.Instance.PlayerData.AddMaterial(refined, _currentJob.Amount);
+		EmitSignal(SignalName.RefinementComplete, (int)refined, _currentJob.Amount);
+		_currentJob = null;
+	}
+	
+	private void StartNextJob()
+	{
+		if (_jobQueue.Count > 0)
+		{
+			_currentJob = _jobQueue.Dequeue();
+			SaveWorkshopState();
+		}
+	}
+	
+	private void ProcessOfflineTime()
+	{
+		var offlineSeconds = (DateTime.Now - _lastUpdateTime).TotalSeconds;
+		
+		while (offlineSeconds > 0 && (_currentJob != null || _jobQueue.Count > 0))
+		{
+			if (_currentJob == null && _jobQueue.Count > 0)
+				StartNextJob();
+			
+			if (_currentJob != null)
+			{
+				if (offlineSeconds >= _currentJob.TimeRemaining)
+				{
+					offlineSeconds -= _currentJob.TimeRemaining;
+					CompleteCurrentJob();
+				}
+				else
+				{
+					_currentJob.TimeRemaining -= (float)offlineSeconds;
+					offlineSeconds = 0;
+				}
+			}
+		}
+		
+		_lastUpdateTime = DateTime.Now;
+		SaveWorkshopState();
+	}
+	
+	private float GetRefinementTime(MaterialType material)
+	{
+		return material switch
+		{
+			MaterialType.EssenceShard => 15 * 60f,  // 15 minutes
+			MaterialType.MonsterPart => 30 * 60f,   // 30 minutes
+			MaterialType.AncientFragment => 60 * 60f, // 60 minutes
+			_ => 60f
+		};
+	}
+	
+	private MaterialType GetRefinedMaterial(MaterialType raw)
+	{
+		return raw switch
+		{
+			MaterialType.EssenceShard => MaterialType.ConcentratedEssence,
+			MaterialType.MonsterPart => MaterialType.PurifiedExtract,
+			MaterialType.AncientFragment => MaterialType.RestoredRelic,
+			_ => raw
+		};
+	}
+	
+	private void SaveWorkshopState()
+	{
+		var saveData = new WorkshopSaveData
+		{
+			CurrentJob = _currentJob,
+			JobQueue = new List<RefinementJob>(_jobQueue),
+			LastUpdateTime = DateTime.Now
+		};
+		
+		GameManager.Instance.SaveManager.SaveWorkshopData(saveData);
+	}
+	
+	private void LoadWorkshopState()
+	{
+		var saveData = GameManager.Instance.SaveManager.LoadWorkshopData();
+		if (saveData != null)
+		{
+			_currentJob = saveData.CurrentJob;
+			_jobQueue = new Queue<RefinementJob>(saveData.JobQueue);
+			_lastUpdateTime = saveData.LastUpdateTime;
+		}
+	}
+}
+
+public class RefinementJob
+{
+	public MaterialType RawMaterial { get; set; }
+	public int Amount { get; set; }
+	public float TimeRemaining { get; set; }
+}
+
+public enum MaterialType
+{
+	// Raw Materials
+	EssenceShard,
+	MonsterPart,
+	AncientFragment,
+	
+	// Refined Materials
+	ConcentratedEssence,
+	PurifiedExtract,
+	RestoredRelic
+}
+```
+
+## Scene Tree Structure Example
+
+### Player.tscn Node Hierarchy
+```
+Player (CharacterBody2D)
+├── PlayerStats (Node) [PlayerStats.cs]
+├── PlayerMovement (Node) [PlayerMovement.cs]
+├── PlayerCombat (Node) [PlayerCombat.cs]
+├── PlayerInventory (Node) [PlayerInventory.cs]
+├── Health (Node) [Health.cs]
+├── SkillManager (Node) [SkillManager.cs]
+├── Sprite2D
+│   └── AnimationPlayer
+├── CollisionShape2D
+├── Camera2D
+└── SkillSlots (Node)
+	├── BasicAttack (Node)
+	├── SpecialAttack (Node)
+	├── QSkill (Node)
+	├── ESkill (Node)
+	└── RSkill (Node)
+```
+
+## Autoload (Singletons) Setup
+
+In Godot Project Settings → Autoload, add these:
+- GameManager (Scripts/Core/GameManager.cs)
+- SaveManager (Scripts/Core/SaveManager.cs)
+- AudioManager (Scripts/Core/AudioManager.cs)
+- SceneManager (Scripts/Core/SceneManager.cs)
+
+## Next Steps to Build
+
+1. **Set up the project** in Godot with C# support
+2. **Create the folder structure** as outlined above
+3. **Build core systems first**: GameManager, SaveManager, SceneManager
+4. **Implement player movement and basic combat**
+5. **Create one enemy type** and test spawning
+6. **Build the Hub scene** with basic UI
+7. **Implement Workshop idle system**
+8. **Add item/stat system**
+9. **Create level-up upgrade system**
+10. **Polish and balance**
