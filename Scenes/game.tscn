@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://6a6ovxmbcjd1"]
+
+[ext_resource type="Script" uid="uid://ije0l625j2w0" path="res://Scripts/Game.cs" id="1_wrm1d"]
+[ext_resource type="PackedScene" uid="uid://cvuvmrd8khk2g" path="res://Scenes/enemy.tscn" id="2_3dryh"]
+[ext_resource type="PackedScene" uid="uid://jb1p3bafbe1" path="res://Scenes/player.tscn" id="3_wowpa"]
+
+[node name="Game" type="Node" node_paths=PackedStringArray("Player")]
+script = ExtResource("1_wrm1d")
+EnemyScene = ExtResource("2_3dryh")
+Player = NodePath("Player")
+
+[node name="Player" parent="." instance=ExtResource("3_wowpa")]
+
+[node name="SpawnTimer" type="Timer" parent="."]
+wait_time = 2.0
+autostart = true
