@@ -3,33 +3,32 @@ using System;
 
 public partial class Enemy : CharacterBody2D
 {
-  [Export]
-  public float Speed = 200.0f;
+  // Stats
+  [Export] public float Speed = 200.0f;
+  [Export] public float MaxHealth = 100.0f;
+  [Export] public float Damage = 10.0f;
+  [Export] public float AttackCooldown = 1.0f;
 
-  [Export]
-  public float Health = 100.0f;
+  public float Health { get; private set; }
 
-  [Export]
-  public float Damage = 10.0f;
-
-  [Export]
-  public float AttackCooldown = 1.0f;
+  // Dependencies
+  private Player _player;
+  private Sprite2D _sprite;
 
   private float _timeSinceLastAttack = 0f;
 
-  private Node2D _player;
-
   public override void _Ready()
   {
-    // Get player from group
-    var players = GetTree().GetNodesInGroup("player");
-    if (players.Count > 0)
+    Health = MaxHealth;
+
+    _sprite = GetNode<Sprite2D>("Sprite2D");
+
+    // Find player via group (singleton pattern)
+    _player = GetTree().GetFirstNodeInGroup("player") as Player;
+
+    if (_player == null)
     {
-      _player = players[0] as Node2D;
-    }
-    else
-    {
-      GD.PrintErr("Enemy could not find Player! Make sure Player is in 'player' group.");
+      GD.PrintErr("Enemy: No player found! Ensure Player is in 'player' group.");
     }
   }
 
@@ -42,7 +41,7 @@ public partial class Enemy : CharacterBody2D
     // Rotation = direction.Angle();
     MoveAndSlide();
 
-        // Attack player on collision
+    // Attack player on collision
     _timeSinceLastAttack += (float)delta;
 
     if (_timeSinceLastAttack >= AttackCooldown)
@@ -67,20 +66,29 @@ public partial class Enemy : CharacterBody2D
 
     if (Health <= 0)
     {
-      QueueFree(); // Destroy enemy immediately
+      Die(); // Destroy enemy immediately
       return; // IMPORTANT: Exit before trying to flash
     }
 
-    // Only flash if still alive
-    var sprite = GetNode<Sprite2D>("Sprite2D");
-    sprite.Modulate = Colors.White;
-    GetTree().CreateTimer(0.1).Timeout += () =>
+    // Flash effect (only if alive)
+    if (_sprite != null && IsInstanceValid(_sprite))
     {
-      // Check if sprite still exists before trying to change color
-      if (IsInstanceValid(sprite))
+      _sprite.Modulate = Colors.White;
+      GetTree().CreateTimer(0.1).Timeout += () =>
       {
-        sprite.Modulate = Colors.Red;
-      }
-    };
+        if (IsInstanceValid(_sprite) && !IsQueuedForDeletion())
+        {
+          _sprite.Modulate = Colors.Red;
+        }
+      };
+    }
+  }
+
+  private void Die()
+  {
+    // TODO: Drop XP shards here
+    // TODO: Play death sound/effect
+
+    QueueFree();
   }
 }

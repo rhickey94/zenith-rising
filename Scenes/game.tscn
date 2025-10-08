@@ -1,9 +1,16 @@
-[gd_scene load_steps=10 format=3 uid="uid://6a6ovxmbcjd1"]
+[gd_scene load_steps=13 format=3 uid="uid://6a6ovxmbcjd1"]
 
 [ext_resource type="Script" uid="uid://ije0l625j2w0" path="res://Scripts/Game.cs" id="1_wrm1d"]
 [ext_resource type="PackedScene" uid="uid://cvuvmrd8khk2g" path="res://Scenes/enemy.tscn" id="2_3dryh"]
-[ext_resource type="PackedScene" uid="uid://jb1p3bafbe1" path="res://Scenes/player.tscn" id="3_wowpa"]
+[ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player.cs" id="3_wowpa"]
 [ext_resource type="Script" uid="uid://fwkhgpcy2am3" path="res://Scripts/Hud.cs" id="4_3dryh"]
+[ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/projectile.tscn" id="4_i6g32"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_sh265"]
+size = Vector2(50, 50)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
+size = Vector2(50, 50)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3gfia"]
 bg_color = Color(0.16470589, 0.16470589, 0.16470589, 1)
@@ -53,20 +60,35 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[node name="Game" type="Node" node_paths=PackedStringArray("Player")]
+[node name="Game" type="Node" node_paths=PackedStringArray("Player", "HUD")]
 script = ExtResource("1_wrm1d")
 EnemyScene = ExtResource("2_3dryh")
 Player = NodePath("Player")
+HUD = NodePath("UILayer/HUD")
 
-[node name="Player" parent="." node_paths=PackedStringArray("_hud") instance=ExtResource("3_wowpa")]
-_hud = NodePath("../HUD")
+[node name="Player" type="CharacterBody2D" parent="." groups=["player"]]
+script = ExtResource("3_wowpa")
+ProjectileScene = ExtResource("4_i6g32")
+
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
+modulate = Color(0.8070632, 0.64180166, 0.89619935, 1)
+position = Vector2(3, -1)
+texture = SubResource("PlaceholderTexture2D_sh265")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+position = Vector2(2, 0)
+shape = SubResource("RectangleShape2D_4flbx")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
 
 [node name="SpawnTimer" type="Timer" parent="."]
 wait_time = 2.0
 autostart = true
 
-[node name="HUD" type="Control" parent="."]
-z_index = 100
+[node name="UILayer" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="HUD" type="Control" parent="UILayer"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -75,7 +97,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("4_3dryh")
 
-[node name="TopLeft" type="VBoxContainer" parent="HUD"]
+[node name="TopLeft" type="VBoxContainer" parent="UILayer/HUD"]
 custom_minimum_size = Vector2(300, 20)
 layout_mode = 1
 offset_left = 20.0
@@ -83,12 +105,12 @@ offset_top = 20.0
 offset_right = 320.0
 offset_bottom = 66.0
 
-[node name="HealthLabel" type="Label" parent="HUD/TopLeft"]
+[node name="HealthLabel" type="Label" parent="UILayer/HUD/TopLeft"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Health"
 
-[node name="HealthBar" type="ProgressBar" parent="HUD/TopLeft"]
+[node name="HealthBar" type="ProgressBar" parent="UILayer/HUD/TopLeft"]
 custom_minimum_size = Vector2(250, 25)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_3gfia")
@@ -96,12 +118,12 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_e0onf")
 value = 75.0
 show_percentage = false
 
-[node name="Experience" type="Label" parent="HUD/TopLeft"]
+[node name="ExperienceLabel" type="Label" parent="UILayer/HUD/TopLeft"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Experience"
 
-[node name="ExperienceBar" type="ProgressBar" parent="HUD/TopLeft"]
+[node name="ExperienceBar" type="ProgressBar" parent="UILayer/HUD/TopLeft"]
 custom_minimum_size = Vector2(250, 20)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_fccik")
@@ -109,13 +131,13 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bjfho")
 value = 45.0
 show_percentage = false
 
-[node name="LevelLabel" type="Label" parent="HUD/TopLeft"]
+[node name="LevelLabel" type="Label" parent="UILayer/HUD/TopLeft"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.96198636, 0.96198624, 1)
 theme_override_font_sizes/font_size = 18
 text = "Level 1"
 
-[node name="TopRight" type="VBoxContainer" parent="HUD"]
+[node name="TopRight" type="VBoxContainer" parent="UILayer/HUD"]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 1
 anchors_preset = 1
@@ -128,63 +150,59 @@ offset_bottom = 144.0
 grow_horizontal = 0
 theme_override_constants/separation = 8
 
-[node name="GoldContainer" type="HBoxContainer" parent="HUD/TopRight"]
+[node name="GoldContainer" type="HBoxContainer" parent="UILayer/HUD/TopRight"]
 layout_mode = 2
 
-[node name="GoldLabel" type="Label" parent="HUD/TopRight/GoldContainer"]
+[node name="GoldLabel" type="Label" parent="UILayer/HUD/TopRight/GoldContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Gold: "
 
-[node name="GoldAmount" type="Label" parent="HUD/TopRight/GoldContainer"]
+[node name="GoldAmount" type="Label" parent="UILayer/HUD/TopRight/GoldContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 0.08235294, 1)
 theme_override_font_sizes/font_size = 20
-text = "0"
 
-[node name="EssenceContainer" type="HBoxContainer" parent="HUD/TopRight"]
+[node name="EssenceContainer" type="HBoxContainer" parent="UILayer/HUD/TopRight"]
 layout_mode = 2
 
-[node name="EssenceLabel" type="Label" parent="HUD/TopRight/EssenceContainer"]
+[node name="EssenceLabel" type="Label" parent="UILayer/HUD/TopRight/EssenceContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Essence: "
 
-[node name="EssenceAmount" type="Label" parent="HUD/TopRight/EssenceContainer"]
+[node name="EssenceAmount" type="Label" parent="UILayer/HUD/TopRight/EssenceContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.29411766, 1, 1)
 theme_override_font_sizes/font_size = 20
-text = "0"
 
-[node name="PartsContainer" type="HBoxContainer" parent="HUD/TopRight"]
+[node name="PartsContainer" type="HBoxContainer" parent="UILayer/HUD/TopRight"]
 layout_mode = 2
 
-[node name="PartsLabel" type="Label" parent="HUD/TopRight/PartsContainer"]
+[node name="PartsLabel" type="Label" parent="UILayer/HUD/TopRight/PartsContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Parts: "
 
-[node name="PartsAmount" type="Label" parent="HUD/TopRight/PartsContainer"]
+[node name="PartsAmount" type="Label" parent="UILayer/HUD/TopRight/PartsContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(5.7756904e-07, 0.45206803, 0.46423185, 1)
 theme_override_font_sizes/font_size = 20
-text = "0"
 
-[node name="FragmentsContainer" type="HBoxContainer" parent="HUD/TopRight"]
+[node name="FragmentsContainer" type="HBoxContainer" parent="UILayer/HUD/TopRight"]
 layout_mode = 2
 
-[node name="FragmentsLabel" type="Label" parent="HUD/TopRight/FragmentsContainer"]
+[node name="FragmentsLabel" type="Label" parent="UILayer/HUD/TopRight/FragmentsContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Fragments: "
 
-[node name="FragmentsAmount" type="Label" parent="HUD/TopRight/FragmentsContainer"]
+[node name="FragmentsAmount" type="Label" parent="UILayer/HUD/TopRight/FragmentsContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.50980395, 0.08235294, 1)
 theme_override_font_sizes/font_size = 20
-text = "0"
 
-[node name="FloorInfo" type="PanelContainer" parent="HUD"]
+[node name="FloorInfo" type="PanelContainer" parent="UILayer/HUD"]
 custom_minimum_size = Vector2(300, 50)
 layout_mode = 1
 anchors_preset = 5
@@ -197,17 +215,17 @@ offset_bottom = 60.0
 grow_horizontal = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_6fbih")
 
-[node name="FloorContent" type="VBoxContainer" parent="HUD/FloorInfo"]
+[node name="FloorContent" type="VBoxContainer" parent="UILayer/HUD/FloorInfo"]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="FloorTitle" type="Label" parent="HUD/FloorInfo/FloorContent"]
+[node name="FloorTitle" type="Label" parent="UILayer/HUD/FloorInfo/FloorContent"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.59925395, 0.050125547, 0.74111795, 1)
 text = "Floor 1: Initialization"
 horizontal_alignment = 1
 
-[node name="WaveLabel" type="Label" parent="HUD/FloorInfo/FloorContent"]
+[node name="WaveLabel" type="Label" parent="UILayer/HUD/FloorInfo/FloorContent"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Wave 1- 5 Enemies Remaining"
