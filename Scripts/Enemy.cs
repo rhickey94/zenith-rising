@@ -8,12 +8,16 @@ public partial class Enemy : CharacterBody2D
   [Export] public float MaxHealth = 100.0f;
   [Export] public float Damage = 10.0f;
   [Export] public float AttackCooldown = 1.0f;
+  [Export] public int ExperienceReward = 20;
+  [Export] public int ExperienceShardCount = 1;
 
   public float Health { get; private set; }
 
   // Dependencies
+  [Export] public PackedScene ExperienceShardScene;
   private Player _player;
   private Sprite2D _sprite;
+  
 
   private float _timeSinceLastAttack = 0f;
 
@@ -86,9 +90,22 @@ public partial class Enemy : CharacterBody2D
 
   private void Die()
   {
-    // TODO: Drop XP shards here
-    // TODO: Play death sound/effect
+    CallDeferred(MethodName.SpawnExperienceShards);
 
     QueueFree();
+  }
+
+  private void SpawnExperienceShards()
+  {
+        if (ExperienceShardScene != null && _player != null)
+    {
+      for (int i = 0; i < ExperienceShardCount; i++)
+      {
+        var shard = ExperienceShardScene.Instantiate<ExperienceShard>();
+        shard.Position = GlobalPosition + new Vector2(GD.Randf() * 20 - 10, GD.Randf() * 20 - 10);
+        shard.ExperienceValue = ExperienceReward / ExperienceShardCount;
+        GetTree().Root.CallDeferred(Node.MethodName.AddChild, shard);
+      }
+    }
   }
 }

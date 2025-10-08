@@ -1,10 +1,11 @@
-[gd_scene load_steps=13 format=3 uid="uid://6a6ovxmbcjd1"]
+[gd_scene load_steps=14 format=3 uid="uid://6a6ovxmbcjd1"]
 
 [ext_resource type="Script" uid="uid://ije0l625j2w0" path="res://Scripts/Game.cs" id="1_wrm1d"]
 [ext_resource type="PackedScene" uid="uid://cvuvmrd8khk2g" path="res://Scenes/enemy.tscn" id="2_3dryh"]
 [ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player.cs" id="3_wowpa"]
 [ext_resource type="Script" uid="uid://fwkhgpcy2am3" path="res://Scripts/Hud.cs" id="4_3dryh"]
 [ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/projectile.tscn" id="4_i6g32"]
+[ext_resource type="PackedScene" uid="uid://fr50f27cq0cp" path="res://Scenes/level_up_panel.tscn" id="6_i6g32"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_sh265"]
 size = Vector2(50, 50)
@@ -66,9 +67,10 @@ EnemyScene = ExtResource("2_3dryh")
 Player = NodePath("Player")
 HUD = NodePath("UILayer/HUD")
 
-[node name="Player" type="CharacterBody2D" parent="." groups=["player"]]
+[node name="Player" type="CharacterBody2D" parent="." node_paths=PackedStringArray("LevelUpPanel") groups=["player"]]
 script = ExtResource("3_wowpa")
 ProjectileScene = ExtResource("4_i6g32")
+LevelUpPanel = NodePath("../UILayer/LevelUpPanel")
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
 modulate = Color(0.8070632, 0.64180166, 0.89619935, 1)
@@ -230,3 +232,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Wave 1- 5 Enemies Remaining"
 horizontal_alignment = 1
+
+[node name="LevelUpPanel" parent="UILayer" instance=ExtResource("6_i6g32")]
+process_mode = 3
