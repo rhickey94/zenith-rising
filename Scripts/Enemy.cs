@@ -9,6 +9,14 @@ public partial class Enemy : CharacterBody2D
   [Export]
   public float Health = 100.0f;
 
+  [Export]
+  public float Damage = 10.0f;
+
+  [Export]
+  public float AttackCooldown = 1.0f;
+
+  private float _timeSinceLastAttack = 0f;
+
   private Node2D _player;
 
   public override void _Ready()
@@ -33,6 +41,24 @@ public partial class Enemy : CharacterBody2D
     Velocity = direction * Speed;
     // Rotation = direction.Angle();
     MoveAndSlide();
+
+        // Attack player on collision
+    _timeSinceLastAttack += (float)delta;
+
+    if (_timeSinceLastAttack >= AttackCooldown)
+    {
+      // Check if touching player
+      for (int i = 0; i < GetSlideCollisionCount(); i++)
+      {
+        var collision = GetSlideCollision(i);
+        if (collision.GetCollider() is Player player)
+        {
+          player.TakeDamage(Damage);
+          _timeSinceLastAttack = 0f;
+          break;
+        }
+      }
+    }
   }
 
   public void TakeDamage(float damage)
