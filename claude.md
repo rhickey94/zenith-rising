@@ -4,10 +4,11 @@
 A sci-fi roguelite action-RPG with idle/incremental mechanics built in Godot 4.x with C#. Players fight through tower floors in active combat sessions while idle systems process materials and generate resources between play sessions.
 
 ## Core Design Philosophy
-- **Active play = power gains** (levels, gear, combat strength)
+- **Active play = power gains** (levels, gear, combat strength, skill mastery)
 - **Idle time = efficiency gains** (material refinement, resource generation, unlock systems)
 - **Idle enhances, never replaces** active gameplay
 - Players progress meaningfully in both 15-minute sessions and 2-hour grinds
+- Every run contributes to permanent progression (no wasted time)
 
 ## Current Status
 **Phase:** Early Development (MVP - ~30% complete)
@@ -32,6 +33,8 @@ A sci-fi roguelite action-RPG with idle/incremental mechanics built in Godot 4.x
 - Gear/equipment system
 - Save system
 - Polish (sound, particles, screen shake)
+- Skill mastery system
+- Endgame infinite floors
 
 ## MVP Requirements
 
@@ -66,12 +69,12 @@ A sci-fi roguelite action-RPG with idle/incremental mechanics built in Godot 4.x
 - Max level per run: 20 (prevents infinite scaling)
 - Level resets to 1 each new run
 - Character Level (Permanent): Separate from in-run leveling
-- Gain 1 character level per floor boss defeated
+- Gain character XP from all activities (not just boss kills)
 - Each character level: +3 stat points to distribute
-- Character level cap: 50 (for MVP, expandable later)
+- Character level cap: 200 (extended from 50 for longer progression)
 
 **Save System:**
-- Persists: Character level and stat distribution, all collected gear and materials (in stash), Workshop queue and timers (continues offline), Treasury accumulation and timer, highest floor reached, skill unlocks
+- Persists: Character level and stat distribution, all collected gear and materials (in stash), Workshop queue and timers (continues offline), Treasury accumulation and timer, highest floor reached, skill unlocks and mastery progress, Ascension XP and levels
 - Resets: In-run level (back to 1), in-run upgrades (chosen fresh each run), floor position (always restart from Floor 1 or highest unlocked)
 
 ### Core Loop Validation Checklist
@@ -83,33 +86,24 @@ Before launch, players should be able to:
 - [ ] Understand what each material is used for
 - [ ] Know exactly what they're working toward next
 - [ ] Die and not feel like they wasted their time (kept XP and some loot)
+- [ ] See clear skill mastery progression from active play
+- [ ] Have aspirational content to work toward (infinite floors)
 
 ### What We're Explicitly NOT Building Yet
 **Save for Post-MVP:**
-- Skill synergies/combos (great idea, but adds complexity)
-- Research Lab (defined but not implemented)
-- Training Ground (defined but not implemented)
 - More than 3 classes
-- More than 5 floors
 - PvP or multiplayer
-- Prestige/New Game+ systems
 - Seasonal content
-- Cosmetics system
+- Cosmetics system (save for retention updates)
 - Advanced enchantments beyond stat boosts
-
-**Why Wait:**
-- Validate the core loop first
-- Get player feedback on what they want more of
-- Avoid scope creep killing the project
-- Ship a tight, polished experience rather than bloated half-baked one
 
 ### The MVP Test: "Can You Play It for 10 Hours?"
 **Hour 1:** Tutorial, first run, unlock Workshop
 **Hour 2-3:** Learning enemy patterns, upgrading first gear pieces
-**Hour 4-5:** Experimenting with skill loadouts, reaching Floor 3
-**Hour 6-7:** Farming for specific gear drops, enhancing to +5
+**Hour 4-5:** Experimenting with skill loadouts, reaching Floor 3, seeing skill mastery grow
+**Hour 6-7:** Farming for specific gear drops, enhancing to +5, mastering first skill
 **Hour 8-9:** Pushing to Floor 5 boss, min-maxing build
-**Hour 10:** Beat Floor 5, feel accomplished, excited for more content
+**Hour 10:** Beat Floor 5, unlock infinite floors, excited for endgame
 
 **If players are still engaged at Hour 10:** The core loop works. Ship it and expand.
 **If players are bored by Hour 5:** The loop is broken. Fix before adding features.
@@ -123,6 +117,7 @@ Before launch, players should be able to:
 - **Version Control:** Git + GitHub
 
 ## Project Structure
+```
 TowerAscension/
 ├── Scenes/
 │   ├── Game.tscn (main game scene)
@@ -142,9 +137,10 @@ TowerAscension/
 │   ├── Game.cs
 │   └── UpgradeResource.cs
 └── Assets/
-├── Sprites/
-├── Audio/
-└── Fonts/
+    ├── Sprites/
+    ├── Audio/
+    └── Fonts/
+```
 
 ## Core Systems
 
@@ -163,7 +159,7 @@ All scaling derives from these base stats:
 
 **Stat Growth:**
 - Gain +3 stat points per character level (distribute freely)
-- Training Ground can provide permanent +1 to specific stats (expensive long-term investment)
+- Ascension system provides percentage bonuses to stats
 - Gear provides bonus stats
 
 ### Combat System
@@ -189,13 +185,13 @@ Uses Godot Resources (`UpgradeResource`) for serialization support.
 **Level-Up Flow:**
 1. XP bar fills → Player levels up
 2. Game pauses (GetTree().Paused = true)
-3. Show 3 random upgrades from pool
+3. Show 3 random upgrades from pool (prioritizes equipped skill enhancements)
 4. Player selects one
 5. Upgrade applied immediately
 6. Game resumes
 
-### Ability System (Planned)
-**Hybrid Approach:** Permanent Abilities (Customizable Foundation) + Random Upgrades (Run Variety)
+### Skill System (Reworked)
+**Core Concept:** Skills are mastered through use, not time-gated. Every skill use contributes to permanent progression.
 
 **Core Combat Structure (Always Available):**
 - **Left Click:** Basic Attack (auto-aims at nearest enemy)
@@ -222,64 +218,42 @@ Before each run, equip 3 Active Skills from your unlocked pool:
 2. **E Key** - Utility/Defensive Skill
 3. **R Key** - Ultimate Skill (long cooldown)
 
-**How You Unlock Skills:**
-- Start with 2-3 basic skills per slot unlocked
-- Research Lab unlocks new skills by studying monsters
-- Training Ground can unlock skills with training points
-- Floor bosses drop skill unlock tokens
+**Skill Mastery System (NEW):**
+Each skill tracks its own usage and has mastery levels based on enemies killed with that skill:
 
-**Example Warrior Skill Pool:**
-- **Q Options:** Whirlwind, Charge, Ground Slam, Cleave
-- **E Options:** Iron Skin, War Cry, Bloodlust, Parry
-- **R Options:** Earthquake, Berserker Rage, Execute, Fortress
+```
+Example: Whirlwind Mastery Progress
+├── Bronze (0/100 kills): Base skill unlocked
+├── Silver (0/500 kills): +50% damage, +2 sec duration
+├── Gold (0/2000 kills): Pulls enemies, +100% damage
+└── Diamond (0/10000 kills): Creates fire tornado, chains to nearby enemies
 
-**Skill Progression:**
-Each skill has 3 levels:
-- Level 1: Unlocked (base version)
-- Level 2: Enhanced (better numbers, costs 5 training points)
-- Level 3: Mastered (adds extra effect, costs 15 training points)
+Current: 347/500 kills to Silver ⚔️
+```
 
-**Example Skill Progression:**
-- **Whirlwind (Q)**
-  - Lv1: Spin for 3 seconds, dealing damage around you
-  - Lv2: Spin for 5 seconds, +50% damage
-  - Lv3: Enemies hit are pulled toward you
+**How Skills Progress:**
+- Every enemy killed with a skill grants mastery XP
+- Mastery is permanent and never lost
+- Visual feedback in HUD shows progress
+- Skills visibly transform at mastery milestones
+- In-run upgrades now specifically enhance YOUR equipped skills
 
-**In-Run Progression (Level-Up Upgrades):**
-Every level-up during a run, choose 1 of 3 random upgrades:
+**How You Unlock New Skills:**
+- Start with 2 basic skills per slot unlocked
+- Floor bosses drop skill unlock tokens (guaranteed)
+- Research Lab unlocks skills by studying specific monsters
+- Rare elite drops can contain skill scrolls
 
-1. **Skill Modifiers** (40% chance)
-   - Reduce cooldowns on equipped skills
-   - Add effects: "Q skill now burns enemies"
-   - Increase damage/duration/area
-   - Stack multiple times per run
-
-2. **Passive Bonuses** (40% chance)
-   - +15% movement speed
-   - +20% attack speed
-   - +10% critical chance
-   - Gain a damage aura
-   - Projectiles pierce enemies
-   - Life steal on attacks
-
-3. **Stat Boosts** (20% chance)
-   - +5 to a specific stat (temporary for this run)
-   - +15% to all stats
-   - +50 max HP
-
-**Example Run Progression:**
-- Start: Basic Attack, Special (Fireball), Q (Whirlwind), E (Iron Skin), R (Berserker Rage)
-- Level 2: Choose "+20% Fireball damage"
-- Level 4: Choose "Whirlwind pulls enemies"
-- Level 6: Choose "+15% attack speed"
-- Level 8: Choose "Fireball chains to nearby enemies"
-- Level 10: Choose "+10 Strength"
-- End result: Your Fireball is now a chaining nuke, your Whirlwind is a crowd control monster
+**In-Run Skill Synergies:**
+Level-up choices now prioritize YOUR equipped skills:
+- "Whirlwind Mastery" - Your Whirlwind gains +2 projectiles (only appears if you have Whirlwind)
+- "Skill Combo" - Using Q→E→R in sequence triggers explosion
+- "Cooldown Sync" - All skills refresh when you get 10 kills
 
 **Skill Unlock Pace:**
 - Early Game (Floors 1-3): 2 skills per slot unlocked (6 total choices)
 - Mid Game (Floors 4-7): 4 skills per slot unlocked (12 total)
-- Late Game (Floors 8-12): 6+ skills per slot (18+ total)
+- Late Game (Floors 8+): 6+ skills per slot (18+ total)
 
 ### Enemy System
 **Current Implementation:**
@@ -308,13 +282,15 @@ Every level-up during a run, choose 1 of 3 random upgrades:
 - **Catalyst Fragments:** Drop from floor bosses only (100%, 1-2 per boss)
 - **Gear:** Drop from elites (10% chance) and bosses (100%, higher rarity)
 - **Gold:** Drop from all enemies (50% chance, 5-20 gold)
+- **Skill Scrolls:** Rare drop from elites (2% chance)
 
 **Visual Clarity:**
 - Materials: Small colored particles (blue = Energy Cores, red = Modification Components, gold = Catalyst Fragments)
 - Gear: Big glowing item on ground with rarity color (white/green/blue/purple/orange)
+- Skill Scrolls: Glowing purple orbs with skill icon
 - Auto-pickup radius: Small at start, upgradeable
 
-## Planned Systems (Not Yet Implemented)
+## Planned Systems
 
 ### Material Economy
 **Core Philosophy:** Items drop from combat (you never craft gear), but you enhance them using materials. Simple 3-material system with clear, distinct purposes.
@@ -347,14 +323,6 @@ Every level-up during a run, choose 1 of 3 random upgrades:
      - Perfect catalysts = Guaranteed max roll synergies
    - **Clear purpose:** Tie gear into your specific build/playstyle
 
-**Why This Works:**
-- Active players: Use raw materials immediately with RNG outcomes
-- Idle players: Refine materials while away for guaranteed/better outcomes
-- Simple to understand: Only 3 materials, each with one clear purpose
-- Deep optimization: Choosing mods and synergies creates build variety
-- Idle enhances active: Refined materials are better, not different
-- No bloat: No confusing web of 15+ crafting materials
-
 ### Idle Systems
 
 **Workshop (Material Refinement):**
@@ -369,70 +337,44 @@ Every level-up during a run, choose 1 of 3 random upgrades:
 - Gold used for: respec, consumables, salvaging, rushing
 
 **Gold's Clear Purposes:**
-1. **Respeccing (Player Agency):** Cost 100 gold × character level, completely reset skill choices
-2. **Consumables (Active Play Support):** Health Potions (50g), Damage Buffs (100g), XP Boost (150g)
-3. **Salvaging (Resource Conversion):** Sell unwanted gear for gold, get 50% of enhancement investment back
-4. **Workshop Rushing (Convenience):** 10 gold per minute remaining on refining timer
-5. **Base Upgrades (Long-term Sinks):** Unlock facility upgrades (costs scale: 500 → 2000 → 5000 gold)
+1. **Respeccing (Player Agency):** Cost 100 gold × character level, completely reset stat points
+2. **Skill Reset:** Cost 500 gold, reset all skill mastery to redistribute
+3. **Consumables (Active Play Support):** Health Potions (50g), Damage Buffs (100g), XP Boost (150g)
+4. **Salvaging (Resource Conversion):** Sell unwanted gear for gold, get 50% of enhancement investment back
+5. **Workshop Rushing (Convenience):** 10 gold per minute remaining on refining timer
+6. **Base Upgrades (Long-term Sinks):** Unlock facility upgrades (costs scale: 500 → 2000 → 5000 gold)
 
-**Treasury Upgrades:**
-- Increase generation rate (+20% per level)
-- Increase cap duration (8h → 12h → 16h)
-- Unlock "interest" mechanic (unspent gold gains 5% per day, max 1000)
-
-**Research Lab (Phase 2):**
+**Research Lab (Phase 2, Reworked for Mastery):**
 - Automatically studies monsters you've killed (tracks kill count)
 - Each monster type has research tiers (10 kills, 50 kills, 200 kills)
 - Research progresses while idle (1 tier per 2 hours of offline time)
-- Can only research monsters you've personally killed
 
-**Research Benefits:**
-- Tier 1: +5% drop rate from that monster
-- Tier 2: Unlock a new skill related to that monster type
-- Tier 3: Bonus damage vs that monster type
+**Research Benefits (Reworked for Mastery, Not Power):**
+- Tier 1: Monster weak points glow (easier critical hits)
+- Tier 2: See attack telegraphs 0.5 seconds earlier
+- Tier 3: Unlock monster-specific skill variant
 
-**Research Lab Upgrades:**
-- Research multiple monsters simultaneously
-- Faster research speed
-- Unlock "monster essence" drops for special crafting
+**Training Ground (Phase 2, Reworked):**
+- Generates 1 Quality of Life Token per day (max 7)
+- Spend tokens on permanent QoL improvements:
+  - **Quick Start:** Begin runs at level 2/3/4 (costs 3/5/7 tokens)
+  - **Smart Loot:** Items drop weighted toward your build (5 tokens)
+  - **Skill XP Boost:** Next run has 2x skill mastery gain (1 token)
+  - **Extended Floors:** Boss timer increased by 30 seconds (3 tokens)
 
-**Training Ground (Phase 2):**
-- Accumulates 1 Training Point per hour (max 24 points, then stops)
-- Spend Training Points on permanent efficiency bonuses
-- Doesn't increase combat stats directly, makes active play MORE rewarding
-
-**Training Options:**
-- **Loot Luck:** +2% rare drop chance per point (max 10 points)
-- **Experience Boost:** +5% XP gain per point (max 10 points)
-- **Material Yield:** +10% extra materials from drops per point (max 5 points)
-- **Starting Power:** Begin runs at level 2/3/4 (costs 5/10/15 points)
-- **Skill Leveling:** Upgrade skills to Level 2 (5 points) or Level 3 (15 points)
-
-### Gear System (Planned)
+### Gear System
 **4 Equipment Slots:**
 1. Weapon (primary stat + damage)
 2. Armor (defense + secondary stats)
 3. Accessory (pure stat bonuses)
 4. Relic (unique build-defining properties)
 
-**Gear Properties:**
-- **Rarity:** Common → Uncommon → Rare → Epic → Legendary (determines base stats)
-- **Power Level:** 0-10 (each level adds +10% to all base stats)
-- **Modification Slot:** One active special property (can be replaced)
-- **Synergy Slot:** One build-defining bonus (requires rare materials)
-
 **How Gear Enhancement Works:**
 Each piece of equipment has 4 layers:
 1. **Base Stats** (fixed on drop, determined by rarity)
 2. **Power Level** (0-10, upgraded with Energy Cores)
-   - Each level adds +10% to all base stats
-   - Max level 10 = +100% stats (doubles item power)
 3. **Modification** (one active special property, added with Modification Components)
-   - Examples: "Attacks pierce", "20% life steal", "+50% crit damage"
-   - Can be replaced/rerolled
 4. **Synergy** (one build-defining bonus, added with Catalyst Fragments)
-   - Examples: "+30% damage if DEX > 50", "+40% effect after using dash"
-   - Ties gear into specific build/playstyle
 
 **Enhancement Example:**
 ```
@@ -444,85 +386,18 @@ Plasma Rifle (Epic)
 └─ Synergy: "+25% damage when above 80% health"
 ```
 
-**Key Design Principles:**
-- Gear DROPS from combat (never crafted)
-- Materials ENHANCE dropped gear
-- Power Level = linear strength progression
-- Modifications = behavioral customization
-- Synergies = build identity
+### Ascension System (Post-MVP Phase 2)
+**Purpose:** Infinite progression system providing permanent character power independent of gear
 
-### The Hub: Your Base (Planned)
+**How It Works:**
+- **Ascension XP:** Earned from EVERY enemy kill, boss defeat, and floor clear
+- **Never Lost:** Accumulates permanently across all runs, even deaths
+- **Uncapped:** Infinite levels with exponential XP requirements
 
-**Layout (Simple to Start):**
-**Central Plaza:** Quick access to all facilities
-- **Blacksmith:** Upgrade equipment with refined materials
-- **Merchant:** Buy consumables and basic gear with gold
-- **Class Selector:** Change class, view stats
-- **Portal:** Enter the tower (start a run)
-
-**Facility Wings:**
-- **Workshop** (left): Shows crafting queue, material storage
-- **Treasury** (right): Displays gold generation, collection button
-- **Research Lab** (back left): Monster codex, active research
-- **Training Ground** (back right): Spend training points, view efficiency stats
-
-**Progression Gates:**
-- Start: Only Workshop and basic Blacksmith available
-- Floor 2 cleared: Treasury unlocked
-- Floor 3 cleared: Research Lab unlocked (Phase 2 feature)
-- Floor 4 cleared: Training Ground unlocked (Phase 2 feature)
-- Floor 5 cleared: "You beat MVP!" celebration
-
-**Visual Feedback:**
-- Facilities glow when they have something ready to collect
-- Progress bars show idle timers
-- Notifications appear when you open the game: "Workshop completed 3 items!" "Treasury full: 1,450 gold!"
-
-### Progression Flow Example
-
-**Day 1 - New Player:**
-1. Tutorial run on Floor 1, learn combat basics
-2. Extract with basic loot and materials
-3. Unlock Workshop and Treasury
-4. Deposit materials in Workshop (start first refinement)
-5. Close game
-
-**Day 2 - Return:**
-1. Collect refined materials and 200 gold from idle earnings
-2. Use materials to upgrade weapon at Blacksmith (+10% damage)
-3. Run Floor 1 again, feels stronger, push to Floor 2
-4. Defeat Floor 2 boss, extract with better loot
-5. Unlock Research Lab
-6. Set Lab to study skeletons, deposit new materials in Workshop
-7. Close game
-
-**Day 3-7 - Early Loop:**
-- Daily check-ins to collect idle progress
-- Use refined materials to steadily upgrade gear
-- Push to higher floors (unlock Treasury bonuses)
-- Complete monster research (unlock new skills)
-- Accumulate training points (invest in Loot Luck)
-
-**Week 2+ - Established Loop:**
-- Strong enough to farm Floor 5-7 efficiently
-- Workshop constantly refining materials for next upgrades
-- Research Lab cycling through monster types
-- Training Ground bonuses making runs more efficient
-- Can choose to grind actively for hours OR check in daily
-- Both playstyles progress meaningfully
-
-Ascension System (Post-MVP Phase 2)
-Purpose: Infinite progression system providing permanent character power independent of gear
-How It Works:
-
-Ascension XP: Earned from EVERY enemy kill, boss defeat, and floor clear (separate from character XP)
-Never Lost: Accumulates permanently across all runs, even deaths
-Uncapped: Infinite levels with exponential XP requirements
-
-Ascension Levels Grant:
-
+**Ascension Levels Grant:**
 +1 Ascension Point per level to spend in three trees:
 
+```
 Power Tree (Raw Stats):
 ├── Might: +2% physical damage per point
 ├── Focus: +2% magical damage per point
@@ -540,56 +415,124 @@ Utility Tree (Unique Effects):
 ├── Execution: +2% instant-kill chance on enemies below 20% HP
 ├── Momentum: +1% damage for each enemy killed recently (cap 50%)
 └── Resonance: +3% to trigger equipment effects twice
-Why This Complements Your Systems:
+```
 
-Bad Luck Protection: Even with poor gear drops, you're always getting stronger
-Long-term Goal: Something to work toward after hitting level 50 cap
-Synergizes with Gear: Ascension % bonuses multiply with gear stats
-Respects Time: Every enemy killed matters, even in failed runs
-Clear from Idle: Ascension is ONLY from active play (combat), while idle helps with gear
+### Endgame: Infinite Tower Scaling
+**Unlocked after beating Floor 5:**
 
-How It Ties Into Your Game Loop
-Example Progression Path:
-Week 1:
+**Ascension Floors (6+):**
+- Each floor is 20% harder than the previous
+- No floor cap - push as high as you can
+- Ascension becomes necessary to progress
+- Special rewards every 5 floors:
+  - Floor 10: Exclusive cosmetic set
+  - Floor 15: Title: "Tower Climber"
+  - Floor 20: Unique modification type
+  - Floor 25: Legendary relic blueprint
+  - Every 5 floors: Prestige points for leaderboard
 
-Focus on Character Levels (1-50)
-Start accumulating Ascension XP passively
-Maybe gain 5-10 Ascension Levels just from playing
+**Corruption System (Floors 1-5 Replayability):**
+After beating a floor, can replay with Corruption levels 1-10:
+- Each Corruption level: +50% enemy stats, +50% rewards
+- Corruption modifiers add challenge:
+  - Level 1: "Enemies explode on death"
+  - Level 3: "No health drops"
+  - Level 5: "Elite spawn rate doubled"
+  - Level 7: "Skills cost health"
+  - Level 10: "One hit kills you"
 
-Week 2-4:
+**Weekly Tower Events:**
+- "Speed Week": Clear floors 25% faster for bonus rewards
+- "Swarm Week": Double enemies, double XP
+- "Elite Week": All enemies are elite tier
+- Global leaderboard resets weekly
 
-Hit Character Level cap (50)
-Ascension becomes primary progression
-Use Ascension Points to complement your build
-"I'm a Ranger, so I'll invest in Agility and Multishot"
+### Retention Systems
 
-Month 2+:
+**Daily Missions:**
+- "Kill 100 enemies" → 50 Energy Cores
+- "Use skills 50 times" → Skill XP boost (2 hours)
+- "Clear any floor" → 100 gold
 
-Ascension Level 50+ with specialized build
-Research Lab unlocking monster bonuses
-Training Ground providing QoL improvements
-Perfect gear with max Power Levels
-Still gaining Ascension XP for that next point
+**Weekly Challenges:**
+- "Reach Floor 5" → Legendary gear box
+- "Master any skill to Silver" → Catalyst Fragment x3
+- "Clear Corruption 5+ on any floor" → Exclusive modification
 
-Implementation Priority
-Based on your current documentation, I'd suggest:
+**Collection Goals:**
+- Gear Sets: Collect all pieces for set bonuses
+- Monster Codex: 100% completion unlocks special title
+- Skill Mastery: Master all skills to Diamond for prestige cosmetic
 
-Keep Ascension in Phase 2 (Post-MVP) along with Research Lab and Training Ground
-For MVP: Character Levels + Gear is enough progression
-Add Ascension when: Players start hitting level cap in testing
+**Leaderboards:**
+- Highest Ascension Floor reached
+- Fastest Floor 5 clear time
+- Total Ascension Level
+- Weekly event rankings
 
-This way you can launch with a tight experience and add Ascension as the "endgame update" that keeps players engaged long-term.
-The Complete Power Ecosystem
-With Ascension added, your power systems would be:
+### The Hub: Your Base
 
-Gear (RNG/Crafting) - Your equipment and how you enhance it
-Character Level (Limited) - Your base stat foundation
-Ascension (Infinite) - Your permanent account-wide progression
-In-Run Upgrades (Temporary) - Run variety and excitement
-Research Lab (Knowledge) - Make you better at playing
-Training Ground (Efficiency) - Make your time more valuable
+**Layout (Simple to Start):**
+**Central Plaza:** Quick access to all facilities
+- **Blacksmith:** Upgrade equipment with refined materials
+- **Merchant:** Buy consumables and basic gear with gold
+- **Class Selector:** Change class, view stats, see skill mastery
+- **Portal:** Enter the tower (start a run)
+- **Leaderboard:** Check rankings and weekly events
 
-Each system has a clear role and they all complement rather than compete with each other!
+**Facility Wings:**
+- **Workshop** (left): Shows crafting queue, material storage
+- **Treasury** (right): Displays gold generation, collection button
+- **Research Lab** (back left): Monster codex, active research
+- **Training Ground** (back right): Spend QoL tokens, view benefits
+
+**Progression Gates:**
+- Start: Only Workshop and basic Blacksmith available
+- Floor 2 cleared: Treasury unlocked
+- Floor 3 cleared: Research Lab unlocked
+- Floor 4 cleared: Training Ground unlocked
+- Floor 5 cleared: Infinite Ascension Floors unlocked
+- Floor 10 reached: Prestige shop unlocked
+
+### Progression Flow Example
+
+**Day 1 - New Player:**
+1. Tutorial run on Floor 1, learn combat basics
+2. Extract with basic loot and materials
+3. Unlock Workshop and Treasury
+4. Deposit materials in Workshop (start first refinement)
+5. Close game
+
+**Day 2 - Return:**
+1. Collect refined materials and 200 gold from idle earnings
+2. Use materials to upgrade weapon at Blacksmith (+10% damage)
+3. Run Floor 1 again, feels stronger, push to Floor 2
+4. Defeat Floor 2 boss, extract with better loot
+5. Notice Whirlwind skill progress: 23/100 kills
+6. Close game
+
+**Day 3-7 - Early Loop:**
+- Daily check-ins to collect idle progress
+- Use refined materials to steadily upgrade gear
+- Push to higher floors (unlock new facilities)
+- See skills gradually mastering through use
+- Complete daily missions for extra resources
+
+**Week 2+ - Established Loop:**
+- Character level approaching 50+
+- Multiple skills at Silver mastery tier
+- Farming Floor 5 for Catalyst Fragments
+- Workshop constantly refining materials
+- Starting to eye Corruption levels for extra challenge
+- Can choose to grind actively for hours OR check in daily
+
+**Month 2+ - Endgame:**
+- Character level 150+, Ascension level 30+
+- Pushing Floor 15+ in Ascension Tower
+- Several skills at Diamond mastery
+- Competing on weekly leaderboards
+- Perfect gear with synergies tailored to build
+- Still finding new skill combinations to master
 
 ## Godot-Specific Patterns
 
@@ -626,15 +569,22 @@ Godot C# signals can only pass:
 
 // Right - Resource can be passed
 [Signal] public delegate void MySignalEventHandler(CustomResource data);
-Scene Instancing Pattern
-csharp[Export] public PackedScene EnemyScene; // Drag in editor
+```
+
+### Scene Instancing Pattern
+```csharp
+[Export] public PackedScene EnemyScene; // Drag in editor
 
 var enemy = EnemyScene.Instantiate<Enemy>();
 enemy.GlobalPosition = spawnPos;
 AddChild(enemy); // Or GetTree().Root.AddChild(enemy) for persistence
-Architecture Patterns
-Singleton Pattern (Game Managers)
-csharppublic partial class GameManager : Node
+```
+
+### Architecture Patterns
+
+**Singleton Pattern (Game Managers)**
+```csharp
+public partial class GameManager : Node
 {
     public static GameManager Instance { get; private set; }
     
@@ -648,99 +598,99 @@ csharppublic partial class GameManager : Node
         Instance = this;
     }
 }
+```
 Add to Project Settings → Autoload for true singletons.
-Component Pattern (Player)
-Player has separate component scripts for different concerns:
 
-Movement logic
-Combat logic
-Inventory management
-Stats calculation
+**Component Pattern (Player)**
+Player has separate component scripts for different concerns:
+- Movement logic
+- Combat logic
+- Inventory management
+- Stats calculation
 Helps keep code modular and testable.
 
-Factory Pattern (Spawning)
+**Factory Pattern (Spawning)**
 Game.cs acts as spawn manager:
-csharppublic Enemy SpawnEnemy(Vector2 position)
+```csharp
+public Enemy SpawnEnemy(Vector2 position)
 {
     var enemy = EnemyScene.Instantiate<Enemy>();
     enemy.GlobalPosition = position;
     AddChild(enemy);
     return enemy;
 }
-UI Design Guidelines
-Color Palette (Metallic Sci-Fi)
+```
 
-Primary: Steel Blue (#4a90e2)
-Secondary: Muted Purple (#9b59b6)
-Backgrounds: Slate grays with depth
-Accents: Subtle glows, no harsh neon
-Fonts: Clean sans-serif (Segoe UI style)
+### UI Design Guidelines
 
-HUD Structure
+**Color Palette (Metallic Sci-Fi)**
+- Primary: Steel Blue (#4a90e2)
+- Secondary: Muted Purple (#9b59b6)
+- Backgrounds: Slate grays with depth
+- Accents: Subtle glows, no harsh neon
+- Fonts: Clean sans-serif (Segoe UI style)
 
-Canvas Layer (layer 100): Keeps UI on screen
-Follow Viewport: Must be FALSE for screen-space UI
-Full Rect anchors: UI Control at (0,0)-(1,1) with offset 0
-TopLeft: Health/XP bars, level badge, primary stats
-TopRight: Resource counters (gold, materials)
-TopCenter: Floor info, wave counter
-Bottom: Skills bar (not yet implemented)
+**HUD Structure**
+- Canvas Layer (layer 100): Keeps UI on screen
+- Follow Viewport: Must be FALSE for screen-space UI
+- Full Rect anchors: UI Control at (0,0)-(1,1) with offset 0
+- TopLeft: Health/XP bars, level badge, primary stats
+- TopRight: Resource counters (gold, materials)
+- TopCenter: Floor info, wave counter
+- Bottom: Skills bar with mastery progress
 
-UI Elements
+**UI Elements**
+- Semi-transparent dark panels (rgba with alpha ~0.95)
+- Border: 2px steel blue (#4a90e2)
+- Corner radius: 8px for panels, 4px for bars
+- Progress bars: Custom StyleBoxFlat with gradient fills
 
-Semi-transparent dark panels (rgba with alpha ~0.95)
-Border: 2px steel blue (#4a90e2)
-Corner radius: 8px for panels, 4px for bars
-Progress bars: Custom StyleBoxFlat with gradient fills
+### Development Workflow
 
-Development Workflow
-Daily Session Structure (2 hours)
+**Daily Session Structure (2 hours)**
+- Hour 1: Build one specific feature
+  - 50 min: Code implementation
+  - 10 min: Test
+- Hour 2: Iterate and polish
+  - 30 min: Fix bugs from yesterday
+  - 20 min: Playtest current build
+  - 10 min: Plan tomorrow's task
 
-Hour 1: Build one specific feature
-
-50 min: Code implementation
-10 min: Test
-
-
-Hour 2: Iterate and polish
-
-30 min: Fix bugs from yesterday
-20 min: Playtest current build
-10 min: Plan tomorrow's task
-
-
-
-Git Commit Pattern
+**Git Commit Pattern**
 Commit after each working feature:
+- "Add XP shard pickup system"
+- "Implement level-up UI with upgrades"
+- "Fix physics collision error in enemy death"
 
-"Add XP shard pickup system"
-"Implement level-up UI with upgrades"
-"Fix physics collision error in enemy death"
-
-Testing Checklist
+**Testing Checklist**
 Before ending session:
+- [ ] Game runs without errors
+- [ ] Core loop works (kill → loot → level → upgrade)
+- [ ] No red errors in Output panel
+- [ ] Git committed with clear message
 
- Game runs without errors
- Core loop works (kill → loot → level → upgrade)
- No red errors in Output panel
- Git committed with clear message
+### Common Gotchas & Solutions
 
-Common Gotchas & Solutions
-Problem: HUD doesn't follow camera
-Cause: CanvasLayer has follow_viewport_enabled = true
-Fix: Set to false (default). CanvasLayer should be screen-space.
-Problem: Node not found errors
-Cause: Using FindChild in _Ready() before scene fully loaded
-Fix: Use Groups + cache reference, or use CallDeferred for initialization
-Problem: Physics error when spawning
-Cause: Trying to AddChild during collision processing
-Fix: Use CallDeferred(MethodName.SpawnMethod)
-Problem: Signal parameter error (GD0202)
-Cause: Trying to pass custom C# class through signal
-Fix: Use int index or convert class to Godot Resource
-Problem: Upgrade not applying
-Cause: Not calling ApplyUpgrade() after selecting
-Fix: Ensure OnUpgradeSelected() calls ApplyUpgrade(upgrade.Type)
+**Problem:** HUD doesn't follow camera
+- **Cause:** CanvasLayer has follow_viewport_enabled = true
+- **Fix:** Set to false (default). CanvasLayer should be screen-space.
+
+**Problem:** Node not found errors
+- **Cause:** Using FindChild in _Ready() before scene fully loaded
+- **Fix:** Use Groups + cache reference, or use CallDeferred for initialization
+
+**Problem:** Physics error when spawning
+- **Cause:** Trying to AddChild during collision processing
+- **Fix:** Use CallDeferred(MethodName.SpawnMethod)
+
+**Problem:** Signal parameter error (GD0202)
+- **Cause:** Trying to pass custom C# class through signal
+- **Fix:** Use int index or convert class to Godot Resource
+
+**Problem:** Upgrade not applying
+- **Cause:** Not calling ApplyUpgrade() after selecting
+- **Fix:** Ensure OnUpgradeSelected() calls ApplyUpgrade(upgrade.Type)
+
 ## Technical Considerations
 
 ### Performance Targets
@@ -763,201 +713,120 @@ Fix: Ensure OnUpgradeSelected() calls ApplyUpgrade(upgrade.Type)
 - Material counts: No decimals, whole numbers only
 - Timer system: Server-side validation if online, local storage if offline
 
-Future Considerations
-When to Add Object Pooling
+### Future Considerations
 
-Spawning 50+ enemies total: Consider pooling
-Shooting 20+ projectiles/second: Definitely pool
-100+ XP shards on screen: Pool them
+**When to Add Object Pooling**
+- Spawning 50+ enemies total: Consider pooling
+- Shooting 20+ projectiles/second: Definitely pool
+- 100+ XP shards on screen: Pool them
 
-When to Optimize
-
-After core loop is fun (don't optimize too early)
-When hitting performance targets becomes difficult
-Before adding more content that would compound issues
+**When to Optimize**
+- After core loop is fun (don't optimize too early)
+- When hitting performance targets becomes difficult
+- Before adding more content that would compound issues
 
 ## Launch Scope & Expansion Path
 
 ### MVP Launch Scope
 **Must Have:**
-- 3 classes (Warrior, Mage, Ranger)
+- 3 classes with distinct playstyles
 - 5 floors with unique bosses
-- Workshop (material refinement)
-- Treasury (basic gold generation)
-- Basic combat with 10-15 skills per class
-- Equipment system with 4 slots (weapon, armor, accessory, relic)
-- Character leveling and stat allocation
-- In-run upgrade system
+- Skill mastery system (use-based progression)
+- Workshop and Treasury
+- Basic gear system with enhancements
+- Character leveling to 200
+- In-run upgrade system that synergizes with equipped skills
 - Save/load system
 
-**Phase 1: Core Combat Loop (CURRENT)**
-- Player movement and shooting
-- Enemy AI and spawning
-- XP and leveling system
-- Basic upgrade pool
-- Combat HUD
+### Post-MVP Phase 1 (First Month)
+- Infinite Ascension Floors (6+)
+- Ascension system
+- Corruption levels for floors 1-5
+- Weekly events and leaderboards
+- Daily missions
 
-**Phase 2: Materials & Idle Systems**
-- Material drop system (Energy Cores, Modification Components, Catalyst Fragments)
-- Workshop implementation
-- Treasury implementation
-- Gear enhancement system
-- Base/hub structure
+### Post-MVP Phase 2 (Months 2-3)
+- Research Lab implementation
+- Training Ground with QoL tokens
+- 10 more skills per class
+- Gear set bonuses
+- Monster codex completion rewards
 
-**Phase 3: Multiple Floors & Enemies**
-- 5 floors with visual distinction
-- 3-4 enemy types per floor
-- Boss encounters
-- Extract/continue decision system
-- Death penalty mechanics
+### Future Expansions
+- New classes
+- Prestige system at Floor 50+
+- Seasonal events with unique rewards
+- Co-op mode for 2 players
+- Custom challenge mode creator
 
-**Phase 4: Gear/Equipment System**
-- Gear drops with rarity tiers
-- Power Level upgrades
-- Modification system
-- Synergy system
-- Inventory management
-
-**Phase 5: Polish & Juice**
-- Screen shake, particles, visual effects
-- Sound effects and music
-- Damage numbers, hit feedback
-- Enemy knockback
-- Death animations
-
-**Phase 6: Save System & Meta-Progression**
-- Persistent character levels
-- Gear and material storage
-- Workshop queue persistence
-- Treasury offline accumulation
-- Skill unlocks
-
-**Phase 7: MVP Launch**
-- Final balance pass
-- Bug fixes
-- Performance optimization
-- Early Access on Steam
-
-### Post-MVP Content (Phase 8+)
-**Phase 8: Research Lab & Training Ground**
-- Research Lab system
-- Training Ground
-- More skill unlocks
-- Monster codex
-
-**Phase 9: Expansion**
-- More floors (up to 12)
-- More classes
-- Expanded refinement types
-- More enemy variety
-
-**Phase 10: Meta Systems**
-- Prestige/New Game+ system
-- Challenge modes
-- Seasonal events
-- Legendary equipment tiers
-- Base customization
 ## Why This Design Works
 
 ### For Active Players:
 - Fighting is always the fastest way to progress
-- Idle systems give you something to do with your loot (refining, research)
-- No waiting—you can always jump in and play
+- Skill mastery rewards active use, not waiting
+- Infinite floors provide endless challenge
 - Grinding is rewarded with direct power gains
-- Multiple progression paths (gear, research, training, floors)
+- Multiple progression paths (gear, skills, ascension, floors)
 
 ### For Casual Players:
-- Check in once a day for meaningful progress
-- Idle systems catch you up slowly
-- Never feel pressured to play for hours
-- Training Points provide long-term goals
-- Clear feedback on idle progress earned
+- Check in once a day for meaningful idle progress
+- Can focus on mastering one skill at a time
+- Corruption levels let them replay at comfortable difficulty
+- Clear daily missions in 15 minutes
+- Never feel "left behind" due to personal progression
 
 ### For Both:
-- Clear feedback loop: fight → collect → refine → upgrade → fight stronger
-- Complexity increases gradually (start with 2 systems, unlock more)
-- Respects player time (idle has caps, active is efficient)
-- Multiple viable playstyles
-- Always something to work toward
+- Clear feedback loop: fight → collect → refine → upgrade → master skills → climb higher
+- Always something to work toward (next skill tier, next floor, next ascension level)
+- No wasted runs - everything contributes to permanent progression
+- Complexity increases gradually
+- Respects player time with multiple progression speeds
 
 ## Key Design Principles
 
-1. **Idle enhances, never replaces** - Active play is always most rewarding
-2. **Clear feedback** - Players always know what idle progress earned them
-3. **No punishment** - Missing a day doesn't ruin progress (caps prevent FOMO)
-4. **Respect time** - Both 15-minute sessions and 2-hour grinds feel productive
-5. **Gradual complexity** - Start simple, layer systems as players advance
-6. **Player agency** - Meaningful choices about skills, stats, and gear
-7. **Fair monetization** - Never pay-to-win, always pay-for-convenience or cosmetics (if applicable)
-
-## Monetization Considerations (If Applicable)
-
-**Fair Model:**
-- **Free:** All core gameplay, no power locked behind payments
-- **Premium Currency Uses:**
-  - Cosmetic skins for characters/weapons
-  - Workshop queue speedups (NOT bypassing gameplay)
-  - Extra storage slots (convenience, not power)
-  - Battle pass with cosmetics + small boosts
-
-**Never:**
-- Direct power purchases
-- Loot boxes with gameplay items
-- Energy systems that block active play
-- Ads required for core features
+1. **Active play drives progression** - Idle only enhances, never replaces
+2. **Every action matters** - All kills contribute to skill/ascension progress
+3. **Clear purpose for power** - Infinite floors give reason to get stronger
+4. **No time-gating on core progression** - Skills and power come from play
+5. **Multiple valid goals** - Chase floors, perfect builds, or complete collections
+6. **Respect player investment** - Permanent progression never lost
+7. **Gradual complexity** - Start simple, layer systems as players advance
 
 ## Known Issues
+- Enemy spawning doesn't increase difficulty over time (planned)
+- No sound effects or music
+- Placeholder art (colored squares)
+- No death particles or screen shake
+- Single enemy type (need variety)
+- No save system (progress lost on quit)
 
-Enemy spawning doesn't increase difficulty over time (planned)
-No sound effects or music
-Placeholder art (colored squares)
-No death particles or screen shake
-Single enemy type (need variety)
-No save system (progress lost on quit)
+## Next Priority Tasks
+1. Implement skill mastery tracking
+2. Add 2-3 enemy types (fast/tank/ranged)
+3. Expand upgrade pool to prioritize equipped skills
+4. Implement basic material drop system
+5. Create floor transition system
+6. Add boss encounter for Floor 1
 
-Next Priority Tasks
+## Development Notes
+- Keep sessions focused on ONE feature
+- Playtest after every change
+- Skills should feel impactful immediately
+- Every run should progress something permanent
+- Don't add complexity until current systems are fun
+- Commit working code daily
 
-Add 2-3 enemy types (fast/tank/ranged)
-Expand upgrade pool to 15-20 options
-Add basic juice (screen shake, particles)
-Implement wave system with difficulty scaling
-Start material drop system
-
-Development Notes
-
-Keep sessions focused on ONE feature
-Playtest after every change
-Don't add complexity until current systems are fun
-Commit working code daily
-Ask questions when stuck - don't waste time debugging alone
-
-Reference Links
-
-Godot C# Docs: https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/
-Design Document: [See full design doc in project artifacts]
-Asset Sources: itch.io, OpenGameArt.org, Kenney.nl (when ready for real art)
-
-
-For Claude Code
+## For Claude Code
 When helping with this project:
-
-Assume C# knowledge but Godot beginner
-Explain Godot-specific concepts clearly
-Provide complete, copy-paste ready code
-Point out common Godot pitfalls
-Reference this document's patterns and architecture
-Prioritize working code over perfect code
-Keep explanations practical and example-driven
-
+- Assume C# knowledge but Godot beginner
+- Explain Godot-specific concepts clearly
+- Provide complete, copy-paste ready code
+- Point out common Godot pitfalls
+- Reference this document's patterns and architecture
+- Remember skill mastery is use-based, not time-based
+- Prioritize working code over perfect code
+- Keep explanations practical and example-driven
 
 ---
 
-Save this as `claude.md` in your project root! This gives Claude Code full context about:
-- What you've built
-- How systems work
-- Godot-specific patterns you're using
-- Common issues and solutions
-- Your design philosophy
-- Next steps
-
-When you start a new Claude Code session, you can say: "Read claude.md for project context" and it'll know everything! 🎉
+This documentation represents the complete game design with all systems interconnected for maximum retention and player satisfaction. The core loop of fight → collect → enhance → master → climb creates endless meaningful progression.
