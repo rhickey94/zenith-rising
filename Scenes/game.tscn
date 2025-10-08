@@ -1,11 +1,11 @@
 [gd_scene load_steps=14 format=3 uid="uid://6a6ovxmbcjd1"]
 
 [ext_resource type="Script" uid="uid://ije0l625j2w0" path="res://Scripts/Game.cs" id="1_wrm1d"]
-[ext_resource type="PackedScene" uid="uid://cvuvmrd8khk2g" path="res://Scenes/enemy.tscn" id="2_3dryh"]
-[ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player.cs" id="3_wowpa"]
-[ext_resource type="Script" uid="uid://fwkhgpcy2am3" path="res://Scripts/Hud.cs" id="4_3dryh"]
-[ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/projectile.tscn" id="4_i6g32"]
-[ext_resource type="PackedScene" uid="uid://fr50f27cq0cp" path="res://Scenes/level_up_panel.tscn" id="6_i6g32"]
+[ext_resource type="PackedScene" uid="uid://cvuvmrd8khk2g" path="res://Scenes/Enemy/enemy.tscn" id="2_3dryh"]
+[ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="3_wowpa"]
+[ext_resource type="Script" uid="uid://fwkhgpcy2am3" path="res://Scripts/UI/Hud.cs" id="4_3dryh"]
+[ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/UI/projectile.tscn" id="4_i6g32"]
+[ext_resource type="PackedScene" uid="uid://fr50f27cq0cp" path="res://Scenes/UI/level_up_panel.tscn" id="6_i6g32"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_sh265"]
 size = Vector2(50, 50)

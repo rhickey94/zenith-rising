@@ -27,13 +27,15 @@ A sci-fi roguelite action-RPG with idle/incremental mechanics built in Godot 4.x
 - Upgrade pool expansion (have 8, want 20+)
 
 **Not Started:**
+- Active skill system (Q/E/R abilities)
+- Upgrade system refactor (currently hardcoded, needs UpgradePoolManager)
+- Skill mastery system
 - Materials system
 - Workshop/Treasury (idle systems)
 - Multiple floors (have 1, need 5+)
 - Gear/equipment system
 - Save system
 - Polish (sound, particles, screen shake)
-- Skill mastery system
 - Endgame infinite floors
 
 ## MVP Requirements
@@ -801,12 +803,29 @@ Before ending session:
 - No save system (progress lost on quit)
 
 ## Next Priority Tasks
-1. Implement skill mastery tracking
-2. Add 2-3 enemy types (fast/tank/ranged)
-3. Expand upgrade pool to prioritize equipped skills
-4. Implement basic material drop system
-5. Create floor transition system
-6. Add boss encounter for Floor 1
+1. **Implement Q/E/R active skill system** (foundation for everything else)
+   - Add cooldown-based skills (1-2 per slot for one class)
+   - Manual/auto aim depending on skill
+   - Visual feedback (cooldown UI in HUD)
+   - Keep it simple: just make skills work and feel good
+
+2. **Refactor upgrade system to use UpgradePoolManager** (AFTER skills work)
+   - Extend `Upgrade.cs` with: Category, RequiredSkill, Weight, CanStack fields
+   - Create UpgradePoolManager singleton (autoload)
+   - Load upgrades from Resources/Upgrades/ directory
+   - Implement weighted selection (40% skill modifiers, 40% passives, 20% stats)
+   - Add skill-specific filtering (only show if skill equipped)
+   - Remove hardcoded upgrade list from Player.cs
+
+3. **Implement skill mastery tracking** (builds on working skills)
+   - Track kills per skill (Bronze/Silver/Gold/Diamond tiers)
+   - Visual progress in HUD
+   - Permanent progression across runs
+
+4. Add 2-3 enemy types (fast/tank/ranged)
+5. Implement basic material drop system
+6. Create floor transition system
+7. Add boss encounter for Floor 1
 
 ## Development Notes
 - Keep sessions focused on ONE feature
@@ -817,7 +836,15 @@ Before ending session:
 - Commit working code daily
 
 ## For Claude Code
-When helping with this project:
+
+**Your Role: Mentor, Not Implementer**
+- **DO NOT implement features unless explicitly asked**
+- Your role is to guide, advise, and explain - not to write code proactively
+- When asked "what's next" or "where are we" - provide analysis and recommendations, not implementation
+- Wait for explicit requests like "implement X" or "write the code for Y" before coding
+- Offer guidance on approach, architecture, and Godot patterns first
+
+**When Providing Implementation (only when explicitly requested):**
 - Assume C# knowledge but Godot beginner
 - Explain Godot-specific concepts clearly
 - Provide complete, copy-paste ready code

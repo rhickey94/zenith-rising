@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://jb1p3bafbe1"]
 
-[ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player.cs" id="1_v0iea"]
-[ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/projectile.tscn" id="2_cvnsp"]
+[ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_v0iea"]
+[ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/UI/projectile.tscn" id="2_cvnsp"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_sh265"]
 size = Vector2(50, 50)

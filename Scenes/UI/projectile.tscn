@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://cm4rpp2gwgqnc"]
 
-[ext_resource type="Script" uid="uid://4hfpxxflk4m4" path="res://Scripts/Projectile.cs" id="1_f8cdk"]
+[ext_resource type="Script" uid="uid://4hfpxxflk4m4" path="res://Scripts/Items/Projectile.cs" id="1_f8cdk"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_yr2qt"]
 size = Vector2(10, 10)
