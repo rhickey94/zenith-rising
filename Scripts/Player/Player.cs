@@ -8,9 +8,11 @@ public partial class Player : CharacterBody2D
 	// Stats
 	[Export] public float Speed = 300.0f;
 	[Export] public float FireRate = 0.2f;
+	[Export] public float MeleeRate = 0.5f;
 
 	// Scenes
 	[Export] public PackedScene ProjectileScene;
+	[Export] public PackedScene MeleeAttackScene;
 
 	// UI Dependencies
 	[Export] public LevelUpPanel LevelUpPanel;
@@ -25,9 +27,9 @@ public partial class Player : CharacterBody2D
 	private SkillManager _skillManager;
 	private StatsManager _statsManager;
 	private UpgradeManager _upgradeManager;
-	private Dictionary<UpgradeType, float> _activeUpgrades = [];
 
 	private float _timeSinceLastShot = 0f;
+	private float _timeSinceLastMelee = 0f;
 
 	public override void _Ready()
 	{
@@ -98,15 +100,36 @@ public partial class Player : CharacterBody2D
 		MoveAndSlide();
 
 		_timeSinceLastShot += (float)delta;
+		_timeSinceLastMelee += (float)delta;
 
-		if (Input.IsActionPressed("ui_left_click") && _timeSinceLastShot > FireRate)
+		if (Input.IsActionPressed("ui_left_click") && _timeSinceLastMelee > MeleeRate)
+		{
+			Melee();
+			_timeSinceLastMelee = 0f;
+		}
+
+		if (Input.IsActionPressed("ui_right_click") && _timeSinceLastShot > FireRate)
 		{
 			Shoot();
 			_timeSinceLastShot = 0f;
 		}
 	}
 
-	private void Attack() { }
+	private void Melee()
+  {
+		if (MeleeAttackScene == null) return;
+
+		var meleeAttack = MeleeAttackScene.Instantiate<MeleeAttack>();
+		meleeAttack.GlobalPosition = GlobalPosition;
+
+		Vector2 mousePosition = GetGlobalMousePosition();
+		Vector2 attackDirection = (mousePosition - GlobalPosition).Normalized();
+
+		var damageBonus = GetUpgradeValue(UpgradeType.DamagePercent);
+		meleeAttack.Initialize(damageBonus, attackDirection);
+
+		GetTree().Root.AddChild(meleeAttack);
+	}
 
 	private void Shoot()
 	{
