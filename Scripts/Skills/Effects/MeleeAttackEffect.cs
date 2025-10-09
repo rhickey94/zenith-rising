@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Godot;
 using SpaceTower.Scripts.Enemies.Base;
 
-namespace SpaceTower.Scripts.Skills.SkillEffects;
+namespace SpaceTower.Scripts.Skills.Effects;
 
 public partial class MeleeAttackEffect : Area2D
 {

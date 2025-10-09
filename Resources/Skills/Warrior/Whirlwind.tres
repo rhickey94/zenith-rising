@@ -1,13 +1,9 @@
 [gd_resource type="Resource" script_class="InstantAOESkill" load_steps=3 format=3 uid="uid://5g8accyxr8hh"]
 
 [ext_resource type="PackedScene" uid="uid://blpyt6xpu1lhh" path="res://Scenes/SkillEffects/whirlwind_effect.tscn" id="1_72mrr"]
-[ext_resource type="Script" uid="uid://37854fuudgd" path="res://Scripts/Skills/SkillTypes/InstantAOESkill.cs" id="2_j6uu0"]
+[ext_resource type="Script" uid="uid://dlqhwikuotfew" path="res://Scripts/Skills/Data/InstantAOESkill.cs" id="2_72mrr"]
 
 [resource]
-script = ExtResource("2_j6uu0")
-SkillName = "Whirlwind"
-Description = "Spin and damage nearby enemies"
-Cooldown = 5.0
-Slot = 2
+script = ExtResource("2_72mrr")
 SkillEffectScene = ExtResource("1_72mrr")
 metadata/_custom_type_script = "uid://dff1q4v5i7rpk"

@@ -1,10 +1,10 @@
 using Godot;
 using SpaceTower.Scripts.PlayerScripts;
 using SpaceTower.Scripts.Skills.Base;
-using SpaceTower.Scripts.Skills.SkillEffects;
-using SpaceTower.Scripts.Skills.SkillTypes;
+using SpaceTower.Scripts.Skills.Data;
+using SpaceTower.Scripts.Skills.Effects;
 
-namespace SpaceTower.Scripts.Skills.Warrior.Offensive;
+namespace SpaceTower.Scripts.Skills.Executors.Warrior;
 
 public class Whirlwind : ISkillExecutor
 {

@@ -1,12 +1,12 @@
 using Godot;
 using SpaceTower.Scripts.PlayerScripts;
 using SpaceTower.Scripts.Skills.Base;
-using SpaceTower.Scripts.Skills.SkillTypes;
-using SpaceTower.Scripts.Skills.SkillEffects;
+using SpaceTower.Scripts.Skills.Data;
+using SpaceTower.Scripts.Skills.Effects;
 
-namespace SpaceTower.Scripts.Skills.Mage.Offensive;
+namespace SpaceTower.Scripts.Skills.Executors.Mage;
 
-public class Fireball : ISkillExecutor
+public class ProjectileSkillExecutor : ISkillExecutor
 {
     public void ExecuteSkill(Player player, Skill baseSkill)
     {

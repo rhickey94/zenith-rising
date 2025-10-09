@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Godot;
 using SpaceTower.Progression.Upgrades;
 using SpaceTower.Scripts.PlayerScripts.Components;
-using SpaceTower.Scripts.Skills.SkillEffects;
+using SpaceTower.Scripts.Skills.Effects;
 using SpaceTower.Scripts.UI.Menus;
 
 namespace SpaceTower.Scripts.PlayerScripts;

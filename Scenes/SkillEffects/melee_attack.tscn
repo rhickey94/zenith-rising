@@ -1,10 +1,9 @@
 [gd_scene load_steps=2 format=3 uid="uid://du4yo1vulblyh"]
 
-[ext_resource type="Script" uid="uid://dfwgjo06muayk" path="res://Scripts/Skills/SkillEffects/MeleeAttackEffect.cs" id="1_vl88p"]
+[ext_resource type="Script" uid="uid://2ngkujaefvpe" path="res://Scripts/Skills/Effects/MeleeAttackEffect.cs" id="1_vl88p"]
 
 [node name="MeleeAttack" type="Area2D"]
 script = ExtResource("1_vl88p")
-BaseDamage = 100.0
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 polygon = PackedVector2Array(0, 0, 100, -50, 100, 50)

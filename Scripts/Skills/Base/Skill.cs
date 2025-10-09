@@ -1,7 +1,7 @@
 using Godot;
 using SpaceTower.Scripts.PlayerScripts;
-using SpaceTower.Scripts.Skills.Mage.Offensive;
-using SpaceTower.Scripts.Skills.Warrior.Offensive;
+using SpaceTower.Scripts.Skills.Executors.Mage;
+using SpaceTower.Scripts.Skills.Executors.Warrior;
 
 namespace SpaceTower.Scripts.Skills.Base;
 
@@ -36,7 +36,7 @@ public partial class Skill : Resource
         return SkillName switch
         {
             "Whirlwind" => new Whirlwind(),
-            "Fireball" => new Fireball(),
+            "Fireball" => new ProjectileSkillExecutor(),
             "Basic Strike" => new WarriorBasicAttack(),
             _ => null
         };

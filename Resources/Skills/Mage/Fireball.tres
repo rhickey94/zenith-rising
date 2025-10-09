@@ -1,14 +1,10 @@
 [gd_resource type="Resource" script_class="ProjectileSkill" load_steps=3 format=3 uid="uid://ck7w68lb1penv"]
 
 [ext_resource type="PackedScene" uid="uid://b107rbmwnfdg" path="res://Scenes/SkillEffects/fireball_projectile.tscn" id="1_dich7"]
-[ext_resource type="Script" uid="uid://ds54a7ovplxnu" path="res://Scripts/Skills/SkillTypes/ProjectileSkill.cs" id="2_w047o"]
+[ext_resource type="Script" uid="uid://dd080vxgkhmnp" path="res://Scripts/Skills/Data/ProjectileSkill.cs" id="2_dich7"]
 
 [resource]
-script = ExtResource("2_w047o")
-SkillName = "Fireball"
-Description = "Launch an explosive fireball"
-Cooldown = 3.0
+script = ExtResource("2_dich7")
 AllowedClass = 1
-Slot = 2
 SkillEffectScene = ExtResource("1_dich7")
 metadata/_custom_type_script = "uid://dff1q4v5i7rpk"
