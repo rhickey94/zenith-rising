@@ -1,16 +1,16 @@
-using Godot;
-using SpaceTower.Progression;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
+using SpaceTower.Progression;
 
 namespace SpaceTower.Scripts.PlayerScripts.Components;
 
 [GlobalClass]
 public partial class UpgradeManager : Node
 {
-    private Dictionary<UpgradeType, float> _activeUpgrades = [];
+    private readonly Dictionary<UpgradeType, float> _activeUpgrades = [];
     // Available upgrades pool
-    private List<Upgrade> _availableUpgrades =
+    private readonly List<Upgrade> _availableUpgrades =
     [
             new Upgrade { UpgradeName = "Damage Boost", Description = "+15% Damage", Type = UpgradeType.DamagePercent, Value = 0.15f },
                 new Upgrade { UpgradeName = "Attack Speed", Description = "+20% Fire Rate", Type = UpgradeType.AttackSpeed, Value = 0.20f },

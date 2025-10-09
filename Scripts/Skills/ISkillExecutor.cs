@@ -4,5 +4,5 @@ namespace SpaceTower.Scripts.Skills;
 
 public interface ISkillExecutor
 {
-		void ExecuteSkill(Player player, Skill skill);
+    void ExecuteSkill(Player player, Skill skill);
 }

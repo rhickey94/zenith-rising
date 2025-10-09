@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Godot;
 using SpaceTower.Progression;
-using System.Collections.Generic;
 
 namespace SpaceTower.Scripts.UI;
 

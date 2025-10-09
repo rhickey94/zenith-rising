@@ -45,7 +45,11 @@ public partial class Enemy : CharacterBody2D
 
     public override void _PhysicsProcess(double delta)
     {
-        if (_player == null) return;
+        if (_player == null)
+        {
+            return;
+        }
+
 
         Vector2 direction = (_player.GlobalPosition - GlobalPosition).Normalized();
         Velocity = direction * Speed;
