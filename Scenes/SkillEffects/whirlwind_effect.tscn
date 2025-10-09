@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://blpyt6xpu1lhh"]
 
-[ext_resource type="Script" uid="uid://cx15niybdrx6x" path="res://Scripts/Effects/WhirlwindEffect.cs" id="1_nap35"]
+[ext_resource type="Script" uid="uid://cx15niybdrx6x" path="res://Scripts/Skills/SkillEffects/WhirlwindEffect.cs" id="1_nap35"]
 
 [node name="WhirlwindEffect" type="Node2D"]
 script = ExtResource("1_nap35")

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Godot;
 using SpaceTower.Progression.Upgrades;
-using SpaceTower.Scripts.Effects;
 using SpaceTower.Scripts.PlayerScripts.Components;
+using SpaceTower.Scripts.Skills.SkillEffects;
 using SpaceTower.Scripts.UI.Menus;
 
 namespace SpaceTower.Scripts.PlayerScripts;
@@ -37,9 +37,6 @@ public partial class Player : CharacterBody2D
     private SkillManager _skillManager;
     private StatsManager _statsManager;
     private UpgradeManager _upgradeManager;
-
-    private float _timeSinceLastShot = 0f;
-    private float _timeSinceLastMelee = 0f;
 
     public override void _Ready()
     {
@@ -98,7 +95,6 @@ public partial class Player : CharacterBody2D
         _skillManager?.HandleInput(@event);
     }
 
-
     public override void _PhysicsProcess(double delta)
     {
         Vector2 direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
@@ -110,66 +106,9 @@ public partial class Player : CharacterBody2D
         }
 
         // Update skill cooldowns
-
-
         _skillManager?.Update((float)delta);
 
         MoveAndSlide();
-
-        _timeSinceLastShot += (float)delta;
-        _timeSinceLastMelee += (float)delta;
-
-        if (Input.IsActionPressed("ui_left_click") && _timeSinceLastMelee > MeleeRate)
-        {
-            Melee();
-            _timeSinceLastMelee = 0f;
-        }
-
-        if (Input.IsActionPressed("ui_right_click") && _timeSinceLastShot > FireRate)
-        {
-            Shoot();
-            _timeSinceLastShot = 0f;
-        }
-    }
-
-    private void Melee()
-    {
-        if (MeleeAttackScene == null)
-        {
-            return;
-        }
-
-
-        var meleeAttack = MeleeAttackScene.Instantiate<MeleeAttack>();
-        meleeAttack.GlobalPosition = GlobalPosition;
-
-        Vector2 mousePosition = GetGlobalMousePosition();
-        Vector2 attackDirection = (mousePosition - GlobalPosition).Normalized();
-
-        var damageBonus = GetUpgradeValue(UpgradeType.DamagePercent);
-        meleeAttack.Initialize(damageBonus, attackDirection);
-
-        GetTree().Root.AddChild(meleeAttack);
-    }
-
-    private void Shoot()
-    {
-        if (ProjectileScene == null)
-        {
-            return;
-        }
-
-        Vector2 mousePosition = GetGlobalMousePosition();
-        Vector2 shootDirection = (mousePosition - GlobalPosition).Normalized();
-
-        var projectile = ProjectileScene.Instantiate<Projectile>();
-        projectile.GlobalPosition = GlobalPosition;
-
-        var damageBonus = GetUpgradeValue(UpgradeType.DamagePercent);
-        var pierceCount = (int)GetUpgradeValue(UpgradeType.ProjectilePierce);
-        projectile.Initialize(shootDirection, damageBonus, pierceCount);
-
-        GetTree().Root.AddChild(projectile);
     }
 
     public void TakeDamage(float damage)

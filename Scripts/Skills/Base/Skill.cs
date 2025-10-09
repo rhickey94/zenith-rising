@@ -13,11 +13,6 @@ public partial class Skill : Resource
     [Export] public SkillType Type { get; set; }
     [Export] public float Cooldown { get; set; } = 0f; // For active skills
 
-    [Export] public float EffectValue { get; set; } = 0f; // Generic effect value, interpretation depends on skill
-    [Export] public float EffectDuration { get; set; } = 0f; // Duration for effects like buffs/debuffs
-
-    [Export] public float Range { get; set; } = 150f;
-
     [Export] public PlayerClass AllowedClass { get; set; }
     [Export] public SkillSlot Slot { get; set; }
 
@@ -42,7 +37,7 @@ public partial class Skill : Resource
         {
             "Whirlwind" => new Whirlwind(),
             "Fireball" => new Fireball(),
-
+            "Basic Strike" => new WarriorBasicAttack(),
             _ => null
         };
     }
@@ -56,6 +51,9 @@ public enum SkillType
 
 public enum SkillSlot
 {
+    BasicAttack,
+    SpecialAttack,
+
     Primary,    // Q key
     Secondary,  // E key
     Ultimate    // R key

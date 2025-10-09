@@ -15,5 +15,10 @@
   },
 
   // Ensure EditorConfig is enabled
-  "editorconfig.enable": true
+  "editorconfig.enable": true,
+  "files.exclude": {
+    "**/*.uid": true,
+    "**/.godot": true,
+    "**/.import": true
+  }
 }

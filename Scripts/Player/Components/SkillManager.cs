@@ -6,10 +6,15 @@ namespace SpaceTower.Scripts.PlayerScripts.Components;
 [GlobalClass]
 public partial class SkillManager : Node
 {
+    [Export] public Skill BasicAttackSkill { get; set; }
+    [Export] public Skill SpecialAttackSkill { get; set; }
+
     [Export] public Skill PrimarySkill { get; set; }
     [Export] public Skill SecondarySkill { get; set; }
     [Export] public Skill UltimateSkill { get; set; }
 
+    private float _basicAttackCooldownTimer = 0.0f;
+    private float _specialAttackCooldownTimer = 0.0f;
     private float _primarySkillCooldownTimer = 0.0f;
     private float _secondarySkillCooldownTimer = 0.0f;
     private float _ultimateSkillCooldownTimer = 0.0f;
@@ -29,6 +34,16 @@ public partial class SkillManager : Node
 
     public void Update(float delta)
     {
+        if (_basicAttackCooldownTimer > 0)
+        {
+            _basicAttackCooldownTimer -= delta;
+        }
+
+        if (_specialAttackCooldownTimer > 0)
+        {
+            _specialAttackCooldownTimer -= delta;
+        }
+
         if (_primarySkillCooldownTimer > 0)
         {
             _primarySkillCooldownTimer -= delta;
@@ -48,6 +63,22 @@ public partial class SkillManager : Node
 
     public void HandleInput(InputEvent @event)
     {
+        if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
+        {
+            GD.Print($"Mouse clicked! Button: {mouseEvent.ButtonIndex}");  // ← ADD THIS
+            GD.Print($"BasicAttackSkill is null: {BasicAttackSkill == null}");  // ← ADD THIS
+
+            if (mouseEvent.ButtonIndex == MouseButton.Left && BasicAttackSkill != null)
+            {
+                GD.Print($"Calling BasicAttackSkill: {BasicAttackSkill.SkillName}");  // ← ADD THIS
+                UseSkill(BasicAttackSkill, ref _basicAttackCooldownTimer);
+            }
+            else if (mouseEvent.ButtonIndex == MouseButton.Right && SpecialAttackSkill != null)
+            {
+                UseSkill(SpecialAttackSkill, ref _specialAttackCooldownTimer);
+            }
+        }
+
         if (@event is InputEventKey eventKey && eventKey.Pressed)
         {
             if (eventKey.Keycode == Key.Q && PrimarySkill != null)

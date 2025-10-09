@@ -1,42 +1,31 @@
 using Godot;
-using SpaceTower.Scripts.Enemies.Base;
 using SpaceTower.Scripts.PlayerScripts;
 using SpaceTower.Scripts.Skills.Base;
+using SpaceTower.Scripts.Skills.SkillEffects;
+using SpaceTower.Scripts.Skills.SkillTypes;
 
 namespace SpaceTower.Scripts.Skills.Warrior.Offensive;
 
 public class Whirlwind : ISkillExecutor
 {
-    public void ExecuteSkill(Player player, Skill skill)
+    public void ExecuteSkill(Player player, Skill baseSkill)
     {
         // Spawn visual effect
-
-        if (skill.SkillEffectScene != null)
+        if (baseSkill is not InstantAOESkill skill)
         {
-            var effect = skill.SkillEffectScene.Instantiate<Node2D>();
-            effect.GlobalPosition = player.GlobalPosition;
-            player.GetTree().Root.AddChild(effect);
+            GD.PrintErr("Whirlwind: Skill is not of type InstantAOESkill!");
+            return;
         }
 
-        // For now, just damage all enemies in range
-
-        var enemies = player.GetTree().GetNodesInGroup("enemies");
-        int hitCount = 0;
-
-        foreach (Node node in enemies)
+        if (skill.SkillEffectScene == null)
         {
-            if (node is Enemy enemy)
-            {
-                float distance = player.GlobalPosition.DistanceTo(enemy.GlobalPosition);
-                if (distance < skill.Range) // 150 pixel range
-
-                {
-                    enemy.TakeDamage(skill.EffectValue);
-                    hitCount++;
-                }
-            }
+            GD.PrintErr("Whirlwind: SkillEffectScene not set! Assign WhirlwindEffect.tscn to the Skill resource.");
+            return;
         }
 
-        GD.Print($"{skill.SkillName} hit {hitCount} enemies!");
+        var effect = skill.SkillEffectScene.Instantiate<WhirlwindEffect>();
+        effect.GlobalPosition = player.GlobalPosition;
+        effect.Initialize(skill.Damage, skill.Radius); // 0.5s lifetime
+        player.GetTree().Root.AddChild(effect);
     }
 }

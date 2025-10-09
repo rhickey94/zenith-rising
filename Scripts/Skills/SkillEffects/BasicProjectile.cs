@@ -1,9 +1,9 @@
 using Godot;
 using SpaceTower.Scripts.Enemies.Base;
 
-namespace SpaceTower.Scripts.Effects;
+namespace SpaceTower.Scripts.Skills.SkillEffects;
 
-public partial class Projectile : Area2D
+public partial class BasicProjectile : Area2D
 {
     [Export] public float Speed = 600.0f;
     [Export] public float BaseDamage = 25.0f;

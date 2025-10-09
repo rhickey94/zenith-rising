@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="1_a3d8c"]
 [ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_xpcdj"]
-[ext_resource type="Resource" uid="uid://ck7w68lb1penv" path="res://Resources/Skills/Mage/Offensive/Fireball.tres" id="3_htcer"]
+[ext_resource type="Resource" uid="uid://ck7w68lb1penv" path="res://Resources/Skills/Mage/Fireball.tres" id="3_htcer"]
 [ext_resource type="Script" uid="uid://b3km77lyp5ba3" path="res://Scripts/Player/Components/StatsManager.cs" id="4_mtuoh"]
 [ext_resource type="Script" uid="uid://cx5d7m8au6iit" path="res://Scripts/Player/Components/UpgradeManager.cs" id="5_htcer"]
 

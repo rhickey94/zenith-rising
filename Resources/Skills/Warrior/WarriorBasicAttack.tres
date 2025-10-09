@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MeleeAttackSkill" load_steps=3 format=3 uid="uid://dfssvafd8e1nw"]
+
+[ext_resource type="PackedScene" uid="uid://du4yo1vulblyh" path="res://Scenes/SkillEffects/melee_attack.tscn" id="1_ejf0k"]
+[ext_resource type="Script" uid="uid://uulv8c2dx4i6" path="res://Scripts/Skills/SkillTypes/MeleeAttackSkill.cs" id="2_jm70f"]
+
+[resource]
+script = ExtResource("2_jm70f")
+SkillName = "Basic Strike"
+Description = "Basic attack"
+Cooldown = 0.3
+SkillEffectScene = ExtResource("1_ejf0k")
+metadata/_custom_type_script = "uid://uulv8c2dx4i6"

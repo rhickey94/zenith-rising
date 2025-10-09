@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using Godot;
 using SpaceTower.Scripts.Enemies.Base;
 
-namespace SpaceTower.Scripts.Effects;
+namespace SpaceTower.Scripts.Skills.SkillEffects;
 
-public partial class MeleeAttack : Area2D
+public partial class MeleeAttackEffect : Area2D
 {
-    [Export] public float BaseDamage = 10.0f;
-    [Export] public float Lifetime = 0.3f;
+    private float _damage = 10.0f;
+    private float _lifetime = 0.3f;
     private readonly HashSet<Enemy> _hitEnemies = [];
 
     public override void _Ready()
@@ -17,20 +17,21 @@ public partial class MeleeAttack : Area2D
         BodyEntered += OnBodyEntered;
     }
 
-    public void Initialize(float damageBonus, Vector2 direction)
+    public void Initialize(Vector2 direction, float baseDamage, float lifetime, float damageBonus)
     {
-        BaseDamage *= 1 + damageBonus;
+        _damage = baseDamage * (1 + damageBonus);
+        _lifetime = lifetime;
 
         Rotation = direction.Angle();
 
-        GD.Print($"Melee initialized with {BaseDamage} damage");
+        GD.Print($"Melee initialized with {_damage} damage");
     }
 
     public override void _PhysicsProcess(double delta)
     {
-        Lifetime -= (float)delta;
+        _lifetime -= (float)delta;
 
-        if (Lifetime <= 0)
+        if (_lifetime <= 0)
         {
             QueueFree();
         }
@@ -42,9 +43,9 @@ public partial class MeleeAttack : Area2D
 
         if (body is Enemy enemy && !_hitEnemies.Contains(enemy))
         {
-            enemy.TakeDamage(BaseDamage);
+            enemy.TakeDamage(_damage);
             _hitEnemies.Add(enemy);
-            GD.Print($"Melee hit {enemy.Name} for {BaseDamage} damage!");
+            GD.Print($"Melee hit {enemy.Name} for {_damage} damage!");
         }
     }
 }
