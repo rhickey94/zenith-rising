@@ -23,6 +23,8 @@ public partial class SkillManager : Node
         {
             GD.PrintErr("SkillManager: Could not find Player parent!");
         }
+
+        ValidateSkill(PrimarySkill, SkillSlot.Primary);
     }
 
     public void Update(float delta)
@@ -86,5 +88,24 @@ public partial class SkillManager : Node
         // Start cooldown
 
         cooldownRemaining = skill.Cooldown;
+    }
+
+    private void ValidateSkill(Skill skill, SkillSlot expectedSlot)
+    {
+        if (skill == null)
+        {
+            return;
+        }
+
+
+        if (skill.AllowedClass != _player.CurrentClass)
+        {
+            GD.PrintErr($"Skill {skill.SkillName} is for {skill.AllowedClass}, but player is {_player.CurrentClass}!");
+        }
+
+        if (skill.Slot != expectedSlot)
+        {
+            GD.PrintErr($"Skill {skill.SkillName} is a {skill.Slot} skill, but equipped in {expectedSlot} slot!");
+        }
     }
 }

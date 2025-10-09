@@ -13,12 +13,14 @@ public partial class Skill : Resource
     [Export] public float Cooldown { get; set; } = 0f; // For active skills
 
     [Export] public float EffectValue { get; set; } = 0f; // Generic effect value, interpretation depends on skill
-
     [Export] public float EffectDuration { get; set; } = 0f; // Duration for effects like buffs/debuffs
 
     [Export] public float Range { get; set; } = 150f;
-    [Export] public PackedScene SkillEffectScene { get; set; } // Optional visual effect scene
 
+    [Export] public PlayerClass AllowedClass { get; set; }
+    [Export] public SkillSlot Slot { get; set; }
+
+    [Export] public PackedScene SkillEffectScene { get; set; } // Optional visual effect scene
 
     private ISkillExecutor _executor;
 
@@ -49,4 +51,11 @@ public enum SkillType
 {
     Active,
     Passive
+}
+
+public enum SkillSlot
+{
+    Primary,    // Q key
+    Secondary,  // E key
+    Ultimate    // R key
 }

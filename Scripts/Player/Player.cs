@@ -15,6 +15,8 @@ public partial class Player : CharacterBody2D
     [Export] public float FireRate = 0.2f;
     [Export] public float MeleeRate = 0.5f;
 
+    [Export] public PlayerClass CurrentClass = PlayerClass.Warrior;
+
     // Scenes
 
     [Export] public PackedScene ProjectileScene;
