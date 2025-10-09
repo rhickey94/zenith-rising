@@ -159,7 +159,6 @@ public partial class Player : CharacterBody2D
             return;
         }
 
-
         Vector2 mousePosition = GetGlobalMousePosition();
         Vector2 shootDirection = (mousePosition - GlobalPosition).Normalized();
 

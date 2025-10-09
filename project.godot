@@ -29,6 +29,16 @@ project/assembly_name="Space Tower"
 version_control/plugin_name="GitPlugin"
 version_control/autoload_on_startup=true
 
+[file_customization]
+
+folder_colors={
+"res://Scenes/Enemies/": "red",
+"res://Scripts/Player/": "purple",
+"res://Scripts/Skills/Mage/": "blue",
+"res://Scripts/Skills/Ranger/": "green",
+"res://Scripts/Skills/Warrior/": "orange"
+}
+
 [input]
 
 ui_left={

@@ -3,7 +3,7 @@ using SpaceTower.Scripts.Enemies.Base;
 using SpaceTower.Scripts.PlayerScripts;
 using SpaceTower.Scripts.Skills.Base;
 
-namespace SpaceTower.Scripts.Skills.Offensive;
+namespace SpaceTower.Scripts.Skills.Warrior.Offensive;
 
 public class Whirlwind : ISkillExecutor
 {
