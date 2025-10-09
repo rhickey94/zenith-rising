@@ -41,7 +41,6 @@ public partial class Game : Node
       GD.PrintErr("Game: EnemyScene not assigned!");
     }
 
-    Player.HUD = HUD;
     Player.Initialize();
   }
 

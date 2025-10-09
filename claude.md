@@ -835,6 +835,9 @@ Before ending session:
 - Don't add complexity until current systems are fun
 - Commit working code daily
 
+### Technical Debt / Pending Refactors
+- **Upgrade System:** Currently hardcoded in Player.cs. Needs UpgradePoolManager refactor (documented in Next Priority Tasks #2) - do AFTER skills are implemented
+
 ## For Claude Code
 
 **Your Role: Mentor, Not Implementer**

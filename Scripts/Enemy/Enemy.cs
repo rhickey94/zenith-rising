@@ -23,6 +23,7 @@ public partial class Enemy : CharacterBody2D
 
   public override void _Ready()
   {
+    AddToGroup("enemies");
     Health = MaxHealth;
 
     _sprite = GetNode<Sprite2D>("Sprite2D");

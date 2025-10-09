@@ -45,6 +45,21 @@ public partial class Hud : Control
     {
       GD.PrintErr("HUD: Critical UI elements missing! Check node paths.");
     }
+
+    // NEW: Connect to Player signals
+
+    if (GetTree().GetFirstNodeInGroup("player") is Player player)
+    {
+      player.HealthChanged += UpdateHealth;
+      player.ExperienceChanged += UpdateExperience;
+      player.ResourcesChanged += UpdateResources;
+      player.FloorInfoChanged += UpdateFloorInfo;
+      player.WaveInfoChanged += UpdateWaveInfo;
+    }
+    else
+    {
+      GD.PrintErr("HUD: Could not find Player to connect signals!");
+    }
   }
 
   public void UpdateHealth(float currentHealth, float maxHealth)
@@ -56,7 +71,7 @@ public partial class Hud : Control
     _healthLabel.Text = $"Health: {currentHealth}/{maxHealth}";
   }
 
-  public void UpdateExperience(float currentExp, float expToNextLevel, int level)
+  public void UpdateExperience(int currentExp, int expToNextLevel, int level)
   {
     if (_experienceBar == null || _experienceLabel == null || _levelLabel == null) return;
 

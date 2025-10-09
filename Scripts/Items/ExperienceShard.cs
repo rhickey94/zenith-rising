@@ -27,7 +27,7 @@ public partial class ExperienceShard : Area2D
 
   public override void _PhysicsProcess(double delta)
   {
-    if (_player == null || _isBeingCollected) return;
+    if (_player == null || !IsInstanceValid(_player) || _isBeingCollected) return;
 
     // Move toward player if close enough
     float distance = GlobalPosition.DistanceTo(_player.GlobalPosition);

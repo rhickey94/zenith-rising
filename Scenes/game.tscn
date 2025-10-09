@@ -1,8 +1,9 @@
-[gd_scene load_steps=14 format=3 uid="uid://6a6ovxmbcjd1"]
+[gd_scene load_steps=15 format=3 uid="uid://6a6ovxmbcjd1"]
 
 [ext_resource type="Script" uid="uid://ije0l625j2w0" path="res://Scripts/Game.cs" id="1_wrm1d"]
 [ext_resource type="PackedScene" uid="uid://cvuvmrd8khk2g" path="res://Scenes/Enemy/enemy.tscn" id="2_3dryh"]
 [ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="3_wowpa"]
+[ext_resource type="Resource" uid="uid://5g8accyxr8hh" path="res://Resources/Skills/Whirlwind.tres" id="4_1l0tm"]
 [ext_resource type="Script" uid="uid://fwkhgpcy2am3" path="res://Scripts/UI/Hud.cs" id="4_3dryh"]
 [ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/UI/projectile.tscn" id="4_i6g32"]
 [ext_resource type="PackedScene" uid="uid://fr50f27cq0cp" path="res://Scenes/UI/level_up_panel.tscn" id="6_i6g32"]
@@ -69,6 +70,7 @@ HUD = NodePath("UILayer/HUD")
 
 [node name="Player" type="CharacterBody2D" parent="." node_paths=PackedStringArray("LevelUpPanel") groups=["player"]]
 script = ExtResource("3_wowpa")
+PrimarySkill = ExtResource("4_1l0tm")
 ProjectileScene = ExtResource("4_i6g32")
 LevelUpPanel = NodePath("../UILayer/LevelUpPanel")
 

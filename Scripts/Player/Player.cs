@@ -10,6 +10,14 @@ public partial class Player : CharacterBody2D
 	[Export] public float Speed = 300.0f;
 	[Export] public float FireRate = 0.2f;
 
+	// Skills
+	[Export] public Skill PrimarySkill;
+	[Export] public Skill SecondarySkill;
+	[Export] public Skill UltimateSkill;
+	private float _primarySkillCooldownTimer = 0.0f;
+	private float _secondarySkillCooldownTimer = 0.0f;
+	private float _ultimateSkillCooldownTimer = 0.0f;
+
 	public float Health { get; private set; } = 100.0f;
 
 	// Progression
@@ -21,8 +29,14 @@ public partial class Player : CharacterBody2D
 	[Export] public PackedScene ProjectileScene;
 
 	// Dependencies
-	[Export] public Hud HUD;
 	[Export] public LevelUpPanel LevelUpPanel;
+
+	// Signals for HUD updates
+	[Signal] public delegate void HealthChangedEventHandler(float currentHealth, float maxHealth);
+	[Signal] public delegate void ExperienceChangedEventHandler(int currentXP, int requiredXP, int level);
+	[Signal] public delegate void ResourcesChangedEventHandler(int gold, int cores, int components, int fragments);
+	[Signal] public delegate void FloorInfoChangedEventHandler(int floorNumber, string floorName);
+	[Signal] public delegate void WaveInfoChangedEventHandler(int waveNumber, int enemiesRemaining);
 
 	private Dictionary<UpgradeType, float> _activeUpgrades = [];
 	// Available upgrades pool
@@ -58,14 +72,33 @@ public partial class Player : CharacterBody2D
 
 	public void Initialize()
 	{
-		if (HUD == null)
-		{
-			GD.PrintErr("Player could not find HUD! Make sure HUD is at /root/Root/HUD");
-			return;
-		}
-
-		UpdateHUD();
+		// Emit initial state
+		EmitHealthUpdate();
+		EmitExperienceUpdate();
+		EmitResourcesUpdate(0, 0, 0, 0);
+		EmitFloorInfoUpdate(1, "Initialization");
+		EmitWaveInfoUpdate(1, 0);
 	}
+
+	public override void _UnhandledInput(InputEvent @event)
+	{
+		if (@event is InputEventKey eventKey && eventKey.Pressed)
+		{
+			if (eventKey.Keycode == Key.Q && PrimarySkill != null)
+			{
+				UseSkill(PrimarySkill, ref _primarySkillCooldownTimer);
+			}
+			else if (eventKey.Keycode == Key.E && SecondarySkill != null)
+			{
+				UseSkill(SecondarySkill, ref _secondarySkillCooldownTimer);
+			}
+			else if (eventKey.Keycode == Key.R && UltimateSkill != null)
+			{
+				UseSkill(UltimateSkill, ref _ultimateSkillCooldownTimer);
+			}
+		}
+	}
+
 
 	public override void _PhysicsProcess(double delta)
 	{
@@ -73,9 +106,14 @@ public partial class Player : CharacterBody2D
 		Velocity = direction * Speed;
 
 		if (direction != Vector2.Zero)
-		{
 			Rotation = direction.Angle();
-		}
+
+		if (_primarySkillCooldownTimer > 0)
+			_primarySkillCooldownTimer -= (float)delta;
+		if (_secondarySkillCooldownTimer > 0)
+			_secondarySkillCooldownTimer -= (float)delta;
+		if (_ultimateSkillCooldownTimer > 0)
+			_ultimateSkillCooldownTimer -= (float)delta;
 
 		MoveAndSlide();
 
@@ -87,6 +125,8 @@ public partial class Player : CharacterBody2D
 			_timeSinceLastShot = 0f;
 		}
 	}
+
+	private void Attack() { }
 
 	private void Shoot()
 	{
@@ -105,12 +145,40 @@ public partial class Player : CharacterBody2D
 		GetTree().Root.AddChild(projectile);
 	}
 
+	private void UseSkill(Skill skill, ref float cooldownRemaining)
+	{
+		if (skill == null)
+		{
+			GD.Print("No skill equipped!");
+			return;
+		}
+
+		if (cooldownRemaining > 0)
+		{
+			GD.Print($"{skill.SkillName} on cooldown: {cooldownRemaining:F1}s remaining");
+			return;
+		}
+
+		GD.Print($"Using {skill.SkillName}!");
+
+		// Execute skill effect
+		ExecuteSkillEffect(skill);
+
+		// Start cooldown
+		cooldownRemaining = skill.Cooldown;
+	}
+
+	private void ExecuteSkillEffect(Skill skill)
+	{
+		skill.Execute(this);
+	}
+
 	public void TakeDamage(float damage)
 	{
 		Health -= damage;
 		if (Health < 0) Health = 0;
 
-		UpdateHUD();
+		EmitHealthUpdate();
 
 		if (Health <= 0)
 		{
@@ -127,7 +195,7 @@ public partial class Player : CharacterBody2D
 			LevelUp();
 		}
 
-		UpdateHUD();
+		EmitExperienceUpdate();
 	}
 
 	private void LevelUp()
@@ -148,7 +216,8 @@ public partial class Player : CharacterBody2D
 			LevelUpPanel.ShowUpgrades(upgradeOptions);
 		}
 
-		UpdateHUD();
+		EmitHealthUpdate();
+		EmitExperienceUpdate();
 	}
 
 	private List<Upgrade> GetRandomUpgrades(int count)
@@ -157,15 +226,29 @@ public partial class Player : CharacterBody2D
 		return [.. shuffled.Take(count)];
 	}
 
-	private void UpdateHUD()
+	private void EmitHealthUpdate()
 	{
-		if (HUD == null) return;
+		EmitSignal(SignalName.HealthChanged, Health, MaxHealth);
+	}
 
-		HUD.UpdateHealth(Health, MaxHealth);
-		HUD.UpdateExperience(Experience, ExperienceToNextLevel, Level);
-		HUD.UpdateResources(0, 0, 0, 0);
-		HUD.UpdateFloorInfo(1, "Initialization");
-		HUD.UpdateWaveInfo(1, 0);
+	private void EmitExperienceUpdate()
+	{
+		EmitSignal(SignalName.ExperienceChanged, Experience, ExperienceToNextLevel, Level);
+	}
+
+	private void EmitResourcesUpdate(int gold, int cores, int components, int fragments)
+	{
+		EmitSignal(SignalName.ResourcesChanged, gold, cores, components, fragments);
+	}
+
+	private void EmitFloorInfoUpdate(int floorNumber, string floorName)
+	{
+		EmitSignal(SignalName.FloorInfoChanged, floorNumber, floorName);
+	}
+
+	private void EmitWaveInfoUpdate(int waveNumber, int enemiesRemaining)
+	{
+		EmitSignal(SignalName.WaveInfoChanged, waveNumber, enemiesRemaining);
 	}
 
 	private void Die()
