@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://byy2xqaagfcws"]
 
-[ext_resource type="Script" uid="uid://ds6w70t0n4jl1" path="res://Scripts/Items/ExperienceShard.cs" id="1_hy72a"]
+[ext_resource type="Script" uid="uid://ds6w70t0n4jl1" path="res://Scripts/Items/Collectibles/ExperienceShard.cs" id="1_hy72a"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_5e3jn"]
 size = Vector2(8, 8)

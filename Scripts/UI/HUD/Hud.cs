@@ -1,7 +1,7 @@
 using Godot;
 using SpaceTower.Scripts.PlayerScripts;
 
-namespace SpaceTower.Scripts.UI;
+namespace SpaceTower.Scripts.UI.HUD;
 
 public partial class Hud : Control
 {

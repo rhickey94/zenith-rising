@@ -11,7 +11,8 @@ A sci-fi roguelite action-RPG with idle/incremental mechanics built in Godot 4.x
 - Every run contributes to permanent progression (no wasted time)
 
 ## Current Status
-**Phase:** Early Development (MVP - ~30% complete)
+**Phase:** Early Development (MVP - ~40% complete)
+
 **Completed:**
 - ✅ Player movement and shooting mechanics
 - ✅ Enemy AI (chase and attack)
@@ -21,15 +22,21 @@ A sci-fi roguelite action-RPG with idle/incremental mechanics built in Godot 4.x
 - ✅ XP shard drops and collection
 - ✅ Level-up system with upgrade choices
 - ✅ 8 basic upgrade types with functional effects
+- ✅ **Player component refactor** (StatsManager, SkillManager, UpgradeManager)
+- ✅ **Namespace organization** (proper C# structure)
+- ✅ **Q/E/R active skill system** (cooldowns, skill resources, executor pattern)
+- ✅ **First working skill: Whirlwind** (AOE damage)
+- ✅ **Melee attack system** (left-click melee combat)
+- ✅ **EditorConfig** (code standards enforced)
 
 **In Progress:**
+- Skill expansion (have 1 skill, need 2-3 per slot minimum)
 - Enemy variety (need more types)
 - Upgrade pool expansion (have 8, want 20+)
 
 **Not Started:**
-- Active skill system (Q/E/R abilities)
 - Upgrade system refactor (currently hardcoded, needs UpgradePoolManager)
-- Skill mastery system
+- Skill mastery tracking system
 - Materials system
 - Workshop/Treasury (idle systems)
 - Multiple floors (have 1, need 5+)
@@ -120,29 +127,55 @@ Before launch, players should be able to:
 
 ## Project Structure
 ```
-TowerAscension/
+SpaceTower/
 ├── Scenes/
 │   ├── Game.tscn (main game scene)
 │   ├── Player.tscn
 │   ├── Enemy.tscn
 │   ├── Projectile.tscn
+│   ├── MeleeAttack.tscn
 │   ├── XPShard.tscn
 │   ├── HUD.tscn
 │   └── LevelUpPanel.tscn
 ├── Scripts/
-│   ├── Player.cs
-│   ├── Enemy.cs
-│   ├── Projectile.cs
-│   ├── XPShard.cs
-│   ├── Hud.cs
-│   ├── LevelUpPanel.cs
 │   ├── Game.cs
-│   └── UpgradeResource.cs
+│   ├── Player/
+│   │   ├── Player.cs
+│   │   └── Components/
+│   │       ├── StatsManager.cs
+│   │       ├── SkillManager.cs
+│   │       └── UpgradeManager.cs
+│   ├── Skills/
+│   │   ├── Skill.cs (Resource)
+│   │   ├── ISkillExecutor.cs
+│   │   └── Whirlwind.cs
+│   ├── Effects/
+│   │   ├── Projectile.cs
+│   │   ├── MeleeAttack.cs
+│   │   └── WhirlwindEffect.cs
+│   ├── Enemy/
+│   │   └── Enemy.cs
+│   ├── Items/
+│   │   └── ExperienceShard.cs
+│   ├── Progression/
+│   │   └── Upgrade.cs
+│   └── UI/
+│       ├── Hud.cs
+│       └── LevelUpPanel.cs
 └── Assets/
     ├── Sprites/
     ├── Audio/
     └── Fonts/
 ```
+
+**Namespace Structure:**
+- `SpaceTower.Scripts.PlayerScripts` - Player and components
+- `SpaceTower.Scripts.Skills` - Skill system
+- `SpaceTower.Scripts.Effects` - Visual effects and projectiles
+- `SpaceTower.Scripts.EnemyScripts` - Enemy logic
+- `SpaceTower.Scripts.UI` - HUD and menus
+- `SpaceTower.Progression` - Upgrades and progression
+- `SpaceTower.Items` - Collectibles
 
 ## Core Systems
 
@@ -803,29 +836,40 @@ Before ending session:
 - No save system (progress lost on quit)
 
 ## Next Priority Tasks
-1. **Implement Q/E/R active skill system** (foundation for everything else)
-   - Add cooldown-based skills (1-2 per slot for one class)
-   - Manual/auto aim depending on skill
-   - Visual feedback (cooldown UI in HUD)
-   - Keep it simple: just make skills work and feel good
 
-2. **Refactor upgrade system to use UpgradePoolManager** (AFTER skills work)
+### Completed ✅
+1. ~~**Implement Q/E/R active skill system**~~ - DONE!
+   - ✅ Cooldown-based skills working
+   - ✅ SkillManager component handles input
+   - ✅ Skill Resource system with ISkillExecutor pattern
+   - ✅ First skill implemented: Whirlwind
+
+### Current Focus 🎯
+2. **Expand skill pool** (2-3 skills minimum per slot)
+   - Add 2 more Q skills (offensive): Fireball, Dash Strike
+   - Add 2-3 E skills (utility/defensive): Shield, Teleport, Slow Field
+   - Add 1-2 R skills (ultimate): Meteor, Time Stop
+   - Each skill needs: visual effect, sound, feel impactful
+   - Test each skill for fun factor before moving on
+
+### Next Up 📋
+3. **Refactor upgrade system to use UpgradePoolManager**
    - Extend `Upgrade.cs` with: Category, RequiredSkill, Weight, CanStack fields
    - Create UpgradePoolManager singleton (autoload)
    - Load upgrades from Resources/Upgrades/ directory
    - Implement weighted selection (40% skill modifiers, 40% passives, 20% stats)
    - Add skill-specific filtering (only show if skill equipped)
-   - Remove hardcoded upgrade list from Player.cs
+   - Remove hardcoded upgrade list from UpgradeManager.cs
 
-3. **Implement skill mastery tracking** (builds on working skills)
+4. **Implement skill mastery tracking** (builds on working skills)
    - Track kills per skill (Bronze/Silver/Gold/Diamond tiers)
    - Visual progress in HUD
    - Permanent progression across runs
 
-4. Add 2-3 enemy types (fast/tank/ranged)
-5. Implement basic material drop system
-6. Create floor transition system
-7. Add boss encounter for Floor 1
+5. Add 2-3 enemy types (fast/tank/ranged)
+6. Implement basic material drop system
+7. Create floor transition system
+8. Add boss encounter for Floor 1
 
 ## Development Notes
 - Keep sessions focused on ONE feature
@@ -836,7 +880,8 @@ Before ending session:
 - Commit working code daily
 
 ### Technical Debt / Pending Refactors
-- **Upgrade System:** Currently hardcoded in Player.cs. Needs UpgradePoolManager refactor (documented in Next Priority Tasks #2) - do AFTER skills are implemented
+- **Upgrade System:** Currently hardcoded in UpgradeManager.cs. Needs UpgradePoolManager refactor (documented in Next Priority Tasks #3) - do AFTER more skills are implemented
+- ~~**Player Component Refactor:**~~ ✅ COMPLETED - Player now uses StatsManager, SkillManager, and UpgradeManager components
 
 ## For Claude Code
 

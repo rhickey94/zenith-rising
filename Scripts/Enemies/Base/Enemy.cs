@@ -1,8 +1,8 @@
 using Godot;
-using SpaceTower.Scripts.Items;
+using SpaceTower.Scripts.Items.Collectibles;
 using SpaceTower.Scripts.PlayerScripts;
 
-namespace SpaceTower.Scripts.EnemyScripts;
+namespace SpaceTower.Scripts.Enemies.Base;
 
 public partial class Enemy : CharacterBody2D
 {

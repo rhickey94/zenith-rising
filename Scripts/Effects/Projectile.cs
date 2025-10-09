@@ -1,5 +1,5 @@
 using Godot;
-using SpaceTower.Scripts.EnemyScripts;
+using SpaceTower.Scripts.Enemies.Base;
 
 namespace SpaceTower.Scripts.Effects;
 

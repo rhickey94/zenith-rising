@@ -1,8 +1,9 @@
 using Godot;
-using SpaceTower.Scripts.EnemyScripts;
+using SpaceTower.Scripts.Enemies.Base;
 using SpaceTower.Scripts.PlayerScripts;
+using SpaceTower.Scripts.Skills.Base;
 
-namespace SpaceTower.Scripts.Skills;
+namespace SpaceTower.Scripts.Skills.Offensive;
 
 public class Whirlwind : ISkillExecutor
 {

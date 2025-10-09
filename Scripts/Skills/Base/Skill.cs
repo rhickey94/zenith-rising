@@ -1,7 +1,8 @@
 using Godot;
 using SpaceTower.Scripts.PlayerScripts;
+using SpaceTower.Scripts.Skills.Offensive;
 
-namespace SpaceTower.Scripts.Skills;
+namespace SpaceTower.Scripts.Skills.Base;
 
 [GlobalClass]
 public partial class Skill : Resource

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using SpaceTower.Progression;
+using SpaceTower.Progression.Upgrades;
 
 namespace SpaceTower.Scripts.PlayerScripts.Components;
 

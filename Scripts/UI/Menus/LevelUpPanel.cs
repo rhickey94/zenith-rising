@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Godot;
-using SpaceTower.Progression;
+using SpaceTower.Progression.Upgrades;
 
-namespace SpaceTower.Scripts.UI;
+namespace SpaceTower.Scripts.UI.Menus;
 
 public partial class LevelUpPanel : Control
 {

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://fr50f27cq0cp"]
 
-[ext_resource type="Script" uid="uid://bj0i1dqrc7sdy" path="res://Scripts/UI/LevelUpPanel.cs" id="1_hnakl"]
+[ext_resource type="Script" uid="uid://bj0i1dqrc7sdy" path="res://Scripts/UI/Menus/LevelUpPanel.cs" id="1_hnakl"]
 
 [node name="LevelUpPanel" type="Control"]
 layout_mode = 3
