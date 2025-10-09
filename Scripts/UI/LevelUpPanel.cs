@@ -28,6 +28,7 @@ public partial class LevelUpPanel : Control
         _upgradeButton3.Pressed += () => SelectUpgrade(2);
 
         Hide(); // Hidden by default
+
     }
 
     public void ShowUpgrades(List<Upgrade> options)
@@ -40,6 +41,7 @@ public partial class LevelUpPanel : Control
 
         Show();
         GetTree().Paused = true; // Pause game
+
     }
 
     private string FormatUpgrade(Upgrade upgrade)
@@ -52,5 +54,6 @@ public partial class LevelUpPanel : Control
         EmitSignal(SignalName.UpgradeSelected, _currentOptions[index]);
         Hide();
         GetTree().Paused = false; // Resume game
+
     }
 }

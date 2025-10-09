@@ -7,64 +7,69 @@ namespace SpaceTower.Scripts;
 
 public partial class Game : Node
 {
-  // Scenes
-  [Export] public PackedScene EnemyScene;
+		// Scenes
 
-  // Dependencies
-  [Export] public Player Player;
-  [Export] public Hud HUD;
+		[Export] public PackedScene EnemyScene;
 
-  // Settings
-  [Export] public float SpawnDistance = 400.0f;
-  [Export] public float SpawnInterval = 2.0f;
+		// Dependencies
 
-  private Timer _spawnTimer;
-  private int _enemiesSpawned = 0;
+		[Export] public Player Player;
+		[Export] public Hud HUD;
 
-  public override void _Ready()
-  {
-    _spawnTimer = GetNode<Timer>("SpawnTimer");
-    _spawnTimer.WaitTime = SpawnInterval;
-    _spawnTimer.Timeout += SpawnEnemy;
+		// Settings
 
-    // Validate dependencies
-    if (Player == null)
-    {
-      GD.PrintErr("Game: Player not assigned! Drag Player node into Game's Player field.");
-      return;
-    }
+		[Export] public float SpawnDistance = 400.0f;
+		[Export] public float SpawnInterval = 2.0f;
 
-    if (HUD == null)
-    {
-      GD.PrintErr("Game: HUD not assigned!");
-      return;
-    }
+		private Timer _spawnTimer;
+		private int _enemiesSpawned = 0;
 
-    if (EnemyScene == null)
-    {
-      GD.PrintErr("Game: EnemyScene not assigned!");
-    }
+		public override void _Ready()
+		{
+				_spawnTimer = GetNode<Timer>("SpawnTimer");
+				_spawnTimer.WaitTime = SpawnInterval;
+				_spawnTimer.Timeout += SpawnEnemy;
 
-    Player.Initialize();
-  }
+				// Validate dependencies
 
-  private void SpawnEnemy()
-  {
-    if (Player == null || EnemyScene == null) return;
+				if (Player == null)
+				{
+						GD.PrintErr("Game: Player not assigned! Drag Player node into Game's Player field.");
+						return;
+				}
 
-    var angle = GD.Randf() * Mathf.Tau;
-    var spawnPosition = Player.Position + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * SpawnDistance;
+				if (HUD == null)
+				{
+						GD.PrintErr("Game: HUD not assigned!");
+						return;
+				}
 
-    var enemy = EnemyScene.Instantiate<Enemy>();
-    enemy.Position = spawnPosition;
-    AddChild(enemy);
+				if (EnemyScene == null)
+				{
+						GD.PrintErr("Game: EnemyScene not assigned!");
+				}
 
-    _enemiesSpawned++;
+				Player.Initialize();
+		}
 
-    // Increase difficulty over time (optional)
-    // if (_enemiesSpawned % 10 == 0 && _spawnTimer.WaitTime > 0.5f)
-    // {
-    //   _spawnTimer.WaitTime *= 0.95f; // Spawn 5% faster every 10 enemies
-    // }
-  }
+		private void SpawnEnemy()
+		{
+				if (Player == null || EnemyScene == null) return;
+
+				var angle = GD.Randf() * Mathf.Tau;
+				var spawnPosition = Player.Position + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * SpawnDistance;
+
+				var enemy = EnemyScene.Instantiate<Enemy>();
+				enemy.Position = spawnPosition;
+				AddChild(enemy);
+
+				_enemiesSpawned++;
+
+				// Increase difficulty over time (optional)
+				// if (_enemiesSpawned % 10 == 0 && _spawnTimer.WaitTime > 0.5f)
+				// {
+				//   _spawnTimer.WaitTime *= 0.95f; // Spawn 5% faster every 10 enemies
+				// }
+
+		}
 }

@@ -4,26 +4,27 @@ namespace SpaceTower.Scripts.Effects;
 
 public partial class WhirlwindEffect : Node2D
 {
-  [Export] public float Duration { get; set; } = 1.0f; // Duration in seconds
-  [Export] public float RotationSpeed { get; set; } = 10.0f;
+		[Export] public float Duration { get; set; } = 1.0f; // Duration in seconds
 
-  private float _elapsedTime = 0.0f;
+		[Export] public float RotationSpeed { get; set; } = 10.0f;
 
-  public override void _Ready()
-  {
-  }
+		private float _elapsedTime = 0.0f;
 
-  public override void _Process(double delta)
-  {
-    Rotation += RotationSpeed * (float)delta;
+		public override void _Ready()
+		{
+		}
 
-    _elapsedTime += (float)delta;
-    var fadeProgress = _elapsedTime / Duration;
-    Modulate = new Color(1, 1, 1, 1 - fadeProgress);
+		public override void _Process(double delta)
+		{
+				Rotation += RotationSpeed * (float)delta;
 
-    if (_elapsedTime >= Duration)
-    {
-      QueueFree();
-    }
-  }
+				_elapsedTime += (float)delta;
+				var fadeProgress = _elapsedTime / Duration;
+				Modulate = new Color(1, 1, 1, 1 - fadeProgress);
+
+				if (_elapsedTime >= Duration)
+				{
+						QueueFree();
+				}
+		}
 }
