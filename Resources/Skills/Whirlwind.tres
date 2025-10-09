@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://5g8accyxr8hh"]
 
 [ext_resource type="PackedScene" uid="uid://blpyt6xpu1lhh" path="res://Scenes/Effects/whirlwind_effect.tscn" id="1_fdban"]
-[ext_resource type="Script" uid="uid://dff1q4v5i7rpk" path="res://Scripts/Progression/Skill.cs" id="1_rfmtf"]
+[ext_resource type="Script" uid="uid://dff1q4v5i7rpk" path="res://Scripts/Skills/Skill.cs" id="1_rfmtf"]
 
 [resource]
 script = ExtResource("1_rfmtf")

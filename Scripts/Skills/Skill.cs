@@ -1,5 +1,7 @@
 using Godot;
-using System;
+using SpaceTower.Scripts.PlayerScripts;
+
+namespace SpaceTower.Scripts.Skills;
 
 [GlobalClass]
 public partial class Skill : Resource

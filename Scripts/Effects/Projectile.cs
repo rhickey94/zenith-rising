@@ -1,5 +1,7 @@
 using Godot;
-using System;
+using SpaceTower.Scripts.EnemyScripts;
+
+namespace SpaceTower.Scripts.Effects;
 
 public partial class Projectile : Area2D
 {

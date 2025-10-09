@@ -1,7 +1,9 @@
 using Godot;
-using System;
+using SpaceTower.Progression;
 using System.Collections.Generic;
 using System.Linq;
+
+namespace SpaceTower.Scripts.PlayerScripts.Components;
 
 [GlobalClass]
 public partial class UpgradeManager : Node

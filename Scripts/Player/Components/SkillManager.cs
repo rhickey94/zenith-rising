@@ -1,5 +1,7 @@
 using Godot;
-using System;
+using SpaceTower.Scripts.Skills;
+
+namespace SpaceTower.Scripts.PlayerScripts.Components;
 
 [GlobalClass]
 public partial class SkillManager : Node

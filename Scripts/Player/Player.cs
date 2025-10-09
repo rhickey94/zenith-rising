@@ -1,7 +1,11 @@
 using Godot;
-using System;
+using SpaceTower.Progression;
+using SpaceTower.Scripts.Effects;
+using SpaceTower.Scripts.PlayerScripts.Components;
+using SpaceTower.Scripts.UI;
 using System.Collections.Generic;
-using System.Linq;
+
+namespace SpaceTower.Scripts.PlayerScripts;
 
 public partial class Player : CharacterBody2D
 {
@@ -116,7 +120,7 @@ public partial class Player : CharacterBody2D
 	}
 
 	private void Melee()
-  {
+	{
 		if (MeleeAttackScene == null) return;
 
 		var meleeAttack = MeleeAttackScene.Instantiate<MeleeAttack>();

@@ -1,6 +1,8 @@
 using Godot;
 using System;
 
+namespace SpaceTower.Scripts.PlayerScripts.Components;
+
 [GlobalClass]
 public partial class StatsManager : Node
 {

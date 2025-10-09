@@ -1,5 +1,6 @@
 using Godot;
-using System;
+
+namespace SpaceTower.Scripts.Effects;
 
 public partial class WhirlwindEffect : Node2D
 {

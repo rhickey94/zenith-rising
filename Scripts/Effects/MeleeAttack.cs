@@ -1,6 +1,8 @@
 using Godot;
-using System;
+using SpaceTower.Scripts.EnemyScripts;
 using System.Collections.Generic;
+
+namespace SpaceTower.Scripts.Effects;
 
 public partial class MeleeAttack : Area2D
 {

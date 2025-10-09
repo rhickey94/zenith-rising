@@ -1,5 +1,9 @@
 using Godot;
-using System;
+using SpaceTower.Scripts.EnemyScripts;
+using SpaceTower.Scripts.PlayerScripts;
+using SpaceTower.Scripts.UI;
+
+namespace SpaceTower.Scripts;
 
 public partial class Game : Node
 {

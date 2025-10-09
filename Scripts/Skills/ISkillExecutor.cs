@@ -1,6 +1,8 @@
-using Godot;
+using SpaceTower.Scripts.PlayerScripts;
 
-public interface ISkillExecutor 
+namespace SpaceTower.Scripts.Skills;
+
+public interface ISkillExecutor
 {
   void ExecuteSkill(Player player, Skill skill);
 }

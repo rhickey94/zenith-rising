@@ -1,5 +1,8 @@
 using Godot;
-using System;
+using SpaceTower.Scripts.Items;
+using SpaceTower.Scripts.PlayerScripts;
+
+namespace SpaceTower.Scripts.EnemyScripts;
 
 public partial class Enemy : CharacterBody2D
 {
@@ -17,7 +20,7 @@ public partial class Enemy : CharacterBody2D
   [Export] public PackedScene ExperienceShardScene;
   private Player _player;
   private Sprite2D _sprite;
-  
+
 
   private float _timeSinceLastAttack = 0f;
 
@@ -98,7 +101,7 @@ public partial class Enemy : CharacterBody2D
 
   private void SpawnExperienceShards()
   {
-        if (ExperienceShardScene != null && _player != null)
+    if (ExperienceShardScene != null && _player != null)
     {
       for (int i = 0; i < ExperienceShardCount; i++)
       {

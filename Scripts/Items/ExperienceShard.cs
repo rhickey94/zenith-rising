@@ -1,5 +1,7 @@
 using Godot;
-using System;
+using SpaceTower.Scripts.PlayerScripts;
+
+namespace SpaceTower.Scripts.Items;
 
 public partial class ExperienceShard : Area2D
 {
