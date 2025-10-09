@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://6a6ovxmbcjd1"]
+[gd_scene load_steps=18 format=3 uid="uid://6a6ovxmbcjd1"]
 
 [ext_resource type="Script" uid="uid://ije0l625j2w0" path="res://Scripts/Game.cs" id="1_wrm1d"]
 [ext_resource type="PackedScene" uid="uid://cvuvmrd8khk2g" path="res://Scenes/Enemy/enemy.tscn" id="2_3dryh"]
@@ -6,13 +6,10 @@
 [ext_resource type="Resource" uid="uid://5g8accyxr8hh" path="res://Resources/Skills/Whirlwind.tres" id="4_1l0tm"]
 [ext_resource type="Script" uid="uid://fwkhgpcy2am3" path="res://Scripts/UI/Hud.cs" id="4_3dryh"]
 [ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/UI/projectile.tscn" id="4_i6g32"]
+[ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="5_i6g32"]
 [ext_resource type="PackedScene" uid="uid://fr50f27cq0cp" path="res://Scenes/UI/level_up_panel.tscn" id="6_i6g32"]
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_sh265"]
-size = Vector2(50, 50)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
-size = Vector2(50, 50)
+[ext_resource type="Script" uid="uid://b3km77lyp5ba3" path="res://Scripts/Player/Components/StatsManager.cs" id="9_h4fw4"]
+[ext_resource type="Script" uid="uid://cx5d7m8au6iit" path="res://Scripts/Player/Components/UpgradeManager.cs" id="10_ldgsr"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3gfia"]
 bg_color = Color(0.16470589, 0.16470589, 0.16470589, 1)
@@ -62,28 +59,17 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_sh265"]
+size = Vector2(50, 50)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
+size = Vector2(50, 50)
+
 [node name="Game" type="Node" node_paths=PackedStringArray("Player", "HUD")]
 script = ExtResource("1_wrm1d")
 EnemyScene = ExtResource("2_3dryh")
 Player = NodePath("Player")
 HUD = NodePath("UILayer/HUD")
-
-[node name="Player" type="CharacterBody2D" parent="." node_paths=PackedStringArray("LevelUpPanel") groups=["player"]]
-script = ExtResource("3_wowpa")
-PrimarySkill = ExtResource("4_1l0tm")
-ProjectileScene = ExtResource("4_i6g32")
-LevelUpPanel = NodePath("../UILayer/LevelUpPanel")
-
-[node name="Sprite2D" type="Sprite2D" parent="Player"]
-modulate = Color(0.8070632, 0.64180166, 0.89619935, 1)
-position = Vector2(3, -1)
-texture = SubResource("PlaceholderTexture2D_sh265")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
-position = Vector2(2, 0)
-shape = SubResource("RectangleShape2D_4flbx")
-
-[node name="Camera2D" type="Camera2D" parent="Player"]
 
 [node name="SpawnTimer" type="Timer" parent="."]
 wait_time = 2.0
@@ -237,3 +223,32 @@ horizontal_alignment = 1
 
 [node name="LevelUpPanel" parent="UILayer" instance=ExtResource("6_i6g32")]
 process_mode = 3
+
+[node name="Player" type="CharacterBody2D" parent="." node_paths=PackedStringArray("LevelUpPanel") groups=["player"]]
+script = ExtResource("3_wowpa")
+ProjectileScene = ExtResource("4_i6g32")
+LevelUpPanel = NodePath("../UILayer/LevelUpPanel")
+
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
+modulate = Color(0.8070632, 0.64180166, 0.89619935, 1)
+position = Vector2(3, -1)
+texture = SubResource("PlaceholderTexture2D_sh265")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+position = Vector2(2, 0)
+shape = SubResource("RectangleShape2D_4flbx")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+
+[node name="SkillManager" type="Node" parent="Player"]
+script = ExtResource("5_i6g32")
+PrimarySkill = ExtResource("4_1l0tm")
+metadata/_custom_type_script = "uid://bvjyaqpu6dell"
+
+[node name="StatsManager" type="Node" parent="Player"]
+script = ExtResource("9_h4fw4")
+metadata/_custom_type_script = "uid://b3km77lyp5ba3"
+
+[node name="UpgradeManager" type="Node" parent="Player"]
+script = ExtResource("10_ldgsr")
+metadata/_custom_type_script = "uid://cx5d7m8au6iit"

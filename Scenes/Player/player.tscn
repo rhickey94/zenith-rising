@@ -1,7 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://jb1p3bafbe1"]
+[gd_scene load_steps=8 format=3 uid="uid://jb1p3bafbe1"]
 
-[ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_v0iea"]
-[ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/UI/projectile.tscn" id="2_cvnsp"]
+[ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="1_a3d8c"]
+[ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_xpcdj"]
+[ext_resource type="Resource" uid="uid://5g8accyxr8hh" path="res://Resources/Skills/Whirlwind.tres" id="2_xpcdj"]
+[ext_resource type="Script" uid="uid://b3km77lyp5ba3" path="res://Scripts/Player/Components/StatsManager.cs" id="4_mtuoh"]
+[ext_resource type="Script" uid="uid://cx5d7m8au6iit" path="res://Scripts/Player/Components/UpgradeManager.cs" id="5_htcer"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_sh265"]
 size = Vector2(50, 50)
@@ -10,8 +13,7 @@ size = Vector2(50, 50)
 size = Vector2(50, 50)
 
 [node name="Player" type="CharacterBody2D" groups=["player"]]
-script = ExtResource("1_v0iea")
-ProjectileScene = ExtResource("2_cvnsp")
+script = ExtResource("1_xpcdj")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 modulate = Color(0.8070632, 0.64180166, 0.89619935, 1)
@@ -23,3 +25,16 @@ position = Vector2(2, 0)
 shape = SubResource("RectangleShape2D_4flbx")
 
 [node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="SkillManager" type="Node" parent="."]
+script = ExtResource("1_a3d8c")
+PrimarySkill = ExtResource("2_xpcdj")
+metadata/_custom_type_script = "uid://bvjyaqpu6dell"
+
+[node name="StatsManager" type="Node" parent="."]
+script = ExtResource("4_mtuoh")
+metadata/_custom_type_script = "uid://b3km77lyp5ba3"
+
+[node name="UpgradeManager" type="Node" parent="."]
+script = ExtResource("5_htcer")
+metadata/_custom_type_script = "uid://cx5d7m8au6iit"

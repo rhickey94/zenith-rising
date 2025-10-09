@@ -6,29 +6,13 @@ using System.Linq;
 public partial class Player : CharacterBody2D
 {
 	// Stats
-	[Export] public float MaxHealth { get; set; } = 100.0f;
 	[Export] public float Speed = 300.0f;
 	[Export] public float FireRate = 0.2f;
-
-	// Skills
-	[Export] public Skill PrimarySkill;
-	[Export] public Skill SecondarySkill;
-	[Export] public Skill UltimateSkill;
-	private float _primarySkillCooldownTimer = 0.0f;
-	private float _secondarySkillCooldownTimer = 0.0f;
-	private float _ultimateSkillCooldownTimer = 0.0f;
-
-	public float Health { get; private set; } = 100.0f;
-
-	// Progression
-	[Export] public int Level { get; private set; } = 1;
-	[Export] public int Experience { get; private set; } = 0;
-	[Export] public int ExperienceToNextLevel { get; private set; } = 100;
 
 	// Scenes
 	[Export] public PackedScene ProjectileScene;
 
-	// Dependencies
+	// UI Dependencies
 	[Export] public LevelUpPanel LevelUpPanel;
 
 	// Signals for HUD updates
@@ -38,43 +22,57 @@ public partial class Player : CharacterBody2D
 	[Signal] public delegate void FloorInfoChangedEventHandler(int floorNumber, string floorName);
 	[Signal] public delegate void WaveInfoChangedEventHandler(int waveNumber, int enemiesRemaining);
 
+	private SkillManager _skillManager;
+	private StatsManager _statsManager;
+	private UpgradeManager _upgradeManager;
 	private Dictionary<UpgradeType, float> _activeUpgrades = [];
-	// Available upgrades pool
-	private List<Upgrade> _availableUpgrades =
-	[
-			new Upgrade { UpgradeName = "Damage Boost", Description = "+15% Damage", Type = UpgradeType.DamagePercent, Value = 0.15f },
-				new Upgrade { UpgradeName = "Attack Speed", Description = "+20% Fire Rate", Type = UpgradeType.AttackSpeed, Value = 0.20f },
-				new Upgrade { UpgradeName = "Swift Feet", Description = "+15% Movement Speed", Type = UpgradeType.MovementSpeed, Value = 0.15f },
-				new Upgrade { UpgradeName = "Vitality", Description = "+50 Max Health", Type = UpgradeType.MaxHealth, Value = 50f },
-				new Upgrade { UpgradeName = "Magnet", Description = "+30 Pickup Radius", Type = UpgradeType.PickupRadius, Value = 30f },
-				new Upgrade { UpgradeName = "Piercing Shots", Description = "Projectiles Pierce +1", Type = UpgradeType.ProjectilePierce, Value = 1f },
-				new Upgrade { UpgradeName = "Critical Hit", Description = "+10% Crit Chance", Type = UpgradeType.CritChance, Value = 0.10f },
-				new Upgrade { UpgradeName = "Regeneration", Description = "+2 HP/sec", Type = UpgradeType.HealthRegen, Value = 2f }
-	];
+
 	private float _timeSinceLastShot = 0f;
 
 	public override void _Ready()
 	{
 		AddToGroup("player");
 
-		Health = MaxHealth;
-
 		if (ProjectileScene == null)
 		{
 			GD.PrintErr("Player: ProjectileScene not assigned!");
 		}
 
+		// Get SkillManager component
+		_skillManager = GetNode<SkillManager>("SkillManager");
+		if (_skillManager == null)
+		{
+			GD.PrintErr("Player: SkillManager component not found!");
+		}
+
+		_statsManager = GetNode<StatsManager>("StatsManager");
+		if (_statsManager == null)
+		{
+			GD.PrintErr("Player: StatsManager component not found!");
+		}
+		else
+		{
+			// Subscribe to level up event
+			_statsManager.LeveledUp += OnLeveledUp;
+		}
+
+		_upgradeManager = GetNode<UpgradeManager>("UpgradeManager");
+		if (_upgradeManager == null)
+		{
+			GD.PrintErr("Player: UpgradeManager component not found!");
+		}
+
+		// Connect to LevelUpPanel
 		if (LevelUpPanel != null)
 		{
-			LevelUpPanel.UpgradeSelected += OnUpgradeSelected;
+			LevelUpPanel.UpgradeSelected += HandleUpgradeSelection;
 		}
 	}
 
 	public void Initialize()
 	{
-		// Emit initial state
-		EmitHealthUpdate();
-		EmitExperienceUpdate();
+		_statsManager?.Initialize();
+
 		EmitResourcesUpdate(0, 0, 0, 0);
 		EmitFloorInfoUpdate(1, "Initialization");
 		EmitWaveInfoUpdate(1, 0);
@@ -82,21 +80,7 @@ public partial class Player : CharacterBody2D
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
-		if (@event is InputEventKey eventKey && eventKey.Pressed)
-		{
-			if (eventKey.Keycode == Key.Q && PrimarySkill != null)
-			{
-				UseSkill(PrimarySkill, ref _primarySkillCooldownTimer);
-			}
-			else if (eventKey.Keycode == Key.E && SecondarySkill != null)
-			{
-				UseSkill(SecondarySkill, ref _secondarySkillCooldownTimer);
-			}
-			else if (eventKey.Keycode == Key.R && UltimateSkill != null)
-			{
-				UseSkill(UltimateSkill, ref _ultimateSkillCooldownTimer);
-			}
-		}
+		_skillManager?.HandleInput(@event);
 	}
 
 
@@ -108,12 +92,8 @@ public partial class Player : CharacterBody2D
 		if (direction != Vector2.Zero)
 			Rotation = direction.Angle();
 
-		if (_primarySkillCooldownTimer > 0)
-			_primarySkillCooldownTimer -= (float)delta;
-		if (_secondarySkillCooldownTimer > 0)
-			_secondarySkillCooldownTimer -= (float)delta;
-		if (_ultimateSkillCooldownTimer > 0)
-			_ultimateSkillCooldownTimer -= (float)delta;
+		// Update skill cooldowns
+		_skillManager?.Update((float)delta);
 
 		MoveAndSlide();
 
@@ -145,95 +125,42 @@ public partial class Player : CharacterBody2D
 		GetTree().Root.AddChild(projectile);
 	}
 
-	private void UseSkill(Skill skill, ref float cooldownRemaining)
-	{
-		if (skill == null)
-		{
-			GD.Print("No skill equipped!");
-			return;
-		}
-
-		if (cooldownRemaining > 0)
-		{
-			GD.Print($"{skill.SkillName} on cooldown: {cooldownRemaining:F1}s remaining");
-			return;
-		}
-
-		GD.Print($"Using {skill.SkillName}!");
-
-		// Execute skill effect
-		ExecuteSkillEffect(skill);
-
-		// Start cooldown
-		cooldownRemaining = skill.Cooldown;
-	}
-
-	private void ExecuteSkillEffect(Skill skill)
-	{
-		skill.Execute(this);
-	}
-
 	public void TakeDamage(float damage)
 	{
-		Health -= damage;
-		if (Health < 0) Health = 0;
-
-		EmitHealthUpdate();
-
-		if (Health <= 0)
-		{
-			Die();
-		}
+		_statsManager?.TakeDamage(damage);
 	}
 
 	public void AddExperience(int amount)
 	{
-		Experience += amount;
-
-		while (Experience >= ExperienceToNextLevel)
-		{
-			LevelUp();
-		}
-
-		EmitExperienceUpdate();
+		_statsManager?.AddExperience(amount);
 	}
 
-	private void LevelUp()
+	private void OnLeveledUp()
 	{
-		Experience -= ExperienceToNextLevel;
-		Level++;
-		ExperienceToNextLevel = (int)(ExperienceToNextLevel * 1.5);
-
-		MaxHealth += 20;
-		Health = MaxHealth;
-		Speed += 10;
-
-		GD.Print($"Leveled up to {Level}!");
+		GD.Print("OnLeveledUp called!"); // DEBUG
+		GD.Print($"LevelUpPanel is null: {LevelUpPanel == null}"); // DEBUG
 
 		if (LevelUpPanel != null)
 		{
 			var upgradeOptions = GetRandomUpgrades(3);
+			GD.Print($"Got {upgradeOptions.Count} upgrade options"); // DEBUG
 			LevelUpPanel.ShowUpgrades(upgradeOptions);
 		}
+	}
 
-		EmitHealthUpdate();
-		EmitExperienceUpdate();
+	private void HandleUpgradeSelection(Upgrade upgrade)
+	{
+		_upgradeManager?.ApplyUpgrade(upgrade);
 	}
 
 	private List<Upgrade> GetRandomUpgrades(int count)
 	{
-		var shuffled = _availableUpgrades.OrderBy(x => GD.Randi()).ToList();
-		return [.. shuffled.Take(count)];
+		return _upgradeManager?.GetRandomUpgrades(count);
 	}
 
-	private void EmitHealthUpdate()
+	public float GetUpgradeValue(UpgradeType type)
 	{
-		EmitSignal(SignalName.HealthChanged, Health, MaxHealth);
-	}
-
-	private void EmitExperienceUpdate()
-	{
-		EmitSignal(SignalName.ExperienceChanged, Experience, ExperienceToNextLevel, Level);
+		return _upgradeManager?.GetUpgradeValue(type) ?? 0f;
 	}
 
 	private void EmitResourcesUpdate(int gold, int cores, int components, int fragments)
@@ -249,68 +176,5 @@ public partial class Player : CharacterBody2D
 	private void EmitWaveInfoUpdate(int waveNumber, int enemiesRemaining)
 	{
 		EmitSignal(SignalName.WaveInfoChanged, waveNumber, enemiesRemaining);
-	}
-
-	private void Die()
-	{
-		GD.Print("Player died!");
-		GetTree().ReloadCurrentScene();
-	}
-
-	private void OnUpgradeSelected(Upgrade upgrade)
-	{
-		// Track upgrade
-		if (_activeUpgrades.ContainsKey(upgrade.Type))
-		{
-			_activeUpgrades[upgrade.Type] += upgrade.Value;
-		}
-		else
-		{
-			_activeUpgrades[upgrade.Type] = upgrade.Value;
-		}
-
-		// Apply upgrade immediately
-		ApplyUpgrade(upgrade.Type);
-
-		GD.Print($"Selected: {upgrade.UpgradeName}");
-		GD.Print($"New Value: {_activeUpgrades[upgrade.Type]}");
-	}
-
-
-	private void ApplyUpgrade(UpgradeType upgradeType)
-	{
-		switch (upgradeType)
-		{
-			case UpgradeType.DamagePercent:
-				// Apply damage percent upgrade logic
-				break;
-			case UpgradeType.AttackSpeed:
-				FireRate *= 1 - _activeUpgrades[upgradeType];
-				break;
-			case UpgradeType.MovementSpeed:
-				Speed *= 1 + _activeUpgrades[upgradeType];
-				break;
-			case UpgradeType.MaxHealth:
-				MaxHealth += _activeUpgrades[upgradeType];
-				Health = MaxHealth; // Restore health on upgrade
-				break;
-			case UpgradeType.PickupRadius:
-				// Apply pickup radius upgrade logic
-				break;
-			case UpgradeType.ProjectilePierce:
-				// Apply projectile pierce upgrade logic
-				break;
-			case UpgradeType.CritChance:
-				// Apply crit chance upgrade logic
-				break;
-			case UpgradeType.HealthRegen:
-				// Apply health regen upgrade logic
-				break;
-		}
-	}
-
-	public float GetUpgradeValue(UpgradeType type)
-	{
-		return _activeUpgrades.GetValueOrDefault(type, 0f);
 	}
 }
