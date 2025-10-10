@@ -11,7 +11,7 @@ A sci-fi roguelite action-RPG with idle/incremental mechanics built in Godot 4.x
 - Every run contributes to permanent progression (no wasted time)
 
 ## Current Status
-**Phase:** Early Development (MVP - ~40% complete)
+**Phase:** Early Development (MVP - ~45% complete)
 
 **Completed:**
 - ✅ Player movement and shooting mechanics
@@ -25,18 +25,20 @@ A sci-fi roguelite action-RPG with idle/incremental mechanics built in Godot 4.x
 - ✅ **Player component refactor** (StatsManager, SkillManager, UpgradeManager)
 - ✅ **Namespace organization** (proper C# structure)
 - ✅ **Q/E/R active skill system** (cooldowns, skill resources, executor pattern)
-- ✅ **First working skill: Whirlwind** (AOE damage)
-- ✅ **Melee attack system** (left-click melee combat)
+- ✅ **Type-based skill architecture** (7 skill types, scalable to 100+ skills)
+- ✅ **Skill mastery system** (kill tracking, Bronze/Silver/Gold/Diamond tiers)
+- ✅ **Working skills:** Whirlwind (AOE), Fireball (projectile), Basic attacks (melee/ranged)
+- ✅ **Two-tier effect hierarchy** (SkillEffect for Node2D, CollisionSkillEffect for Area2D)
 - ✅ **EditorConfig** (code standards enforced)
 
 **In Progress:**
-- Skill expansion (have 1 skill, need 2-3 per slot minimum)
+- Implementing 4 new skill types (Dash, Buff, Teleport, DashMelee)
+- Skill expansion (have 3 skills, need 6+ per slot minimum)
 - Enemy variety (need more types)
 - Upgrade pool expansion (have 8, want 20+)
 
 **Not Started:**
 - Upgrade system refactor (currently hardcoded, needs UpgradePoolManager)
-- Skill mastery tracking system
 - Materials system
 - Workshop/Treasury (idle systems)
 - Multiple floors (have 1, need 5+)
@@ -132,36 +134,67 @@ SpaceTower/
 │   ├── Game.tscn (main game scene)
 │   ├── Player.tscn
 │   ├── Enemy.tscn
-│   ├── Projectile.tscn
-│   ├── MeleeAttack.tscn
 │   ├── XPShard.tscn
 │   ├── HUD.tscn
-│   └── LevelUpPanel.tscn
+│   ├── LevelUpPanel.tscn
+│   └── SkillEffects/
+│       ├── fireball_projectile.tscn
+│       ├── projectile.tscn
+│       ├── whirlwind_effect.tscn
+│       └── melee_attack.tscn
 ├── Scripts/
-│   ├── Game.cs
-│   ├── Player/
+│   ├── Core/
+│   │   └── Game.cs
+│   ├── PlayerScripts/
 │   │   ├── Player.cs
 │   │   └── Components/
 │   │       ├── StatsManager.cs
 │   │       ├── SkillManager.cs
 │   │       └── UpgradeManager.cs
 │   ├── Skills/
-│   │   ├── Skill.cs (Resource)
-│   │   ├── ISkillExecutor.cs
-│   │   └── Whirlwind.cs
-│   ├── Effects/
-│   │   ├── Projectile.cs
-│   │   ├── MeleeAttack.cs
-│   │   └── WhirlwindEffect.cs
-│   ├── Enemy/
+│   │   ├── Base/
+│   │   │   ├── Skill.cs (Resource + Factory + Mastery)
+│   │   │   └── ISkillExecutor.cs
+│   │   ├── Data/
+│   │   │   ├── ProjectileSkill.cs
+│   │   │   ├── InstantAOESkill.cs
+│   │   │   ├── MeleeAttackSkill.cs
+│   │   │   ├── DashSkill.cs (planned)
+│   │   │   ├── BuffSkill.cs (planned)
+│   │   │   ├── TeleportSkill.cs (planned)
+│   │   │   └── DashMeleeSkill.cs (planned)
+│   │   ├── Executors/
+│   │   │   ├── ProjectileSkillExecutor.cs
+│   │   │   ├── InstantAOESkillExecutor.cs
+│   │   │   └── MeleeSkillExecutor.cs
+│   │   └── Effects/
+│   │       ├── SkillEffect.cs (base Node2D)
+│   │       ├── CollisionSkillEffect.cs (base Area2D)
+│   │       ├── FireballProjectile.cs
+│   │       ├── BasicProjectile.cs
+│   │       ├── WhirlwindEffect.cs
+│   │       └── MeleeAttackEffect.cs
+│   ├── Enemies/Base/
 │   │   └── Enemy.cs
 │   ├── Items/
 │   │   └── ExperienceShard.cs
-│   ├── Progression/
+│   ├── Progression/Upgrades/
 │   │   └── Upgrade.cs
 │   └── UI/
 │       ├── Hud.cs
 │       └── LevelUpPanel.cs
+├── Resources/Skills/
+│   ├── Mage/
+│   │   ├── Fireball.tres
+│   │   ├── MageBasicAttack.tres
+│   │   └── MageSpecialAttack.tres
+│   ├── Warrior/
+│   │   ├── Whirlwind.tres
+│   │   ├── WarriorBasicAttack.tres
+│   │   └── WarriorSpecialAttack.tres
+│   └── Ranger/
+│       ├── RangerBasicAttack.tres
+│       └── RangerSpecialAttack.tres
 └── Assets/
     ├── Sprites/
     ├── Audio/
@@ -170,11 +203,13 @@ SpaceTower/
 
 **Namespace Structure:**
 - `SpaceTower.Scripts.PlayerScripts` - Player and components
-- `SpaceTower.Scripts.Skills` - Skill system
-- `SpaceTower.Scripts.Effects` - Visual effects and projectiles
-- `SpaceTower.Scripts.EnemyScripts` - Enemy logic
+- `SpaceTower.Scripts.Skills.Base` - Core skill interfaces and base classes
+- `SpaceTower.Scripts.Skills.Data` - Skill type definitions (ProjectileSkill, etc.)
+- `SpaceTower.Scripts.Skills.Executors` - Type-based executors (reusable)
+- `SpaceTower.Scripts.Skills.Effects` - Effect implementations
+- `SpaceTower.Scripts.Enemies.Base` - Enemy logic
 - `SpaceTower.Scripts.UI` - HUD and menus
-- `SpaceTower.Progression` - Upgrades and progression
+- `SpaceTower.Progression.Upgrades` - Upgrades and progression
 - `SpaceTower.Items` - Collectibles
 
 ## Core Systems
@@ -225,8 +260,16 @@ Uses Godot Resources (`UpgradeResource`) for serialization support.
 5. Upgrade applied immediately
 6. Game resumes
 
-### Skill System (Reworked)
-**Core Concept:** Skills are mastered through use, not time-gated. Every skill use contributes to permanent progression.
+### Skill System (Type-Based Architecture)
+**Core Concept:** Skills are mastered through use, not time-gated. Type-based design allows 100+ skills with only 7 executor types.
+
+**Architecture Overview:**
+```
+3-Layer System:
+1. Data (Resources) → Define skill stats (.tres files)
+2. Executors (Type-based) → Spawn effects based on skill type
+3. Effects (Runtime) → Handle behavior, damage, movement
+```
 
 **Core Combat Structure (Always Available):**
 - **Left Click:** Basic Attack (auto-aims at nearest enemy)
@@ -253,25 +296,68 @@ Before each run, equip 3 Active Skills from your unlocked pool:
 2. **E Key** - Utility/Defensive Skill
 3. **R Key** - Ultimate Skill (long cooldown)
 
-**Skill Mastery System (NEW):**
-Each skill tracks its own usage and has mastery levels based on enemies killed with that skill:
+**Supported Skill Types (7 Total):**
 
+| Type | Example Skills | Effect Base Class |
+|------|---------------|-------------------|
+| ProjectileSkill | Fireball, Ice Bolt, Arrow | CollisionSkillEffect (Area2D) |
+| InstantAOESkill | Whirlwind, Earthquake | SkillEffect (Node2D) |
+| MeleeAttackSkill | Sword Slash, Hammer Smash | CollisionSkillEffect (Area2D) |
+| DashSkill | Disengage, Roll | SkillEffect (Node2D) |
+| BuffSkill | Battle Cry, Haste | SkillEffect (Node2D) |
+| TeleportSkill | Blink, Shadow Step | SkillEffect (Node2D) |
+| DashMeleeSkill | Dash Strike, Charge | CollisionSkillEffect (Area2D) |
+
+**How It Works (Factory Pattern with C# Pattern Matching):**
+```csharp
+// In Skill.cs - Type-based factory
+private ISkillExecutor CreateExecutor()
+{
+    return this switch
+    {
+        Data.ProjectileSkill => new ProjectileSkillExecutor(),
+        Data.InstantAOESkill => new InstantAOESkillExecutor(),
+        Data.MeleeAttackSkill => new MeleeSkillExecutor(),
+        Data.DashSkill => new DashSkillExecutor(),
+        // ... 7 types total
+        _ => null
+    };
+}
 ```
-Example: Whirlwind Mastery Progress
-├── Bronze (0/100 kills): Base skill unlocked
-├── Silver (0/500 kills): +50% damage, +2 sec duration
-├── Gold (0/2000 kills): Pulls enemies, +100% damage
-└── Diamond (0/10000 kills): Creates fire tornado, chains to nearby enemies
 
-Current: 347/500 kills to Silver ⚔️
+**Skill Mastery System (Kill-Based Progression):**
+Each skill tracks kills and advances through tiers with permanent bonuses:
+
+```csharp
+public enum SkillMasteryTier
+{
+    Bronze,   // 0-99 kills
+    Silver,   // 100-499 kills
+    Gold,     // 500-1999 kills
+    Diamond   // 2000+ kills
+}
+```
+
+**Mastery Example:**
+```
+Whirlwind Mastery: 347/500 kills to Silver ⚔️
+├── Bronze (0/100): Base skill unlocked ✓
+├── Silver (47/400): +50% damage, +2 sec duration [IN PROGRESS]
+├── Gold (0/1500): Pulls enemies, +100% damage
+└── Diamond (0/8000): Fire tornado, chains to nearby enemies
 ```
 
 **How Skills Progress:**
-- Every enemy killed with a skill grants mastery XP
+- Every enemy killed with a skill grants mastery progress
+- Effects call `OnEnemyKilled(enemy)` to track kills
 - Mastery is permanent and never lost
+- Skills apply tier bonuses via `ApplyMasteryBonuses()` in effects
 - Visual feedback in HUD shows progress
-- Skills visibly transform at mastery milestones
-- In-run upgrades now specifically enhance YOUR equipped skills
+
+**Two-Tier Effect Hierarchy (Godot Compatibility):**
+- **SkillEffect** (Node2D) → For instant/buff/teleport effects
+- **CollisionSkillEffect** (Area2D) → For projectiles/melee attacks
+- Both provide identical `Initialize(skill, player, direction)` API
 
 **How You Unlock New Skills:**
 - Start with 2 basic skills per slot unlocked
@@ -280,8 +366,8 @@ Current: 347/500 kills to Silver ⚔️
 - Rare elite drops can contain skill scrolls
 
 **In-Run Skill Synergies:**
-Level-up choices now prioritize YOUR equipped skills:
-- "Whirlwind Mastery" - Your Whirlwind gains +2 projectiles (only appears if you have Whirlwind)
+Level-up choices prioritize YOUR equipped skills:
+- "Whirlwind Mastery" - Your Whirlwind gains +2 projectiles (only appears if equipped)
 - "Skill Combo" - Using Q→E→R in sequence triggers explosion
 - "Cooldown Sync" - All skills refresh when you get 10 kills
 
@@ -289,6 +375,17 @@ Level-up choices now prioritize YOUR equipped skills:
 - Early Game (Floors 1-3): 2 skills per slot unlocked (6 total choices)
 - Mid Game (Floors 4-7): 4 skills per slot unlocked (12 total)
 - Late Game (Floors 8+): 6+ skills per slot (18+ total)
+
+**Adding New Skills (Data-Driven):**
+1. **Reuse existing type** → Create .tres resource, assign scene, set values
+2. **New skill type needed** → Add Data class, Executor, update factory
+3. **Variant behavior** → Create new effect script, reference in .tres
+
+**Key Benefits:**
+- 7 executors can handle 100+ skills (type-based, not name-based)
+- Create skill variants with zero code (just .tres files)
+- Standardized API: all effects use `Initialize(skill, player, direction)`
+- Automatic mastery tracking through base classes
 
 ### Enemy System
 **Current Implementation:**
@@ -842,18 +939,41 @@ Before ending session:
    - ✅ Cooldown-based skills working
    - ✅ SkillManager component handles input
    - ✅ Skill Resource system with ISkillExecutor pattern
-   - ✅ First skill implemented: Whirlwind
+
+2. ~~**Refactor to type-based skill architecture**~~ - DONE!
+   - ✅ Type-based executors (7 types, scales to 100+ skills)
+   - ✅ Standardized Initialize(skill, player, direction) API
+   - ✅ Two-tier effect hierarchy (SkillEffect vs CollisionSkillEffect)
+   - ✅ C# pattern matching factory
+
+3. ~~**Implement skill mastery tracking**~~ - DONE!
+   - ✅ Kill tracking per skill
+   - ✅ Bronze/Silver/Gold/Diamond tiers with thresholds
+   - ✅ Permanent progression (KillCount, CurrentTier persisted)
+   - ✅ ApplyMasteryBonuses() in all effects
+
+4. ~~**Initial skill implementations**~~ - DONE!
+   - ✅ Whirlwind (InstantAOESkill)
+   - ✅ Fireball (ProjectileSkill)
+   - ✅ Basic attacks (MeleeAttackSkill, ProjectileSkill)
 
 ### Current Focus 🎯
-2. **Expand skill pool** (2-3 skills minimum per slot)
-   - Add 2 more Q skills (offensive): Fireball, Dash Strike
-   - Add 2-3 E skills (utility/defensive): Shield, Teleport, Slow Field
-   - Add 1-2 R skills (ultimate): Meteor, Time Stop
-   - Each skill needs: visual effect, sound, feel impactful
-   - Test each skill for fun factor before moving on
+5. **Implement 4 new skill types** (validate architecture scalability)
+   - DashSkill (movement ability like Disengage)
+   - BuffSkill (stat buff like Battle Cry)
+   - TeleportSkill (instant teleport like Blink)
+   - DashMeleeSkill (combo ability like Dash Strike)
+   - Full code provided in conversation - ready to implement
 
 ### Next Up 📋
-3. **Refactor upgrade system to use UpgradePoolManager**
+6. **Expand skill pool** (6+ skills per slot)
+   - Add skill variants using existing types (Iceball, Lightning Bolt)
+   - Add 2-3 E skills (utility/defensive): Shield, Slow Field
+   - Add 1-2 R skills (ultimate): Meteor, Time Stop
+   - Each skill needs: visual effect, feel impactful
+   - Test mastery progression feel
+
+7. **Refactor upgrade system to use UpgradePoolManager**
    - Extend `Upgrade.cs` with: Category, RequiredSkill, Weight, CanStack fields
    - Create UpgradePoolManager singleton (autoload)
    - Load upgrades from Resources/Upgrades/ directory
@@ -861,15 +981,10 @@ Before ending session:
    - Add skill-specific filtering (only show if skill equipped)
    - Remove hardcoded upgrade list from UpgradeManager.cs
 
-4. **Implement skill mastery tracking** (builds on working skills)
-   - Track kills per skill (Bronze/Silver/Gold/Diamond tiers)
-   - Visual progress in HUD
-   - Permanent progression across runs
-
-5. Add 2-3 enemy types (fast/tank/ranged)
-6. Implement basic material drop system
-7. Create floor transition system
-8. Add boss encounter for Floor 1
+8. Add 2-3 enemy types (fast/tank/ranged)
+9. Implement basic material drop system
+10. Create floor transition system
+11. Add boss encounter for Floor 1
 
 ## Development Notes
 - Keep sessions focused on ONE feature
@@ -880,8 +995,110 @@ Before ending session:
 - Commit working code daily
 
 ### Technical Debt / Pending Refactors
-- **Upgrade System:** Currently hardcoded in UpgradeManager.cs. Needs UpgradePoolManager refactor (documented in Next Priority Tasks #3) - do AFTER more skills are implemented
+- **Upgrade System:** Currently hardcoded in UpgradeManager.cs. Needs UpgradePoolManager refactor (documented in Next Priority Tasks #7) - do AFTER skill pool is expanded
 - ~~**Player Component Refactor:**~~ ✅ COMPLETED - Player now uses StatsManager, SkillManager, and UpgradeManager components
+- ~~**Skill System Architecture:**~~ ✅ COMPLETED - Type-based executors with standardized API and mastery tracking
+
+### Skill System Implementation Reference
+
+**Factory Pattern (C# Pattern Matching):**
+```csharp
+// In Skill.cs
+private ISkillExecutor CreateExecutor()
+{
+    return this switch
+    {
+        Data.ProjectileSkill => new ProjectileSkillExecutor(),
+        Data.InstantAOESkill => new InstantAOESkillExecutor(),
+        Data.MeleeAttackSkill => new MeleeSkillExecutor(),
+        Data.DashSkill => new DashSkillExecutor(),
+        Data.BuffSkill => new BuffSkillExecutor(),
+        Data.TeleportSkill => new TeleportSkillExecutor(),
+        Data.DashMeleeSkill => new DashMeleeSkillExecutor(),
+        _ => null
+    };
+}
+```
+
+**Standardized Executor Pattern:**
+```csharp
+public class ProjectileSkillExecutor : ISkillExecutor
+{
+    public void ExecuteSkill(Player player, Skill baseSkill)
+    {
+        if (baseSkill is not ProjectileSkill skill) return;
+
+        Vector2 direction = (player.GetGlobalMousePosition() - player.GlobalPosition).Normalized();
+
+        var effect = skill.SkillEffectScene.Instantiate<CollisionSkillEffect>();
+        effect.GlobalPosition = player.GlobalPosition;
+        effect.Initialize(skill, player, direction);
+
+        player.GetTree().Root.AddChild(effect);
+    }
+}
+```
+
+**Standardized Effect Pattern:**
+```csharp
+public partial class FireballProjectile : CollisionSkillEffect
+{
+    private float _damage;
+
+    public override void Initialize(Skill sourceSkill, Player caster, Vector2 direction)
+    {
+        base.Initialize(sourceSkill, caster, direction);
+
+        var skill = sourceSkill as ProjectileSkill;
+        _damage = skill.DirectDamage;
+
+        ApplyMasteryBonuses();
+    }
+
+    private void ApplyMasteryBonuses()
+    {
+        switch (_sourceSkill.CurrentTier)
+        {
+            case SkillMasteryTier.Silver:
+                _damage *= 1.5f;
+                break;
+            case SkillMasteryTier.Gold:
+                _damage *= 2.0f;
+                break;
+            case SkillMasteryTier.Diamond:
+                _damage *= 3.0f;
+                break;
+        }
+    }
+
+    private void OnBodyEntered(Node2D body)
+    {
+        if (body is Enemy enemy)
+        {
+            float healthBefore = enemy.Health;
+            enemy.TakeDamage(_damage);
+
+            // Track kill for mastery
+            if (healthBefore > 0 && enemy.Health <= 0)
+            {
+                OnEnemyKilled(enemy);
+            }
+        }
+    }
+}
+```
+
+**Key Patterns to Follow:**
+1. **Data layer** defines skill types with [GlobalClass] attribute
+2. **Executors** are type-based, not skill-specific
+3. **Effects** inherit from SkillEffect (Node2D) or CollisionSkillEffect (Area2D)
+4. **All effects** use `Initialize(Skill sourceSkill, Player caster, Vector2 direction)`
+5. **All effects** call `OnEnemyKilled(enemy)` to track mastery
+6. **All effects** implement `ApplyMasteryBonuses()` for tier scaling
+
+**Documentation:**
+- Complete architecture guide: `skill_system.md`
+- For new collaborators: Covers all patterns, troubleshooting, and examples
 
 ## For Claude Code
 
