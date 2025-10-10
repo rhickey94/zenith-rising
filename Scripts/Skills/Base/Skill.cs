@@ -84,7 +84,6 @@ public partial class Skill : Resource
             Data.ProjectileSkill => new ProjectileSkillExecutor(),
             Data.InstantAOESkill => new InstantAOESkillExecutor(),
             Data.MeleeAttackSkill => new MeleeSkillExecutor(),
-            Data.StunSkill => new MeleeSkillExecutor(), // Reuses melee executor
             _ => null
         };
     }
