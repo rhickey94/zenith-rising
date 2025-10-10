@@ -1,150 +1,388 @@
 # Tower Ascension - Project Documentation
 
 ## Project Overview
-A sci-fi roguelite action-RPG with idle/incremental mechanics built in Godot 4.x with C#. Players fight through tower floors in active combat sessions while idle systems process materials and generate resources between play sessions.
+A bullet hell roguelite with idle mechanics. Players fight through tower floors in active combat while idle systems refine materials between sessions.
 
 ## Core Design Philosophy
-- **Active play = power gains** (levels, gear, combat strength, skill mastery)
-- **Idle time = efficiency gains** (material refinement, resource generation, unlock systems)
+- **Active play = power gains** (character levels, gear, skill mastery)
+- **Idle time = efficiency gains** (material refinement, gold generation)
 - **Idle enhances, never replaces** active gameplay
-- Players progress meaningfully in both 15-minute sessions and 2-hour grinds
 - Every run contributes to permanent progression (no wasted time)
 
-## Current Status
-**Phase:** Early Development (MVP - ~45% complete)
+## Current Status: Be Honest
+**Phase:** Early Prototype (~15-20% to MVP)
 
-**Completed:**
-- ✅ Player movement and shooting mechanics
-- ✅ Enemy AI (chase and attack)
-- ✅ Health/damage system
-- ✅ Combat HUD with health, XP, resources display
-- ✅ Enemy spawning system
-- ✅ XP shard drops and collection
-- ✅ Level-up system with upgrade choices
-- ✅ 8 basic upgrade types with functional effects
-- ✅ **Player component refactor** (StatsManager, SkillManager, UpgradeManager)
-- ✅ **Namespace organization** (proper C# structure)
-- ✅ **Q/E/R active skill system** (cooldowns, skill resources, executor pattern)
-- ✅ **Type-based skill architecture** (7 skill types, scalable to 100+ skills)
-- ✅ **Skill mastery system** (kill tracking, Bronze/Silver/Gold/Diamond tiers)
-- ✅ **Working skills:** Whirlwind (AOE), Fireball (projectile), Basic attacks (melee/ranged)
-- ✅ **Two-tier effect hierarchy** (SkillEffect for Node2D, CollisionSkillEffect for Area2D)
-- ✅ **EditorConfig** (code standards enforced)
+**Actually Working:**
+- ✅ Player movement (WASD) and rotation
+- ✅ Enemy AI (chase player, contact damage)
+- ✅ Basic health/damage system
+- ✅ XP shards drop and level-up flow
+- ✅ Level-up panel shows 3 upgrade choices
+- ✅ Component architecture (StatsManager, SkillManager, UpgradeManager)
+- ✅ Q/E/R skill input handling
+- ✅ Type-based skill executor pattern
+- ✅ 3 working skills: Whirlwind, Fireball, Basic melee/ranged attacks
+- ✅ Skill mastery tracking (kills recorded per skill)
 
-**In Progress:**
-- Implementing 4 new skill types (Dash, Buff, Teleport, DashMelee)
-- Skill expansion (have 3 skills, need 6+ per slot minimum)
-- Enemy variety (need more types)
-- Upgrade pool expansion (have 8, want 20+)
+**Broken/Incomplete:**
+- ❌ 5 of 8 upgrades don't actually work (DamagePercent, PickupRadius, Pierce, Crit, Regen)
+- ❌ Only 1 enemy type (need 2-3 minimum)
+- ❌ No wave escalation or difficulty scaling
+- ❌ No floor system (just an empty arena with spawning)
+- ❌ No bosses
+- ❌ No gear/equipment system
+- ❌ No materials or idle systems
+- ❌ No save system
+- ❌ Character stat system (STR/DEX/INT/VIT/FOR) not implemented
 
 **Not Started:**
-- Upgrade system refactor (currently hardcoded, needs UpgradePoolManager)
 - Materials system
-- Workshop/Treasury (idle systems)
-- Multiple floors (have 1, need 5+)
-- Gear/equipment system
+- Idle systems (Workshop, Treasury)
+- Gear drops and enhancement
+- Multiple floors with progression
+- Save/load
+
+---
+
+## Development Plan: Sequential Risk Reduction
+
+Build in phases where each phase **proves a hypothesis** before investing in the next.
+
+### **Phase 1: Prove Combat is Fun (Week 1-2)**
+**Hypothesis:** "Fighting waves with skills and upgrades is engaging for 15+ minutes"
+
+**Tasks:**
+1. Fix all 8 existing upgrades to actually work
+2. Add 2 enemy types:
+   - FastMelee (speed 300, HP 50, melee)
+   - SlowRanged (speed 100, HP 150, shoots projectiles)
+3. Implement wave escalation:
+   - Spawn rate increases over time
+   - Enemy HP scales by +30% per wave
+4. Add basic boss after 10 minutes:
+   - Just a tanky enemy with 5x HP and 2x damage for now
+5. Add floor transition (reset arena, +50% enemy stats)
+
+**Success Criteria:** You can play 3 floors (~30 min) and it feels engaging. If boring, nothing else matters.
+
+**Cut for now:**
+- New skill types beyond the 3 working ones
+- Skill mastery tiers (just track kills)
+- Materials/idle systems
 - Save system
-- Polish (sound, particles, screen shake)
-- Endgame infinite floors
 
-## MVP Requirements
+---
 
-### Core Bare Bones: What We Need for MVP
+### **Phase 2: Prove Progression Hook (Week 3-4)**
+**Hypothesis:** "Players want to push further because permanent progression feels good"
 
-**Combat & Movement Must-Haves:**
-- Movement: WASD, fixed movement speed (upgradeable via stats/upgrades)
-- Auto-aim basic attack: Targets nearest enemy within range
-- Manual aim special attack: Aims toward mouse/right stick direction
-- Dash: Quick movement burst with i-frames
-- Hit feedback: Screen shake, enemy knockback, damage numbers
-- Death state: Character dies, run ends, return to base with some loot lost
+**Tasks:**
+1. **Implement character stats system:**
+   - 5 stats: Strength, Vitality, Agility, Resilience, Fortune
+   - Simplified scaling (each stat does ONE thing)
+   - Gain 1 stat point per character level
+   - Distribute freely in stat screen
 
-**Enemy Basics:**
-- 3-4 enemy types per floor minimum
-- Simple AI: Chase player, attack on contact or at range
-- Clear visual telegraphs for attacks
-- Spawn in waves (increases over time in each floor)
+2. **Save/load system:**
+   - Save character level + stat allocation to JSON
+   - Save highest floor reached
+   - Persist between runs
 
-**Floor Structure:**
-- Duration: 8-10 minutes to boss spawn OR kill count threshold (whichever comes first)
-- Boss Fight: Unique boss per floor with distinct mechanics
-- Extract Decision: After boss, choose to extract with all loot (safe) or continue to next floor (risk = better rewards but lose some loot if you die)
-- Death Penalty: Lose 50% of materials collected in current run, keep all XP/character levels
-- 5 floors minimum for MVP
-- Each floor: more enemy health, more damage, more spawns
-- Visual distinction per floor (color palette, tileset, music)
+3. **Basic gear drops:**
+   - 3 slots: Weapon, Armor, Accessory
+   - 3 rarities: Common, Rare, Epic
+   - Just flat stats: +Damage, +HP, +AttackSpeed
+   - Drops from bosses (100%) and elites (10%)
 
-**Experience & Leveling:**
-- In-Run XP: Enemies drop XP shards (visible pickups, like Vampire Survivors)
-- XP bar fills, level up, choose 1 of 3 random upgrades
-- Max level per run: 20 (prevents infinite scaling)
-- Level resets to 1 each new run
-- Character Level (Permanent): Separate from in-run leveling
-- Gain character XP from all activities (not just boss kills)
-- Each character level: +3 stat points to distribute
-- Character level cap: 200 (extended from 50 for longer progression)
+4. **5 distinct floors:**
+   - Different enemy mix per floor
+   - Visual distinction (color palette swap)
+   - Boss at end of each floor
 
-**Save System:**
-- Persists: Character level and stat distribution, all collected gear and materials (in stash), Workshop queue and timers (continues offline), Treasury accumulation and timer, highest floor reached, skill unlocks and mastery progress, Ascension XP and levels
-- Resets: In-run level (back to 1), in-run upgrades (chosen fresh each run), floor position (always restart from Floor 1 or highest unlocked)
+**Success Criteria:** After dying, you immediately want to start a new run to test your stat allocation and new gear.
 
-### Core Loop Validation Checklist
-Before launch, players should be able to:
-- [ ] Feel powerful growth within a single 10-minute run
-- [ ] Return after 8 hours and see meaningful idle progress
-- [ ] Make a meaningful choice about their skill loadout
-- [ ] Feel excited when rare gear drops
-- [ ] Understand what each material is used for
-- [ ] Know exactly what they're working toward next
-- [ ] Die and not feel like they wasted their time (kept XP and some loot)
-- [ ] See clear skill mastery progression from active play
-- [ ] Have aspirational content to work toward (infinite floors)
+**Cut for now:**
+- Gear enhancement (Power Levels, Mods)
+- Materials system
+- Idle systems
+- Complex skill mastery tiers
 
-### What We're Explicitly NOT Building Yet
-**Save for Post-MVP:**
-- More than 3 classes
-- PvP or multiplayer
-- Seasonal content
-- Cosmetics system (save for retention updates)
-- Advanced enchantments beyond stat boosts
+---
 
-### The MVP Test: "Can You Play It for 10 Hours?"
-**Hour 1:** Tutorial, first run, unlock Workshop
-**Hour 2-3:** Learning enemy patterns, upgrading first gear pieces
-**Hour 4-5:** Experimenting with skill loadouts, reaching Floor 3, seeing skill mastery grow
-**Hour 6-7:** Farming for specific gear drops, enhancing to +5, mastering first skill
-**Hour 8-9:** Pushing to Floor 5 boss, min-maxing build
-**Hour 10:** Beat Floor 5, unlock infinite floors, excited for endgame
+### **Phase 3: Prove Idle Hook (Week 5-6)**
+**Hypothesis:** "Players return after being away because idle progress matters"
 
-**If players are still engaged at Hour 10:** The core loop works. Ship it and expand.
-**If players are bored by Hour 5:** The loop is broken. Fix before adding features.
+**Tasks:**
+1. **Workshop (MVP version):**
+   - ONE material type: Energy Cores
+   - Drop from all enemies
+   - Refine Raw Cores → Refined Cores (30 min real-time)
+   - Used to upgrade gear Power Level (+10% stats per level, max 5)
+   - Uses DateTime for offline progression
 
-## Tech Stack
-- **Engine:** Godot 4.3+ with .NET support
-- **Language:** C# (prefer C# over GDScript)
-- **Platform:** PC (Steam) for MVP
-- **Theme:** Metallic sci-fi (Mass Effect/Star Wars inspired, NOT neon Tron)
-- **Art Style:** 2D isometric with placeholder squares (real sprites later)
-- **Version Control:** Git + GitHub
+2. **Treasury (MVP version):**
+   - Generates gold based on highest floor cleared
+   - Formula: (Floor × 10) gold/hour
+   - Caps at 8 hours
+   - Gold used for: Respec stats (100g × level)
+
+3. **Simple material drop system:**
+   - Cores drop as collectible items (like XP shards)
+   - Show count in HUD
+
+**Success Criteria:** Close game, return 2 hours later, collect refined cores, upgrade gear, feel good about passive progress.
+
+**Cut forever:**
+- Research Lab (passive power contradicts "active = power")
+- Training Ground (QoL tokens are weird currency)
+- Multiple material types (start with one)
+- Complex gear modifications
+
+---
+
+### **Phase 4: Add Depth (Week 7-8)**
+
+**Tasks:**
+1. **Skill mastery (simplified):**
+   - 3 tiers: Bronze/Silver/Gold (not 4)
+   - Thresholds: 50/200/500 kills (not 100/500/2000/10000)
+   - Each tier: +50% effectiveness
+   - Bronze (default), Silver (+50%), Gold (+100% + special bonus)
+
+2. **Gear modifications (add 2nd material):**
+   - Add Modification Chips (drop from bosses)
+   - Add ONE special property per item
+   - 10-15 mods: Pierce, Chain, Lifesteal, Crit Damage
+   - No synergies layer (too complex)
+
+3. **Expand skill pool:**
+   - Add 10 more skills using existing types
+   - Don't implement new executors yet
+   - Focus on variety and feel
+
+**Success Criteria:** Players experiment with builds (stat allocation + skill choices + gear mods).
+
+---
+
+### **Phase 5: Endgame (Week 9-10)**
+
+**Tasks:**
+1. **Infinite floors (6+):**
+   - Floors scale infinitely
+   - +20% enemy stats per floor
+
+2. **Ascension system (simple):**
+   - Gain ascension XP from all kills/clears
+   - Spend points on +% stat bonuses
+   - 3 trees: Power, Survival, Utility
+
+3. **Weekly challenges:**
+   - Modifiers on floors for bonus rewards
+   - Simple leaderboard
+
+**Cut forever:**
+- Corruption system (redundant with infinite floors)
+- Gear synergies (mods are enough)
+
+---
+
+## Simplified Systems
+
+### **Stats System (Revised)**
+
+**Current design problem:** Each stat does 2 things (confusing)
+
+**Better design:**
+```
+Strength: +3% ALL damage per point
+Vitality: +25 HP per point
+Agility: +2% attack speed per point
+Resilience: +1% damage reduction per point (cap 50%)
+Fortune: +2% crit chance per point (cap 50%)
+```
+
+Each stat does ONE thing. Clear choices.
+
+**Starting stats:** All classes start at 0. Distribute 15 points at character creation.
+
+**Stat growth:** +1 point per character level (cap 100).
+
+---
+
+### **Materials System (Revised)**
+
+**Current design problem:** 3 materials × 2 states = 6 items, complex purposes
+
+**Better design:**
+
+**Phase 3 (MVP):**
+- ONE material: Energy Cores
+- Drops from all enemies
+- Refine in Workshop (30 min)
+- Used for: Gear Power Level only
+
+**Phase 4 (Depth):**
+- Add SECOND material: Modification Chips
+- Drop from bosses
+- Used for: Gear mods
+
+**Never add third material.** Two is enough.
+
+---
+
+### **Skill Mastery (Revised)**
+
+**Current design problem:** 4 tiers with insane thresholds (10,000 kills for Diamond)
+
+**Better design:**
+```
+3 tiers: Bronze/Silver/Gold
+Thresholds: 50/200/500 kills
+
+Bronze (0): Base skill
+Silver (50): +50% effectiveness (achievable in one 15-min session)
+Gold (200): +100% effectiveness + special bonus
+```
+
+Faster feedback loop. More achievable goals.
+
+---
+
+### **Gear System (Revised)**
+
+**Current design problem:** 4 layers (Base + Power + Mod + Synergy) = too complex
+
+**Better design:**
+```
+Phase 2: Base stats only
+Phase 3: Add Power Level (0-5)
+Phase 4: Add Modifications (one per item)
+Never add: Synergies
+```
+
+Each layer = ~20 hours dev time. Ship with 2 layers, expand if players demand more.
+
+---
+
+## Architecture Improvements
+
+### **Problem 1: Skill.cs mixes data and behavior**
+
+**Current:**
+```csharp
+public partial class Skill : Resource  // Data
+{
+    public void Execute(Player player)  // Behavior - WRONG
+    {
+        _executor ??= CreateExecutor();
+        _executor?.ExecuteSkill(player, this);
+    }
+}
+```
+
+**Fix:** Create SkillSystem manager (Autoload singleton)
+```csharp
+public partial class SkillSystem : Node
+{
+    private Dictionary<Type, ISkillExecutor> _executors = new();
+
+    public void ExecuteSkill(Skill skill, Player player)
+    {
+        var executor = GetOrCreateExecutor(skill);
+        executor.ExecuteSkill(player, skill);
+    }
+}
+```
+
+Resources stay pure data. System handles execution.
+
+---
+
+### **Problem 2: No central game state**
+
+**Current:** Player emits signals for floor/resources but no one owns this state
+
+**Fix:** Create GameState manager (Autoload singleton)
+```csharp
+public partial class GameState : Node
+{
+    // Run state
+    public int CurrentFloor { get; private set; } = 1;
+    public int CurrentWave { get; private set; } = 1;
+
+    // Resources
+    public int Gold { get; private set; } = 0;
+    public int EnergyCores { get; private set; } = 0;
+
+    [Signal] public delegate void FloorChangedEventHandler(int floor);
+    [Signal] public delegate void ResourcesChangedEventHandler(int gold, int cores);
+
+    public void AdvanceFloor() { ... }
+    public void AddGold(int amount) { ... }
+}
+```
+
+Now everything references one source of truth.
+
+---
+
+### **Problem 3: UpgradeManager hardcodes upgrades**
+
+**Current:** Hardcoded List in UpgradeManager.cs
+
+**Fix:** Load from Resources/Upgrades/ folder
+```csharp
+public override void _Ready()
+{
+    _availableUpgrades = LoadUpgradesFromResources("res://Resources/Upgrades/");
+}
+
+private List<Upgrade> LoadUpgradesFromResources(string path)
+{
+    var upgrades = new List<Upgrade>();
+    var dir = DirAccess.Open(path);
+
+    foreach (var file in dir.GetFiles())
+    {
+        if (file.EndsWith(".tres"))
+        {
+            upgrades.Add(ResourceLoader.Load<Upgrade>($"{path}{file}"));
+        }
+    }
+    return upgrades;
+}
+```
+
+Now adding upgrades = create .tres file. No code changes.
+
+---
 
 ## Project Structure
 ```
 SpaceTower/
 ├── Scenes/
-│   ├── Game.tscn (main game scene)
-│   ├── Player.tscn
-│   ├── Enemy.tscn
-│   ├── XPShard.tscn
-│   ├── HUD.tscn
-│   ├── LevelUpPanel.tscn
-│   └── SkillEffects/
-│       ├── fireball_projectile.tscn
-│       ├── projectile.tscn
-│       ├── whirlwind_effect.tscn
-│       └── melee_attack.tscn
+│   ├── Core/
+│   │   └── game.tscn
+│   ├── Player/
+│   │   └── player.tscn
+│   ├── Enemies/
+│   │   ├── enemy.tscn
+│   │   ├── fast_melee_enemy.tscn
+│   │   └── slow_ranged_enemy.tscn
+│   ├── Items/
+│   │   ├── experience_shard.tscn
+│   │   └── energy_core.tscn
+│   ├── SkillEffects/
+│   │   ├── fireball_projectile.tscn
+│   │   ├── whirlwind_effect.tscn
+│   │   └── melee_attack.tscn
+│   └── UI/
+│       ├── hud.tscn
+│       └── level_up_panel.tscn
 ├── Scripts/
 │   ├── Core/
-│   │   └── Game.cs
+│   │   ├── Game.cs
+│   │   └── GameState.cs (Autoload)
 │   ├── PlayerScripts/
 │   │   ├── Player.cs
 │   │   └── Components/
@@ -153,164 +391,77 @@ SpaceTower/
 │   │       └── UpgradeManager.cs
 │   ├── Skills/
 │   │   ├── Base/
-│   │   │   ├── Skill.cs (Resource + Factory + Mastery)
-│   │   │   └── ISkillExecutor.cs
+│   │   │   ├── Skill.cs
+│   │   │   ├── ISkillExecutor.cs
+│   │   │   └── SkillSystem.cs (Autoload)
 │   │   ├── Data/
 │   │   │   ├── ProjectileSkill.cs
 │   │   │   ├── InstantAOESkill.cs
-│   │   │   ├── MeleeAttackSkill.cs
-│   │   │   ├── DashSkill.cs (planned)
-│   │   │   ├── BuffSkill.cs (planned)
-│   │   │   ├── TeleportSkill.cs (planned)
-│   │   │   └── DashMeleeSkill.cs (planned)
+│   │   │   └── MeleeAttackSkill.cs
 │   │   ├── Executors/
 │   │   │   ├── ProjectileSkillExecutor.cs
 │   │   │   ├── InstantAOESkillExecutor.cs
 │   │   │   └── MeleeSkillExecutor.cs
 │   │   └── Effects/
-│   │       ├── SkillEffect.cs (base Node2D)
-│   │       ├── CollisionSkillEffect.cs (base Area2D)
+│   │       ├── SkillEffect.cs
+│   │       ├── CollisionSkillEffect.cs
 │   │       ├── FireballProjectile.cs
-│   │       ├── BasicProjectile.cs
-│   │       ├── WhirlwindEffect.cs
-│   │       └── MeleeAttackEffect.cs
-│   ├── Enemies/Base/
-│   │   └── Enemy.cs
-│   ├── Items/
-│   │   └── ExperienceShard.cs
-│   ├── Progression/Upgrades/
-│   │   └── Upgrade.cs
+│   │       └── WhirlwindEffect.cs
+│   ├── Enemies/
+│   │   └── Base/
+│   │       └── Enemy.cs
 │   └── UI/
 │       ├── Hud.cs
 │       └── LevelUpPanel.cs
-├── Resources/Skills/
-│   ├── Mage/
-│   │   ├── Fireball.tres
-│   │   ├── MageBasicAttack.tres
-│   │   └── MageSpecialAttack.tres
-│   ├── Warrior/
-│   │   ├── Whirlwind.tres
-│   │   ├── WarriorBasicAttack.tres
-│   │   └── WarriorSpecialAttack.tres
-│   └── Ranger/
-│       ├── RangerBasicAttack.tres
-│       └── RangerSpecialAttack.tres
+├── Resources/
+│   ├── Skills/
+│   │   ├── Mage/
+│   │   └── Warrior/
+│   └── Upgrades/
+│       ├── DamageBoost.tres
+│       ├── AttackSpeed.tres
+│       └── ...
 └── Assets/
     ├── Sprites/
     ├── Audio/
     └── Fonts/
 ```
 
-**Namespace Structure:**
-- `SpaceTower.Scripts.PlayerScripts` - Player and components
-- `SpaceTower.Scripts.Skills.Base` - Core skill interfaces and base classes
-- `SpaceTower.Scripts.Skills.Data` - Skill type definitions (ProjectileSkill, etc.)
-- `SpaceTower.Scripts.Skills.Executors` - Type-based executors (reusable)
-- `SpaceTower.Scripts.Skills.Effects` - Effect implementations
-- `SpaceTower.Scripts.Enemies.Base` - Enemy logic
-- `SpaceTower.Scripts.UI` - HUD and menus
-- `SpaceTower.Progression.Upgrades` - Upgrades and progression
-- `SpaceTower.Items` - Collectibles
+---
 
-## Core Systems
+## Tech Stack
+- **Engine:** Godot 4.3+ with .NET support
+- **Language:** C# (prefer C# over GDScript)
+- **Platform:** PC (Steam) for MVP
+- **Art Style:** 2D top-down with placeholder sprites
+- **Version Control:** Git + GitHub
 
-### Player Stats (5 Core Stats)
-All scaling derives from these base stats:
-- **Strength:** +2% physical damage, +10 max HP per point
-- **Dexterity:** +1% attack speed, +0.5% crit chance per point
-- **Intelligence:** +2% magical damage, +2% skill power per point
-- **Vitality:** +20 max HP, +0.5 HP/sec regen per point
-- **Fortune:** +3% crit damage, +1% rare drop chance per point
+---
 
-**Base Stats by Class:**
-- **Warrior:** 15 STR, 8 DEX, 5 INT, 12 VIT, 5 FOR (Total: 45)
-- **Mage:** 5 STR, 8 DEX, 15 INT, 8 VIT, 9 FOR (Total: 45)
-- **Ranger:** 8 STR, 15 DEX, 7 INT, 8 VIT, 7 FOR (Total: 45)
-
-**Stat Growth:**
-- Gain +3 stat points per character level (distribute freely)
-- Ascension system provides percentage bonuses to stats
-- Gear provides bonus stats
-
-### Combat System
-- **Left Click/Spacebar:** Auto-aim basic attack
-- **Movement:** WASD with rotation toward movement direction
-- **Camera:** Follows player (Camera2D child node)
-- **Projectiles:** Spawn at player position, travel toward mouse
-- **Collision:** CharacterBody2D for player/enemies, Area2D for projectiles
-
-### Upgrade System (Current)
-Uses Godot Resources (`UpgradeResource`) for serialization support.
-
-**Available Upgrades:**
-1. Damage Boost (+15% damage)
-2. Attack Speed (+20% fire rate)
-3. Swift Feet (+15% movement speed)
-4. Vitality (+50 max health)
-5. Magnet (+30 pickup radius)
-6. Piercing Shots (+1 pierce)
-7. Critical Hit (+10% crit chance)
-8. Regeneration (+2 HP/sec)
-
-**Level-Up Flow:**
-1. XP bar fills → Player levels up
-2. Game pauses (GetTree().Paused = true)
-3. Show 3 random upgrades from pool (prioritizes equipped skill enhancements)
-4. Player selects one
-5. Upgrade applied immediately
-6. Game resumes
-
-### Skill System (Type-Based Architecture)
-**Core Concept:** Skills are mastered through use, not time-gated. Type-based design allows 100+ skills with only 7 executor types.
-
-**Architecture Overview:**
-```
-3-Layer System:
-1. Data (Resources) → Define skill stats (.tres files)
-2. Executors (Type-based) → Spawn effects based on skill type
-3. Effects (Runtime) → Handle behavior, damage, movement
-```
-
-**Core Combat Structure (Always Available):**
-- **Left Click:** Basic Attack (auto-aims at nearest enemy)
-  - Warrior: Sword swing (melee, cleave)
-  - Mage: Magic bolt (ranged, single target)
-  - Ranger: Bow shot (ranged, piercing)
-  - Scales with stats automatically, no cooldown, no cost
-
+## Combat System (Current)
+- **Left Click:** Basic Attack (auto-aim nearest enemy)
 - **Right Click:** Special Attack (manual aim, cooldown)
-  - Warrior: Shield bash (3 sec cooldown, stuns)
-  - Mage: Fireball (4 sec cooldown, AOE)
-  - Ranger: Charged shot (5 sec cooldown, high damage)
-  - Scales with stats + skill power, core identity move
+- **Q/E/R:** Active skills (pre-run loadout)
+- **WASD:** Movement with rotation toward direction
 
-- **Spacebar:** Dash/Dodge Roll
-  - Universal movement ability
-  - 2 second cooldown
-  - Brief invulnerability frames
-  - Mobility and survival tool
+---
 
-**Skill Loadout System (Pre-Run Customization):**
-Before each run, equip 3 Active Skills from your unlocked pool:
-1. **Q Key** - Offensive Skill
-2. **E Key** - Utility/Defensive Skill
-3. **R Key** - Ultimate Skill (long cooldown)
+## Skill System Architecture
 
-**Supported Skill Types (7 Total):**
+**3-Layer System:**
+1. **Data (Resources):** Define skill stats in .tres files
+2. **Executors (Type-based):** Spawn effects based on skill type
+3. **Effects (Runtime):** Handle behavior, damage, movement
 
-| Type | Example Skills | Effect Base Class |
-|------|---------------|-------------------|
-| ProjectileSkill | Fireball, Ice Bolt, Arrow | CollisionSkillEffect (Area2D) |
-| InstantAOESkill | Whirlwind, Earthquake | SkillEffect (Node2D) |
-| MeleeAttackSkill | Sword Slash, Hammer Smash | CollisionSkillEffect (Area2D) |
-| DashSkill | Disengage, Roll | SkillEffect (Node2D) |
-| BuffSkill | Battle Cry, Haste | SkillEffect (Node2D) |
-| TeleportSkill | Blink, Shadow Step | SkillEffect (Node2D) |
-| DashMeleeSkill | Dash Strike, Charge | CollisionSkillEffect (Area2D) |
+**Skill Types:**
+| Type | Example | Effect Base |
+|------|---------|-------------|
+| ProjectileSkill | Fireball | CollisionSkillEffect (Area2D) |
+| InstantAOESkill | Whirlwind | SkillEffect (Node2D) |
+| MeleeAttackSkill | Slash | CollisionSkillEffect (Area2D) |
 
-**How It Works (Factory Pattern with C# Pattern Matching):**
+**Factory Pattern:**
 ```csharp
-// In Skill.cs - Type-based factory
 private ISkillExecutor CreateExecutor()
 {
     return this switch
@@ -318,408 +469,60 @@ private ISkillExecutor CreateExecutor()
         Data.ProjectileSkill => new ProjectileSkillExecutor(),
         Data.InstantAOESkill => new InstantAOESkillExecutor(),
         Data.MeleeAttackSkill => new MeleeSkillExecutor(),
-        Data.DashSkill => new DashSkillExecutor(),
-        // ... 7 types total
         _ => null
     };
 }
 ```
 
-**Skill Mastery System (Kill-Based Progression):**
-Each skill tracks kills and advances through tiers with permanent bonuses:
-
+**Effect Pattern:**
 ```csharp
-public enum SkillMasteryTier
+public override void Initialize(Skill sourceSkill, Player caster, Vector2 direction)
 {
-    Bronze,   // 0-99 kills
-    Silver,   // 100-499 kills
-    Gold,     // 500-1999 kills
-    Diamond   // 2000+ kills
+    base.Initialize(sourceSkill, caster, direction);
+    // Extract skill-specific data
+    // Apply mastery bonuses
+}
+
+private void OnBodyEntered(Node2D body)
+{
+    if (body is Enemy enemy)
+    {
+        float healthBefore = enemy.Health;
+        enemy.TakeDamage(_damage);
+
+        // Track kill for mastery
+        if (healthBefore > 0 && enemy.Health <= 0)
+        {
+            OnEnemyKilled(enemy);
+        }
+    }
 }
 ```
 
-**Mastery Example:**
-```
-Whirlwind Mastery: 347/500 kills to Silver ⚔️
-├── Bronze (0/100): Base skill unlocked ✓
-├── Silver (47/400): +50% damage, +2 sec duration [IN PROGRESS]
-├── Gold (0/1500): Pulls enemies, +100% damage
-└── Diamond (0/8000): Fire tornado, chains to nearby enemies
-```
+---
 
-**How Skills Progress:**
-- Every enemy killed with a skill grants mastery progress
-- Effects call `OnEnemyKilled(enemy)` to track kills
-- Mastery is permanent and never lost
-- Skills apply tier bonuses via `ApplyMasteryBonuses()` in effects
-- Visual feedback in HUD shows progress
-
-**Two-Tier Effect Hierarchy (Godot Compatibility):**
-- **SkillEffect** (Node2D) → For instant/buff/teleport effects
-- **CollisionSkillEffect** (Area2D) → For projectiles/melee attacks
-- Both provide identical `Initialize(skill, player, direction)` API
-
-**How You Unlock New Skills:**
-- Start with 2 basic skills per slot unlocked
-- Floor bosses drop skill unlock tokens (guaranteed)
-- Research Lab unlocks skills by studying specific monsters
-- Rare elite drops can contain skill scrolls
-
-**In-Run Skill Synergies:**
-Level-up choices prioritize YOUR equipped skills:
-- "Whirlwind Mastery" - Your Whirlwind gains +2 projectiles (only appears if equipped)
-- "Skill Combo" - Using Q→E→R in sequence triggers explosion
-- "Cooldown Sync" - All skills refresh when you get 10 kills
-
-**Skill Unlock Pace:**
-- Early Game (Floors 1-3): 2 skills per slot unlocked (6 total choices)
-- Mid Game (Floors 4-7): 4 skills per slot unlocked (12 total)
-- Late Game (Floors 8+): 6+ skills per slot (18+ total)
-
-**Adding New Skills (Data-Driven):**
-1. **Reuse existing type** → Create .tres resource, assign scene, set values
-2. **New skill type needed** → Add Data class, Executor, update factory
-3. **Variant behavior** → Create new effect script, reference in .tres
-
-**Key Benefits:**
-- 7 executors can handle 100+ skills (type-based, not name-based)
-- Create skill variants with zero code (just .tres files)
-- Standardized API: all effects use `Initialize(skill, player, direction)`
-- Automatic mastery tracking through base classes
-
-### Enemy System
-**Current Implementation:**
-- Single enemy type (red square placeholder)
-- Chases player using direct pathfinding
-- Collision-based damage (hits player on contact)
-- Drops 3 XP shards on death (scattered randomly)
-
-**Enemy Stats:**
-- Speed: 150-200
-- MaxHealth: 100
-- Damage: 10
-- AttackCooldown: 1.0s
-
-### XP & Progression
-- Enemies drop 3 XP shards (scattered in 40px radius)
-- Shards auto-move toward player when within 80px
-- Each shard worth ~3 XP (10 XP total per enemy)
-- Level requirements increase by 20% each level
-- Leveling heals to full and grants +20 max HP
-
-### Drop System (Planned)
-**Drop Rates:**
-- **Energy Cores:** Drop from all enemies (100% chance, 1-3 per enemy)
-- **Modification Components:** Drop from elite enemies (20% chance) and bosses (100%)
-- **Catalyst Fragments:** Drop from floor bosses only (100%, 1-2 per boss)
-- **Gear:** Drop from elites (10% chance) and bosses (100%, higher rarity)
-- **Gold:** Drop from all enemies (50% chance, 5-20 gold)
-- **Skill Scrolls:** Rare drop from elites (2% chance)
-
-**Visual Clarity:**
-- Materials: Small colored particles (blue = Energy Cores, red = Modification Components, gold = Catalyst Fragments)
-- Gear: Big glowing item on ground with rarity color (white/green/blue/purple/orange)
-- Skill Scrolls: Glowing purple orbs with skill icon
-- Auto-pickup radius: Small at start, upgradeable
-
-## Planned Systems
-
-### Material Economy
-**Core Philosophy:** Items drop from combat (you never craft gear), but you enhance them using materials. Simple 3-material system with clear, distinct purposes.
-
-**The 3 Materials:**
-1. **Energy Cores** (Common)
-   - **Dropped by:** All enemies (100% chance, 1-3 per enemy)
-   - **Used for:** Power Level upgrades (+10% to all stats per level, max level 10)
-   - **Idle Refinement:** Refines into Stabilized Cores (15 min)
-     - Raw cores = RNG upgrade chance (60-90% success based on level)
-     - Stabilized cores = Guaranteed successful upgrade
-   - **Clear purpose:** Make your gear stronger through linear progression
-
-2. **Modification Components** (Uncommon)
-   - **Dropped by:** Elite enemies (20% chance) and bosses (100%)
-   - **Used for:** Adding or replacing ONE special property per item
-   - **Examples:** "Attacks pierce", "20% life steal", "+50% crit damage", "Chain lightning on hit"
-   - **Idle Refinement:** Refines into specific mod types (30 min)
-     - Raw components = Random mod from any category
-     - Refined components = Choose category (Offensive/Defensive/Utility) for targeted mod
-   - **Clear purpose:** Customize how your gear behaves
-
-3. **Catalyst Fragments** (Rare)
-   - **Dropped by:** Floor bosses only (100%, 1-2 per boss)
-   - **Used for:** Adding build-defining synergy bonuses OR corrupting items for risk/reward
-   - **Synergy Examples:** "+30% damage if DEX > 50", "+40% effect after using dash", "Double stats if health below 50%"
-   - **Corruption:** One-time gamble for massive power with potential downsides
-   - **Idle Refinement:** Refines into Perfect Catalysts (60 min)
-     - Raw fragments = 50-100% effectiveness on synergies
-     - Perfect catalysts = Guaranteed max roll synergies
-   - **Clear purpose:** Tie gear into your specific build/playstyle
-
-### Idle Systems
-
-**Workshop (Material Refinement):**
-- Queue up to 3 refinement jobs
-- Continues processing offline using DateTime
-- Refined materials used at Blacksmith for upgrades
-
-**Treasury (Gold Generation):**
-- Generates gold per hour based on highest floor cleared
-- Formula: (Highest Floor × 10) gold/hour
-- Caps at 8 hours (encourages daily check-ins)
-- Gold used for: respec, consumables, salvaging, rushing
-
-**Gold's Clear Purposes:**
-1. **Respeccing (Player Agency):** Cost 100 gold × character level, completely reset stat points
-2. **Skill Reset:** Cost 500 gold, reset all skill mastery to redistribute
-3. **Consumables (Active Play Support):** Health Potions (50g), Damage Buffs (100g), XP Boost (150g)
-4. **Salvaging (Resource Conversion):** Sell unwanted gear for gold, get 50% of enhancement investment back
-5. **Workshop Rushing (Convenience):** 10 gold per minute remaining on refining timer
-6. **Base Upgrades (Long-term Sinks):** Unlock facility upgrades (costs scale: 500 → 2000 → 5000 gold)
-
-**Research Lab (Phase 2, Reworked for Mastery):**
-- Automatically studies monsters you've killed (tracks kill count)
-- Each monster type has research tiers (10 kills, 50 kills, 200 kills)
-- Research progresses while idle (1 tier per 2 hours of offline time)
-
-**Research Benefits (Reworked for Mastery, Not Power):**
-- Tier 1: Monster weak points glow (easier critical hits)
-- Tier 2: See attack telegraphs 0.5 seconds earlier
-- Tier 3: Unlock monster-specific skill variant
-
-**Training Ground (Phase 2, Reworked):**
-- Generates 1 Quality of Life Token per day (max 7)
-- Spend tokens on permanent QoL improvements:
-  - **Quick Start:** Begin runs at level 2/3/4 (costs 3/5/7 tokens)
-  - **Smart Loot:** Items drop weighted toward your build (5 tokens)
-  - **Skill XP Boost:** Next run has 2x skill mastery gain (1 token)
-  - **Extended Floors:** Boss timer increased by 30 seconds (3 tokens)
-
-### Gear System
-**4 Equipment Slots:**
-1. Weapon (primary stat + damage)
-2. Armor (defense + secondary stats)
-3. Accessory (pure stat bonuses)
-4. Relic (unique build-defining properties)
-
-**How Gear Enhancement Works:**
-Each piece of equipment has 4 layers:
-1. **Base Stats** (fixed on drop, determined by rarity)
-2. **Power Level** (0-10, upgraded with Energy Cores)
-3. **Modification** (one active special property, added with Modification Components)
-4. **Synergy** (one build-defining bonus, added with Catalyst Fragments)
-
-**Enhancement Example:**
-```
-Plasma Rifle (Epic)
-├─ Base: 100 damage, +15 INT, +10 DEX
-├─ Power Level: 3 (+30% to all stats)
-│  └─ Current: 130 damage, +19 INT, +13 DEX
-├─ Modification: "Attacks chain to 2 enemies"
-└─ Synergy: "+25% damage when above 80% health"
-```
-
-### Ascension System (Post-MVP Phase 2)
-**Purpose:** Infinite progression system providing permanent character power independent of gear
-
-**How It Works:**
-- **Ascension XP:** Earned from EVERY enemy kill, boss defeat, and floor clear
-- **Never Lost:** Accumulates permanently across all runs, even deaths
-- **Uncapped:** Infinite levels with exponential XP requirements
-
-**Ascension Levels Grant:**
-+1 Ascension Point per level to spend in three trees:
-
-```
-Power Tree (Raw Stats):
-├── Might: +2% physical damage per point
-├── Focus: +2% magical damage per point
-├── Vitality: +10 HP per point
-└── Agility: +1% attack speed per point
-
-Survival Tree (Defenses):
-├── Armor: +2 flat damage reduction per point
-├── Resistance: +3% elemental resist per point
-├── Recovery: +0.5 HP/sec regen per point
-└── Evasion: +1% dodge chance per point (cap 30%)
-
-Utility Tree (Unique Effects):
-├── Multishot: +5% chance for projectiles to split
-├── Execution: +2% instant-kill chance on enemies below 20% HP
-├── Momentum: +1% damage for each enemy killed recently (cap 50%)
-└── Resonance: +3% to trigger equipment effects twice
-```
-
-### Endgame: Infinite Tower Scaling
-**Unlocked after beating Floor 5:**
-
-**Ascension Floors (6+):**
-- Each floor is 20% harder than the previous
-- No floor cap - push as high as you can
-- Ascension becomes necessary to progress
-- Special rewards every 5 floors:
-  - Floor 10: Exclusive cosmetic set
-  - Floor 15: Title: "Tower Climber"
-  - Floor 20: Unique modification type
-  - Floor 25: Legendary relic blueprint
-  - Every 5 floors: Prestige points for leaderboard
-
-**Corruption System (Floors 1-5 Replayability):**
-After beating a floor, can replay with Corruption levels 1-10:
-- Each Corruption level: +50% enemy stats, +50% rewards
-- Corruption modifiers add challenge:
-  - Level 1: "Enemies explode on death"
-  - Level 3: "No health drops"
-  - Level 5: "Elite spawn rate doubled"
-  - Level 7: "Skills cost health"
-  - Level 10: "One hit kills you"
-
-**Weekly Tower Events:**
-- "Speed Week": Clear floors 25% faster for bonus rewards
-- "Swarm Week": Double enemies, double XP
-- "Elite Week": All enemies are elite tier
-- Global leaderboard resets weekly
-
-### Retention Systems
-
-**Daily Missions:**
-- "Kill 100 enemies" → 50 Energy Cores
-- "Use skills 50 times" → Skill XP boost (2 hours)
-- "Clear any floor" → 100 gold
-
-**Weekly Challenges:**
-- "Reach Floor 5" → Legendary gear box
-- "Master any skill to Silver" → Catalyst Fragment x3
-- "Clear Corruption 5+ on any floor" → Exclusive modification
-
-**Collection Goals:**
-- Gear Sets: Collect all pieces for set bonuses
-- Monster Codex: 100% completion unlocks special title
-- Skill Mastery: Master all skills to Diamond for prestige cosmetic
-
-**Leaderboards:**
-- Highest Ascension Floor reached
-- Fastest Floor 5 clear time
-- Total Ascension Level
-- Weekly event rankings
-
-### The Hub: Your Base
-
-**Layout (Simple to Start):**
-**Central Plaza:** Quick access to all facilities
-- **Blacksmith:** Upgrade equipment with refined materials
-- **Merchant:** Buy consumables and basic gear with gold
-- **Class Selector:** Change class, view stats, see skill mastery
-- **Portal:** Enter the tower (start a run)
-- **Leaderboard:** Check rankings and weekly events
-
-**Facility Wings:**
-- **Workshop** (left): Shows crafting queue, material storage
-- **Treasury** (right): Displays gold generation, collection button
-- **Research Lab** (back left): Monster codex, active research
-- **Training Ground** (back right): Spend QoL tokens, view benefits
-
-**Progression Gates:**
-- Start: Only Workshop and basic Blacksmith available
-- Floor 2 cleared: Treasury unlocked
-- Floor 3 cleared: Research Lab unlocked
-- Floor 4 cleared: Training Ground unlocked
-- Floor 5 cleared: Infinite Ascension Floors unlocked
-- Floor 10 reached: Prestige shop unlocked
-
-### Progression Flow Example
-
-**Day 1 - New Player:**
-1. Tutorial run on Floor 1, learn combat basics
-2. Extract with basic loot and materials
-3. Unlock Workshop and Treasury
-4. Deposit materials in Workshop (start first refinement)
-5. Close game
-
-**Day 2 - Return:**
-1. Collect refined materials and 200 gold from idle earnings
-2. Use materials to upgrade weapon at Blacksmith (+10% damage)
-3. Run Floor 1 again, feels stronger, push to Floor 2
-4. Defeat Floor 2 boss, extract with better loot
-5. Notice Whirlwind skill progress: 23/100 kills
-6. Close game
-
-**Day 3-7 - Early Loop:**
-- Daily check-ins to collect idle progress
-- Use refined materials to steadily upgrade gear
-- Push to higher floors (unlock new facilities)
-- See skills gradually mastering through use
-- Complete daily missions for extra resources
-
-**Week 2+ - Established Loop:**
-- Character level approaching 50+
-- Multiple skills at Silver mastery tier
-- Farming Floor 5 for Catalyst Fragments
-- Workshop constantly refining materials
-- Starting to eye Corruption levels for extra challenge
-- Can choose to grind actively for hours OR check in daily
-
-**Month 2+ - Endgame:**
-- Character level 150+, Ascension level 30+
-- Pushing Floor 15+ in Ascension Tower
-- Several skills at Diamond mastery
-- Competing on weekly leaderboards
-- Perfect gear with synergies tailored to build
-- Still finding new skill combinations to master
-
-## Godot-Specific Patterns
-
-### Node Finding Best Practices
-- **Own children:** Use `GetNode<T>("NodeName")`
-- **Singletons (Player, HUD):** Use Groups + `GetFirstNodeInGroup("player")`
-- **Collections:** Use Groups + `GetNodesInGroup("enemies")`
-- **Complex UI:** Use `[Export]` references (drag in editor)
-- **Frequently reorganized:** Use `%UniqueName` syntax
-
-### Animation Approach
-- **Tween:** Simple property changes (fade, move, scale) - use for effects
-- **AnimationPlayer:** Complex multi-node choreography - use for cutscenes/attacks
-- **AnimatedSprite2D:** Frame-by-frame sprite sheets - use when art available
-- Currently using Tweens for effects (XP shard bobbing, death animations)
+## Godot Patterns
 
 ### Physics & Deferred Calls
-**Critical Rule:** Never modify physics tree during collision processing!
+Never modify physics tree during collision processing:
 - ❌ `AddChild()` in collision callback → ERROR
 - ✅ `CallDeferred(MethodName.AddChild, node)` → Works
-- Use `CallDeferred` when spawning/removing nodes in physics callbacks
-- Use `SetDeferred` for collision shape properties
 
-### Signal Limitations
-Godot C# signals can only pass:
-- ✅ Built-in types: int, float, string, bool
-- ✅ Godot types: Vector2, Node, Resource
-- ❌ Custom C# classes
-
-**Solution:** Use Godot Resources for custom data classes
+### Scene Instancing
 ```csharp
-// Wrong - won't compile
-[Signal] public delegate void MySignalEventHandler(CustomClass data);
-
-// Right - Resource can be passed
-[Signal] public delegate void MySignalEventHandler(CustomResource data);
-```
-
-### Scene Instancing Pattern
-```csharp
-[Export] public PackedScene EnemyScene; // Drag in editor
+[Export] public PackedScene EnemyScene;
 
 var enemy = EnemyScene.Instantiate<Enemy>();
 enemy.GlobalPosition = spawnPos;
-AddChild(enemy); // Or GetTree().Root.AddChild(enemy) for persistence
+AddChild(enemy);
 ```
 
-### Architecture Patterns
-
-**Singleton Pattern (Game Managers)**
+### Singleton Pattern (Autoload)
 ```csharp
-public partial class GameManager : Node
+public partial class GameState : Node
 {
-    public static GameManager Instance { get; private set; }
-    
+    public static GameState Instance { get; private set; }
+
     public override void _Ready()
     {
         if (Instance != null)
@@ -731,394 +534,54 @@ public partial class GameManager : Node
     }
 }
 ```
-Add to Project Settings → Autoload for true singletons.
 
-**Component Pattern (Player)**
-Player has separate component scripts for different concerns:
-- Movement logic
-- Combat logic
-- Inventory management
-- Stats calculation
-Helps keep code modular and testable.
-
-**Factory Pattern (Spawning)**
-Game.cs acts as spawn manager:
-```csharp
-public Enemy SpawnEnemy(Vector2 position)
-{
-    var enemy = EnemyScene.Instantiate<Enemy>();
-    enemy.GlobalPosition = position;
-    AddChild(enemy);
-    return enemy;
-}
-```
-
-### UI Design Guidelines
-
-**Color Palette (Metallic Sci-Fi)**
-- Primary: Steel Blue (#4a90e2)
-- Secondary: Muted Purple (#9b59b6)
-- Backgrounds: Slate grays with depth
-- Accents: Subtle glows, no harsh neon
-- Fonts: Clean sans-serif (Segoe UI style)
-
-**HUD Structure**
-- Canvas Layer (layer 100): Keeps UI on screen
-- Follow Viewport: Must be FALSE for screen-space UI
-- Full Rect anchors: UI Control at (0,0)-(1,1) with offset 0
-- TopLeft: Health/XP bars, level badge, primary stats
-- TopRight: Resource counters (gold, materials)
-- TopCenter: Floor info, wave counter
-- Bottom: Skills bar with mastery progress
-
-**UI Elements**
-- Semi-transparent dark panels (rgba with alpha ~0.95)
-- Border: 2px steel blue (#4a90e2)
-- Corner radius: 8px for panels, 4px for bars
-- Progress bars: Custom StyleBoxFlat with gradient fills
-
-### Development Workflow
-
-**Daily Session Structure (2 hours)**
-- Hour 1: Build one specific feature
-  - 50 min: Code implementation
-  - 10 min: Test
-- Hour 2: Iterate and polish
-  - 30 min: Fix bugs from yesterday
-  - 20 min: Playtest current build
-  - 10 min: Plan tomorrow's task
-
-**Git Commit Pattern**
-Commit after each working feature:
-- "Add XP shard pickup system"
-- "Implement level-up UI with upgrades"
-- "Fix physics collision error in enemy death"
-
-**Testing Checklist**
-Before ending session:
-- [ ] Game runs without errors
-- [ ] Core loop works (kill → loot → level → upgrade)
-- [ ] No red errors in Output panel
-- [ ] Git committed with clear message
-
-### Common Gotchas & Solutions
-
-**Problem:** HUD doesn't follow camera
-- **Cause:** CanvasLayer has follow_viewport_enabled = true
-- **Fix:** Set to false (default). CanvasLayer should be screen-space.
-
-**Problem:** Node not found errors
-- **Cause:** Using FindChild in _Ready() before scene fully loaded
-- **Fix:** Use Groups + cache reference, or use CallDeferred for initialization
-
-**Problem:** Physics error when spawning
-- **Cause:** Trying to AddChild during collision processing
-- **Fix:** Use CallDeferred(MethodName.SpawnMethod)
-
-**Problem:** Signal parameter error (GD0202)
-- **Cause:** Trying to pass custom C# class through signal
-- **Fix:** Use int index or convert class to Godot Resource
-
-**Problem:** Upgrade not applying
-- **Cause:** Not calling ApplyUpgrade() after selecting
-- **Fix:** Ensure OnUpgradeSelected() calls ApplyUpgrade(upgrade.Type)
-
-## Technical Considerations
-
-### Performance Targets
-- **FPS:** 60 FPS minimum with 50+ enemies on screen
-- **Load Times:** <2 seconds between base and runs
-- **Save/Load:** Instant, no loading bars
-- **Spawning:** Can spawn 10+ entities per second without lag
-- **Idle Processing:** Background timer system, not simulation
-
-### Platform Priorities
-**MVP Target:** PC (Steam)
-- Mouse + keyboard primary
-- Controller support secondary
-- Mobile: Consider for post-launch (UI needs redesign)
-
-### Data Structure Considerations
-**Keep it simple:**
-- Gear stats: Use flat modifiers, not complex formulas
-- Enemy scaling: Linear increases per floor (HP +30%, Damage +20% per floor)
-- Material counts: No decimals, whole numbers only
-- Timer system: Server-side validation if online, local storage if offline
-
-### Future Considerations
-
-**When to Add Object Pooling**
-- Spawning 50+ enemies total: Consider pooling
-- Shooting 20+ projectiles/second: Definitely pool
-- 100+ XP shards on screen: Pool them
-
-**When to Optimize**
-- After core loop is fun (don't optimize too early)
-- When hitting performance targets becomes difficult
-- Before adding more content that would compound issues
-
-## Launch Scope & Expansion Path
-
-### MVP Launch Scope
-**Must Have:**
-- 3 classes with distinct playstyles
-- 5 floors with unique bosses
-- Skill mastery system (use-based progression)
-- Workshop and Treasury
-- Basic gear system with enhancements
-- Character leveling to 200
-- In-run upgrade system that synergizes with equipped skills
-- Save/load system
-
-### Post-MVP Phase 1 (First Month)
-- Infinite Ascension Floors (6+)
-- Ascension system
-- Corruption levels for floors 1-5
-- Weekly events and leaderboards
-- Daily missions
-
-### Post-MVP Phase 2 (Months 2-3)
-- Research Lab implementation
-- Training Ground with QoL tokens
-- 10 more skills per class
-- Gear set bonuses
-- Monster codex completion rewards
-
-### Future Expansions
-- New classes
-- Prestige system at Floor 50+
-- Seasonal events with unique rewards
-- Co-op mode for 2 players
-- Custom challenge mode creator
-
-## Why This Design Works
-
-### For Active Players:
-- Fighting is always the fastest way to progress
-- Skill mastery rewards active use, not waiting
-- Infinite floors provide endless challenge
-- Grinding is rewarded with direct power gains
-- Multiple progression paths (gear, skills, ascension, floors)
-
-### For Casual Players:
-- Check in once a day for meaningful idle progress
-- Can focus on mastering one skill at a time
-- Corruption levels let them replay at comfortable difficulty
-- Clear daily missions in 15 minutes
-- Never feel "left behind" due to personal progression
-
-### For Both:
-- Clear feedback loop: fight → collect → refine → upgrade → master skills → climb higher
-- Always something to work toward (next skill tier, next floor, next ascension level)
-- No wasted runs - everything contributes to permanent progression
-- Complexity increases gradually
-- Respects player time with multiple progression speeds
-
-## Key Design Principles
-
-1. **Active play drives progression** - Idle only enhances, never replaces
-2. **Every action matters** - All kills contribute to skill/ascension progress
-3. **Clear purpose for power** - Infinite floors give reason to get stronger
-4. **No time-gating on core progression** - Skills and power come from play
-5. **Multiple valid goals** - Chase floors, perfect builds, or complete collections
-6. **Respect player investment** - Permanent progression never lost
-7. **Gradual complexity** - Start simple, layer systems as players advance
-
-## Known Issues
-- Enemy spawning doesn't increase difficulty over time (planned)
-- No sound effects or music
-- Placeholder art (colored squares)
-- No death particles or screen shake
-- Single enemy type (need variety)
-- No save system (progress lost on quit)
-
-## Next Priority Tasks
-
-### Completed ✅
-1. ~~**Implement Q/E/R active skill system**~~ - DONE!
-   - ✅ Cooldown-based skills working
-   - ✅ SkillManager component handles input
-   - ✅ Skill Resource system with ISkillExecutor pattern
-
-2. ~~**Refactor to type-based skill architecture**~~ - DONE!
-   - ✅ Type-based executors (7 types, scales to 100+ skills)
-   - ✅ Standardized Initialize(skill, player, direction) API
-   - ✅ Two-tier effect hierarchy (SkillEffect vs CollisionSkillEffect)
-   - ✅ C# pattern matching factory
-
-3. ~~**Implement skill mastery tracking**~~ - DONE!
-   - ✅ Kill tracking per skill
-   - ✅ Bronze/Silver/Gold/Diamond tiers with thresholds
-   - ✅ Permanent progression (KillCount, CurrentTier persisted)
-   - ✅ ApplyMasteryBonuses() in all effects
-
-4. ~~**Initial skill implementations**~~ - DONE!
-   - ✅ Whirlwind (InstantAOESkill)
-   - ✅ Fireball (ProjectileSkill)
-   - ✅ Basic attacks (MeleeAttackSkill, ProjectileSkill)
-
-### Current Focus 🎯
-5. **Implement 4 new skill types** (validate architecture scalability)
-   - DashSkill (movement ability like Disengage)
-   - BuffSkill (stat buff like Battle Cry)
-   - TeleportSkill (instant teleport like Blink)
-   - DashMeleeSkill (combo ability like Dash Strike)
-   - Full code provided in conversation - ready to implement
-
-### Next Up 📋
-6. **Expand skill pool** (6+ skills per slot)
-   - Add skill variants using existing types (Iceball, Lightning Bolt)
-   - Add 2-3 E skills (utility/defensive): Shield, Slow Field
-   - Add 1-2 R skills (ultimate): Meteor, Time Stop
-   - Each skill needs: visual effect, feel impactful
-   - Test mastery progression feel
-
-7. **Refactor upgrade system to use UpgradePoolManager**
-   - Extend `Upgrade.cs` with: Category, RequiredSkill, Weight, CanStack fields
-   - Create UpgradePoolManager singleton (autoload)
-   - Load upgrades from Resources/Upgrades/ directory
-   - Implement weighted selection (40% skill modifiers, 40% passives, 20% stats)
-   - Add skill-specific filtering (only show if skill equipped)
-   - Remove hardcoded upgrade list from UpgradeManager.cs
-
-8. Add 2-3 enemy types (fast/tank/ranged)
-9. Implement basic material drop system
-10. Create floor transition system
-11. Add boss encounter for Floor 1
-
-## Development Notes
-- Keep sessions focused on ONE feature
-- Playtest after every change
-- Skills should feel impactful immediately
-- Every run should progress something permanent
-- Don't add complexity until current systems are fun
-- Commit working code daily
-
-### Technical Debt / Pending Refactors
-- **Upgrade System:** Currently hardcoded in UpgradeManager.cs. Needs UpgradePoolManager refactor (documented in Next Priority Tasks #7) - do AFTER skill pool is expanded
-- ~~**Player Component Refactor:**~~ ✅ COMPLETED - Player now uses StatsManager, SkillManager, and UpgradeManager components
-- ~~**Skill System Architecture:**~~ ✅ COMPLETED - Type-based executors with standardized API and mastery tracking
-
-### Skill System Implementation Reference
-
-**Factory Pattern (C# Pattern Matching):**
-```csharp
-// In Skill.cs
-private ISkillExecutor CreateExecutor()
-{
-    return this switch
-    {
-        Data.ProjectileSkill => new ProjectileSkillExecutor(),
-        Data.InstantAOESkill => new InstantAOESkillExecutor(),
-        Data.MeleeAttackSkill => new MeleeSkillExecutor(),
-        Data.DashSkill => new DashSkillExecutor(),
-        Data.BuffSkill => new BuffSkillExecutor(),
-        Data.TeleportSkill => new TeleportSkillExecutor(),
-        Data.DashMeleeSkill => new DashMeleeSkillExecutor(),
-        _ => null
-    };
-}
-```
-
-**Standardized Executor Pattern:**
-```csharp
-public class ProjectileSkillExecutor : ISkillExecutor
-{
-    public void ExecuteSkill(Player player, Skill baseSkill)
-    {
-        if (baseSkill is not ProjectileSkill skill) return;
-
-        Vector2 direction = (player.GetGlobalMousePosition() - player.GlobalPosition).Normalized();
-
-        var effect = skill.SkillEffectScene.Instantiate<CollisionSkillEffect>();
-        effect.GlobalPosition = player.GlobalPosition;
-        effect.Initialize(skill, player, direction);
-
-        player.GetTree().Root.AddChild(effect);
-    }
-}
-```
-
-**Standardized Effect Pattern:**
-```csharp
-public partial class FireballProjectile : CollisionSkillEffect
-{
-    private float _damage;
-
-    public override void Initialize(Skill sourceSkill, Player caster, Vector2 direction)
-    {
-        base.Initialize(sourceSkill, caster, direction);
-
-        var skill = sourceSkill as ProjectileSkill;
-        _damage = skill.DirectDamage;
-
-        ApplyMasteryBonuses();
-    }
-
-    private void ApplyMasteryBonuses()
-    {
-        switch (_sourceSkill.CurrentTier)
-        {
-            case SkillMasteryTier.Silver:
-                _damage *= 1.5f;
-                break;
-            case SkillMasteryTier.Gold:
-                _damage *= 2.0f;
-                break;
-            case SkillMasteryTier.Diamond:
-                _damage *= 3.0f;
-                break;
-        }
-    }
-
-    private void OnBodyEntered(Node2D body)
-    {
-        if (body is Enemy enemy)
-        {
-            float healthBefore = enemy.Health;
-            enemy.TakeDamage(_damage);
-
-            // Track kill for mastery
-            if (healthBefore > 0 && enemy.Health <= 0)
-            {
-                OnEnemyKilled(enemy);
-            }
-        }
-    }
-}
-```
-
-**Key Patterns to Follow:**
-1. **Data layer** defines skill types with [GlobalClass] attribute
-2. **Executors** are type-based, not skill-specific
-3. **Effects** inherit from SkillEffect (Node2D) or CollisionSkillEffect (Area2D)
-4. **All effects** use `Initialize(Skill sourceSkill, Player caster, Vector2 direction)`
-5. **All effects** call `OnEnemyKilled(enemy)` to track mastery
-6. **All effects** implement `ApplyMasteryBonuses()` for tier scaling
-
-**Documentation:**
-- Complete architecture guide: `skill_system.md`
-- For new collaborators: Covers all patterns, troubleshooting, and examples
-
-## For Claude Code
-
-**Your Role: Mentor, Not Implementer**
-- **DO NOT implement features unless explicitly asked**
-- Your role is to guide, advise, and explain - not to write code proactively
-- When asked "what's next" or "where are we" - provide analysis and recommendations, not implementation
-- Wait for explicit requests like "implement X" or "write the code for Y" before coding
-- Offer guidance on approach, architecture, and Godot patterns first
-
-**When Providing Implementation (only when explicitly requested):**
-- Assume C# knowledge but Godot beginner
-- Explain Godot-specific concepts clearly
-- Provide complete, copy-paste ready code
-- Point out common Godot pitfalls
-- Reference this document's patterns and architecture
-- Remember skill mastery is use-based, not time-based
-- Prioritize working code over perfect code
-- Keep explanations practical and example-driven
+Add to Project Settings → Autoload.
 
 ---
 
-This documentation represents the complete game design with all systems interconnected for maximum retention and player satisfaction. The core loop of fight → collect → enhance → master → climb creates endless meaningful progression.
+## Next 2-Hour Session: Phase 1 Start
+
+**Priority tasks:**
+1. Fix 5 broken upgrades (DamagePercent, PickupRadius, Pierce, Crit, Regen)
+2. Add FastMelee enemy type
+3. Add SlowRanged enemy type
+4. Implement wave escalation (spawn rate + HP scaling)
+
+**Each task should take ~20-30 minutes.**
+
+---
+
+## Known Issues
+- 5 of 8 upgrades don't work
+- Only 1 enemy type
+- No difficulty scaling
+- No floor system
+- Player.Speed directly modified (should use StatsManager)
+- Skill.Execute() should be in SkillSystem, not Resource
+
+---
+
+## Development Principles
+
+1. **Be honest about progress** - No aspirational completion percentages
+2. **Prove before building** - Each phase validates a hypothesis
+3. **Simplify ruthlessly** - Cut features that don't directly support the core loop
+4. **Playtest constantly** - Record yourself playing, watch it back
+5. **Ship small** - 2-week MVP beats 6-month vaporware
+
+---
+
+## For Claude Code
+
+When the user says "implement X":
+1. Check if X is in current phase - if not, remind them of sequential plan
+2. Provide complete, working code
+3. Test that it actually works (run the game if possible)
+4. Update this doc with realistic completion status
+
+When the user asks "what's next":
+1. Show current phase progress
+2. List remaining tasks in current phase
+3. Don't jump ahead to future phases
+
+**Core rule:** Don't let the user (or yourself) add features outside the current phase. The sequential plan exists to prevent scope creep.

@@ -1,7 +1,0 @@
-[gd_resource type="Resource" script_class="ProjectileSkill" load_steps=2 format=3 uid="uid://cg3u8qjfh5318"]
-
-[ext_resource type="Script" uid="uid://ds54a7ovplxnu" path="res://Scripts/Skills/SkillTypes/ProjectileSkill.cs" id="1_lxtbi"]
-
-[resource]
-script = ExtResource("1_lxtbi")
-metadata/_custom_type_script = "uid://ds54a7ovplxnu"

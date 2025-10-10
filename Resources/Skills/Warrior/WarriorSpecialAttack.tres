@@ -1,7 +1,0 @@
-[gd_resource type="Resource" script_class="StunSkill" load_steps=2 format=3 uid="uid://b6rlbuorpni5b"]
-
-[ext_resource type="Script" uid="uid://bx54x5t7sbw6u" path="res://Scripts/Skills/Data/StunSkill.cs" id="1_n3t4c"]
-
-[resource]
-script = ExtResource("1_n3t4c")
-Slot = 1
