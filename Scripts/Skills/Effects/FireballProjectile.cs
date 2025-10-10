@@ -1,31 +1,67 @@
 using Godot;
 using SpaceTower.Scripts.Enemies.Base;
+using SpaceTower.Scripts.PlayerScripts;
+using SpaceTower.Scripts.Skills.Base;
+using SpaceTower.Scripts.Skills.Data;
 
 namespace SpaceTower.Scripts.Skills.Effects;
 
-public partial class FireballProjectile : Area2D
+public partial class FireballProjectile : CollisionSkillEffect
 {
     [Export] public float Speed = 400.0f;
     [Export] public float MaxRange = 500.0f;
 
     [Export] public PackedScene ExplosionEffectScene; // Optional visual effect
 
-    private float _directDamage = 40.0f;
-    private float _explosionDamage = 25.0f;
-    private float _explosionRadius = 100.0f;
+    private float _directDamage;
+    private float _explosionDamage;
+    private float _explosionRadius;
 
-    private Vector2 _direction;
     private Vector2 _startPosition;
     private bool _hasExploded = false;
 
-    public void Initialize(Vector2 direction, Vector2 startPosition, float directDamage, float explosionDamage, float explosionRadius)
+    public override void Initialize(Skill sourceSkill, Player caster, Vector2 direction)
     {
-        _direction = direction.Normalized();
-        _startPosition = startPosition;
-        _directDamage = directDamage;
-        _explosionDamage = explosionDamage;
-        _explosionRadius = explosionRadius;
+        base.Initialize(sourceSkill, caster, direction);
+
+        var skill = sourceSkill as ProjectileSkill;
+        if (skill == null)
+        {
+            GD.PrintErr("FireballProjectile: sourceSkill is not ProjectileSkill!");
+            return;
+        }
+
+        _directDamage = skill.DirectDamage;
+        _explosionDamage = skill.ExplosionDamage;
+        _explosionRadius = skill.ExplosionRadius;
+        _startPosition = caster.GlobalPosition;
+
         Rotation = direction.Angle();
+
+        // Apply mastery bonuses
+        ApplyMasteryBonuses();
+    }
+
+    private void ApplyMasteryBonuses()
+    {
+        switch (_sourceSkill.CurrentTier)
+        {
+            case SkillMasteryTier.Silver:
+                _directDamage *= 1.5f;
+                _explosionDamage *= 1.5f;
+                break;
+            case SkillMasteryTier.Gold:
+                _directDamage *= 2.0f;
+                _explosionDamage *= 2.0f;
+                _explosionRadius *= 1.2f;
+                break;
+            case SkillMasteryTier.Diamond:
+                _directDamage *= 3.0f;
+                _explosionDamage *= 3.0f;
+                _explosionRadius *= 1.5f;
+                Speed *= 1.3f;
+                break;
+        }
     }
 
     public override void _Ready()
@@ -56,7 +92,14 @@ public partial class FireballProjectile : Area2D
         if (body is Enemy enemy)
         {
             // Deal direct hit damage
+            float healthBefore = enemy.Health;
             enemy.TakeDamage(_directDamage);
+
+            // Track kill if enemy died from direct hit
+            if (healthBefore > 0 && enemy.Health <= 0)
+            {
+                OnEnemyKilled(enemy);
+            }
 
             // Then explode
             Explode();
@@ -93,8 +136,15 @@ public partial class FireballProjectile : Area2D
                 float distance = GlobalPosition.DistanceTo(enemy.GlobalPosition);
                 if (distance <= _explosionRadius)
                 {
+                    float healthBefore = enemy.Health;
                     enemy.TakeDamage(_explosionDamage);
                     hitCount++;
+
+                    // Track kill if enemy died from explosion
+                    if (healthBefore > 0 && enemy.Health <= 0)
+                    {
+                        OnEnemyKilled(enemy);
+                    }
                 }
             }
         }

@@ -6,35 +6,35 @@ using SpaceTower.Scripts.Skills.Effects;
 
 namespace SpaceTower.Scripts.Skills.Executors;
 
-public class ProjectileSkillExecutor : ISkillExecutor
+public class MeleeSkillExecutor : ISkillExecutor
 {
     public void ExecuteSkill(Player player, Skill baseSkill)
     {
-        if (baseSkill is not ProjectileSkill skill)
+        if (baseSkill is not MeleeAttackSkill skill)
         {
-            GD.PrintErr("ProjectileSkillExecutor: Skill is not of type ProjectileSkill!");
+            GD.PrintErr("MeleeSkillExecutor: Skill is not of type MeleeAttackSkill!");
             return;
         }
 
         if (skill.SkillEffectScene == null)
         {
-            GD.PrintErr("ProjectileSkillExecutor: SkillEffectScene not set!");
+            GD.PrintErr("MeleeSkillExecutor: SkillEffectScene not set!");
             return;
         }
 
-        // Get direction toward mouse
+        // Calculate attack direction toward mouse
         Vector2 direction = (player.GetGlobalMousePosition() - player.GlobalPosition).Normalized();
 
-        // Spawn projectile effect (generic - works for any projectile type)
+        // Spawn melee effect (generic - works for any melee type)
         var effect = skill.SkillEffectScene.Instantiate<CollisionSkillEffect>();
         effect.GlobalPosition = player.GlobalPosition;
 
         // Standardized initialization
         effect.Initialize(skill, player, direction);
 
-        // Add to scene tree
+        // Add to scene
         player.GetTree().Root.AddChild(effect);
 
-        GD.Print($"{skill.SkillName} launched!");
+        GD.Print($"{skill.SkillName} executed!");
     }
 }
