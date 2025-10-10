@@ -547,7 +547,12 @@ Add to Project Settings → Autoload.
 3. Add SlowRanged enemy type
 4. Implement wave escalation (spawn rate + HP scaling)
 
-**Each task should take ~20-30 minutes.**
+**Workflow per task:**
+1. Implement (20-30 min)
+2. **Quick code review** (5 min) - Check for bugs, test in-game, verify it actually works
+3. Move to next task
+
+**Each task cycle: ~25-35 minutes.**
 
 ---
 
