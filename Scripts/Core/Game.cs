@@ -8,16 +8,13 @@ namespace SpaceTower.Scripts.Core;
 public partial class Game : Node
 {
     // Scenes
-
     [Export] public PackedScene EnemyScene;
 
     // Dependencies
-
     [Export] public Player Player;
     [Export] public Hud HUD;
 
     // Settings
-
     [Export] public float SpawnDistance = 400.0f;
     [Export] public float SpawnInterval = 2.0f;
 
