@@ -10,7 +10,7 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 - Every run contributes to permanent progression (no wasted time)
 
 ## Current Status: Be Honest
-**Phase:** Early Prototype (~15-20% to MVP)
+**Phase:** Early Prototype (~20-25% to MVP)
 
 **Actually Working:**
 - ✅ Player movement (WASD) and rotation
@@ -23,9 +23,14 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 - ✅ Type-based skill executor pattern
 - ✅ 3 working skills: Whirlwind, Fireball, Basic melee/ranged attacks
 - ✅ Skill mastery tracking (kills recorded per skill)
+- ✅ **Stats consolidated in StatsManager** (Speed/FireRate/MeleeRate calculated from base + upgrades)
+- ✅ **Upgrade stacking fixed** (recalculates from base values, no more broken math)
+- ✅ **3 of 8 upgrades work correctly** (MovementSpeed, AttackSpeed, MaxHealth)
+- ✅ **Core combat validated as fun** (hypothesis proven)
 
 **Broken/Incomplete:**
-- ❌ 5 of 8 upgrades don't actually work (DamagePercent, PickupRadius, Pierce, Crit, Regen)
+- ❌ 5 of 8 upgrades don't work yet (DamagePercent, PickupRadius, Pierce, Crit, Regen)
+- ❌ No centralized damage calculation system
 - ❌ Only 1 enemy type (need 2-3 minimum)
 - ❌ No wave escalation or difficulty scaling
 - ❌ No floor system (just an empty arena with spawning)
@@ -539,13 +544,27 @@ Add to Project Settings → Autoload.
 
 ---
 
-## Next 2-Hour Session: Phase 1 Start
+## Current Session Progress (Session 2)
 
-**Priority tasks:**
-1. Fix 5 broken upgrades (DamagePercent, PickupRadius, Pierce, Crit, Regen)
-2. Add FastMelee enemy type
-3. Add SlowRanged enemy type
-4. Implement wave escalation (spawn rate + HP scaling)
+**Completed:**
+- ✅ Stats consolidation refactor (Speed/FireRate/MeleeRate now in StatsManager)
+- ✅ Fixed upgrade stacking math (recalculates from base + all upgrades)
+- ✅ Fixed MaxHealth level-up bug (now persists correctly)
+- ✅ Architecture discussion: Decided to keep components for Phase 1, add singletons in Phase 2
+- ✅ Core combat validated as fun (no need to test hypothesis)
+
+**Next Session Tasks:**
+1. Add cached upgrade stats to StatsManager (DamageMultiplier, CritChance, PickupRadius, HealthRegenPerSecond, ProjectilePierceCount)
+2. Create CombatSystem.cs (static class for centralized damage calculation)
+3. Fix 5 broken upgrades:
+   - DamagePercent (apply in CombatSystem.CalculateDamage)
+   - CritChance (apply in CombatSystem.CalculateDamage)
+   - PickupRadius (ExperienceShard reads from StatsManager)
+   - ProjectilePierce (projectiles track pierce count)
+   - HealthRegen (StatsManager._Process() ticks HP every second)
+4. Add FastMelee enemy type
+5. Add SlowRanged enemy type
+6. Implement wave escalation (spawn rate + HP scaling)
 
 **Workflow per task:**
 1. Implement (20-30 min)
@@ -557,12 +576,12 @@ Add to Project Settings → Autoload.
 ---
 
 ## Known Issues
-- 5 of 8 upgrades don't work
+- 5 of 8 upgrades don't work (need CombatSystem + cached stats)
 - Only 1 enemy type
 - No difficulty scaling
 - No floor system
-- Player.Speed directly modified (should use StatsManager)
-- Skill.Execute() should be in SkillSystem, not Resource
+- No centralized damage calculation
+- Skill.Execute() should be in SkillSystem, not Resource (deferred to Phase 2)
 
 ---
 
@@ -573,6 +592,59 @@ Add to Project Settings → Autoload.
 3. **Simplify ruthlessly** - Cut features that don't directly support the core loop
 4. **Playtest constantly** - Record yourself playing, watch it back
 5. **Ship small** - 2-week MVP beats 6-month vaporware
+6. **Don't refactor working architecture until you hit pain points** - Current components work fine for single-class Phase 1
+
+## Architecture Decisions (Session 2)
+
+### **Components vs Singletons**
+
+**Decision:** Hybrid approach
+- **Keep as Player components:** StatsManager, SkillManager, UpgradeManager (run-specific state)
+- **Add as singletons in Phase 2:** PlayerProgression (persistent), GameState (run state), CombatSystem (stateless utility)
+
+**Reasoning:**
+- Components work well for single-class Phase 1
+- Class switching (Warrior/Mage/Ranger) not needed until Phase 2
+- Don't refactor working code before stress-testing it
+- Singletons make sense for: persistence (PlayerProgression), global state (GameState), and stateless utilities (CombatSystem)
+
+### **Upgrade System Architecture**
+
+**Problem identified:** No centralized damage calculation leads to duplicated upgrade logic across all skills
+
+**Solution:** CombatSystem static class
+```csharp
+public static class CombatSystem
+{
+    public static float CalculateDamage(float baseDamage, Player attacker)
+    {
+        var stats = attacker.GetNode<StatsManager>("StatsManager");
+        float damage = baseDamage * stats.DamageMultiplier;
+
+        if (GD.Randf() < stats.CritChance)
+            damage *= 2.0f;
+
+        return damage;
+    }
+}
+```
+
+**Benefits:**
+- One place for all damage logic
+- Easy to extend in Phase 2 (armor, resistances)
+- Skills become simpler: `enemy.TakeDamage(CombatSystem.CalculateDamage(_damage, _caster))`
+
+### **Cached Stats Pattern**
+
+**Upgrade values cached in StatsManager** instead of dictionary lookups every frame:
+```csharp
+// Recalculated when upgrades change
+public float DamageMultiplier { get; private set; } = 1.0f;
+public float CritChance { get; private set; } = 0f;
+public float PickupRadius { get; private set; } = 80f;
+```
+
+**Why:** Performance (no dictionary lookups) + StatsManager becomes the "character sheet"
 
 ---
 

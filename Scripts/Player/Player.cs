@@ -9,25 +9,16 @@ namespace SpaceTower.Scripts.PlayerScripts;
 
 public partial class Player : CharacterBody2D
 {
-    // Stats
-
-    [Export] public float Speed = 300.0f;
-    [Export] public float FireRate = 0.2f;
-    [Export] public float MeleeRate = 0.5f;
-
     [Export] public PlayerClass CurrentClass = PlayerClass.Warrior;
 
     // Scenes
-
     [Export] public PackedScene ProjectileScene;
     [Export] public PackedScene MeleeAttackScene;
 
     // UI Dependencies
-
     [Export] public LevelUpPanel LevelUpPanel;
 
     // Signals for HUD updates
-
     [Signal] public delegate void HealthChangedEventHandler(float currentHealth, float maxHealth);
     [Signal] public delegate void ExperienceChangedEventHandler(int currentXP, int requiredXP, int level);
     [Signal] public delegate void ResourcesChangedEventHandler(int gold, int cores, int components, int fragments);
@@ -47,8 +38,7 @@ public partial class Player : CharacterBody2D
             GD.PrintErr("Player: ProjectileScene not assigned!");
         }
 
-        // Get SkillManager component
-
+        // Get components
         _skillManager = GetNode<SkillManager>("SkillManager");
         if (_skillManager == null)
         {
@@ -63,7 +53,6 @@ public partial class Player : CharacterBody2D
         else
         {
             // Subscribe to level up event
-
             _statsManager.LeveledUp += OnLeveledUp;
         }
 
@@ -74,7 +63,6 @@ public partial class Player : CharacterBody2D
         }
 
         // Connect to LevelUpPanel
-
         if (LevelUpPanel != null)
         {
             LevelUpPanel.UpgradeSelected += HandleUpgradeSelection;
@@ -98,7 +86,9 @@ public partial class Player : CharacterBody2D
     public override void _PhysicsProcess(double delta)
     {
         Vector2 direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
-        Velocity = direction * Speed;
+
+        // Read speed from StatsManager
+        Velocity = direction * _statsManager.Speed;
 
         if (direction != Vector2.Zero)
         {
@@ -123,15 +113,12 @@ public partial class Player : CharacterBody2D
 
     private void OnLeveledUp()
     {
-        GD.Print("OnLeveledUp called!"); // DEBUG
-
-        GD.Print($"LevelUpPanel is null: {LevelUpPanel == null}"); // DEBUG
-
+        GD.Print("OnLeveledUp called!");
 
         if (LevelUpPanel != null)
         {
             var upgradeOptions = GetRandomUpgrades(3);
-            GD.Print($"Got {upgradeOptions.Count} upgrade options"); // DEBUG
+            GD.Print($"Got {upgradeOptions.Count} upgrade options");
 
             LevelUpPanel.ShowUpgrades(upgradeOptions);
         }

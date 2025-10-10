@@ -6,17 +6,25 @@ namespace SpaceTower.Scripts.PlayerScripts.Components;
 [GlobalClass]
 public partial class StatsManager : Node
 {
-    [Export] public float MaxHealth { get; set; } = 100.0f;
+    // Base stats (set in editor)
+    [Export] public float BaseMaxHealth { get; set; } = 100.0f;
+    [Export] public float BaseSpeed { get; set; } = 300.0f;
+    [Export] public float BaseFireRate { get; set; } = 0.2f;
+    [Export] public float BaseMeleeRate { get; set; } = 0.5f;
+
+    // Calculated stats (modified by upgrades)
+    public float MaxHealth { get; private set; } = 100.0f;
     public float Health { get; private set; } = 100.0f;
+    public float Speed { get; private set; }
+    public float FireRate { get; private set; }
+    public float MeleeRate { get; private set; }
 
     // Progression
-
     [Export] public int Level { get; private set; } = 1;
     [Export] public int Experience { get; private set; } = 0;
     [Export] public int ExperienceToNextLevel { get; private set; } = 100;
 
     // Event for level up (Player will listen)
-
     public event Action LeveledUp;
 
     private Player _player;
@@ -28,11 +36,16 @@ public partial class StatsManager : Node
         {
             GD.PrintErr("StatsManager: Could not find Player parent!");
         }
+
+        MaxHealth = BaseMaxHealth;
         Health = MaxHealth;
     }
 
     public void Initialize()
     {
+        // Set initial stat values (no upgrades yet)
+        RecalculateStats(0f, 0f, 0f, 0f);
+
         EmitHealthUpdate();
         EmitExperienceUpdate();
     }
@@ -44,7 +57,6 @@ public partial class StatsManager : Node
         {
             Health = 0;
         }
-
 
         EmitHealthUpdate();
 
@@ -66,12 +78,30 @@ public partial class StatsManager : Node
         EmitExperienceUpdate();
     }
 
-    public void IncreaseMaxHealth(float amount)
+    public void RecalculateStats(float movementSpeedBonus, float attackSpeedBonus, float maxHealthBonus, float baseSpeedBonus)
     {
-        MaxHealth += amount;
-        Health += amount; // Heal player by the same amount
+        GD.Print($"RecalculateStats called: maxHealthBonus={maxHealthBonus}, Level={Level}"); // ← ADD THIS
+        // Apply upgrade bonuses to base values
+        Speed = (BaseSpeed + baseSpeedBonus) * (1 + movementSpeedBonus);
+        FireRate = BaseFireRate * (1 - attackSpeedBonus);
+        MeleeRate = BaseMeleeRate * (1 - attackSpeedBonus);
+        MaxHealth = BaseMaxHealth + maxHealthBonus + CalculateLevelHealthBonus();
+
+        GD.Print($"New MaxHealth: {MaxHealth}"); // ← ADD THIS
+
+        // Don't reduce current health, only increase max if needed
+        if (Health > MaxHealth)
+        {
+            Health = MaxHealth;
+        }
 
         EmitHealthUpdate();
+    }
+
+    private float CalculateLevelHealthBonus()
+    {
+        // +20 HP per level (Level 1 = 0 bonus, Level 2 = 20, Level 3 = 40, etc.)
+        return 20f * (Level - 1);
     }
 
     private void LevelUp()
@@ -80,17 +110,16 @@ public partial class StatsManager : Node
         Level++;
         ExperienceToNextLevel = (int)(ExperienceToNextLevel * 1.5);
 
-        MaxHealth += 20;
-        Health = MaxHealth;
-        _player.Speed += 10;
+        // Update MaxHealth immediately with level bonus (upgrade bonuses added when RecalculateStats is called)
+        MaxHealth = BaseMaxHealth + CalculateLevelHealthBonus();
+        Health = MaxHealth;  // Full heal on level up
 
         GD.Print($"Leveled up to {Level}!");
 
         EmitHealthUpdate();
         EmitExperienceUpdate();
 
-        // Notify Player that level up occurred
-
+        // Notify Player that level up occurred (this will trigger upgrade panel)
         LeveledUp?.Invoke();
     }
 
