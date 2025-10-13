@@ -80,7 +80,7 @@ public partial class Hud : Control
 
         _healthBar.MaxValue = maxHealth;
         _healthBar.Value = currentHealth;
-        _healthLabel.Text = $"Health: {currentHealth}/{maxHealth}";
+        _healthLabel.Text = $"Health: {currentHealth:F0}/{maxHealth:F0}";
     }
 
     public void UpdateExperience(int currentExp, int expToNextLevel, int level)

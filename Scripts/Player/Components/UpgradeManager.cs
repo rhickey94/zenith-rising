@@ -83,9 +83,26 @@ public partial class UpgradeManager : Node
         float movementSpeedBonus = GetUpgradeValue(UpgradeType.MovementSpeed);
         float attackSpeedBonus = GetUpgradeValue(UpgradeType.AttackSpeed);
         float maxHealthBonus = GetUpgradeValue(UpgradeType.MaxHealth);
-        float baseSpeedBonus = 10f * _statsManager.Level;  // Level up bonus (+10 speed per level)
+        float baseSpeedBonus = 10f * _statsManager.Level; // Level up bonus (+10 speed per level)
+
+        float damagePercentBonus = GetUpgradeValue(UpgradeType.DamagePercent);
+        float critChanceBonus = GetUpgradeValue(UpgradeType.CritChance);
+        float pickupRadiusBonus = GetUpgradeValue(UpgradeType.PickupRadius);
+        float healthRegenBonus = GetUpgradeValue(UpgradeType.HealthRegen);
+        float projectilePierceBonus = GetUpgradeValue(UpgradeType.ProjectilePierce);
 
         // Tell StatsManager to recalculate everything from scratch
-        _statsManager.RecalculateStats(movementSpeedBonus, attackSpeedBonus, maxHealthBonus, baseSpeedBonus);
+        _statsManager.RecalculateStats(new StatModifiers
+        {
+            MovementSpeedBonus = movementSpeedBonus,
+            AttackSpeedBonus = attackSpeedBonus,
+            MaxHealthBonus = maxHealthBonus,
+            BaseSpeedBonus = baseSpeedBonus,
+            DamagePercentBonus = damagePercentBonus,
+            CritChanceBonus = critChanceBonus,
+            PickupRadiusBonus = pickupRadiusBonus,
+            HealthRegenBonus = healthRegenBonus,
+            ProjectilePierceBonus = (int)projectilePierceBonus
+        });
     }
 }

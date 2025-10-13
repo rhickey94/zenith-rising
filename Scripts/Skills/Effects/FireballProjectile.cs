@@ -1,4 +1,5 @@
 using Godot;
+using SpaceTower.Scripts.Core;
 using SpaceTower.Scripts.Enemies.Base;
 using SpaceTower.Scripts.PlayerScripts;
 using SpaceTower.Scripts.Skills.Base;
@@ -24,8 +25,7 @@ public partial class FireballProjectile : CollisionSkillEffect
     {
         base.Initialize(sourceSkill, caster, direction);
 
-        var skill = sourceSkill as ProjectileSkill;
-        if (skill == null)
+        if (sourceSkill is not ProjectileSkill skill)
         {
             GD.PrintErr("FireballProjectile: sourceSkill is not ProjectileSkill!");
             return;
@@ -93,7 +93,7 @@ public partial class FireballProjectile : CollisionSkillEffect
         {
             // Deal direct hit damage
             float healthBefore = enemy.Health;
-            enemy.TakeDamage(_directDamage);
+            enemy.TakeDamage(CombatSystem.CalculateDamage(_directDamage, _caster));
 
             // Track kill if enemy died from direct hit
             if (healthBefore > 0 && enemy.Health <= 0)
@@ -137,7 +137,7 @@ public partial class FireballProjectile : CollisionSkillEffect
                 if (distance <= _explosionRadius)
                 {
                     float healthBefore = enemy.Health;
-                    enemy.TakeDamage(_explosionDamage);
+                    enemy.TakeDamage(CombatSystem.CalculateDamage(_explosionDamage, _caster));
                     hitCount++;
 
                     // Track kill if enemy died from explosion

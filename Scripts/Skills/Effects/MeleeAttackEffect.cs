@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Godot;
 using SpaceTower.Progression.Upgrades;
+using SpaceTower.Scripts.Core;
 using SpaceTower.Scripts.Enemies.Base;
 using SpaceTower.Scripts.PlayerScripts;
 using SpaceTower.Scripts.Skills.Base;
@@ -33,10 +34,6 @@ public partial class MeleeAttackEffect : CollisionSkillEffect
 
         _damage = skill.Damage;
         _lifetime = skill.Lifetime;
-
-        // Apply upgrade bonuses
-        var damageBonus = caster.GetUpgradeValue(UpgradeType.DamagePercent);
-        _damage *= (1 + damageBonus);
 
         // Apply mastery bonuses
         ApplyMasteryBonuses();
@@ -81,7 +78,7 @@ public partial class MeleeAttackEffect : CollisionSkillEffect
         if (body is Enemy enemy && !_hitEnemies.Contains(enemy))
         {
             float healthBefore = enemy.Health;
-            enemy.TakeDamage(_damage);
+            enemy.TakeDamage(CombatSystem.CalculateDamage(_damage, _caster));
             _hitEnemies.Add(enemy);
 
             GD.Print($"Melee hit {enemy.Name} for {_damage} damage!");

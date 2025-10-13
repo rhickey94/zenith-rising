@@ -1,7 +1,9 @@
 using Godot;
 using SpaceTower.Progression.Upgrades;
+using SpaceTower.Scripts.Core;
 using SpaceTower.Scripts.Enemies.Base;
 using SpaceTower.Scripts.PlayerScripts;
+using SpaceTower.Scripts.PlayerScripts.Components;
 using SpaceTower.Scripts.Skills.Base;
 using SpaceTower.Scripts.Skills.Data;
 
@@ -21,20 +23,18 @@ public partial class BasicProjectile : CollisionSkillEffect
     {
         base.Initialize(sourceSkill, caster, direction);
 
-        var skill = sourceSkill as ProjectileSkill;
-        if (skill == null)
+        if (sourceSkill is not ProjectileSkill skill)
         {
             GD.PrintErr("BasicProjectile: sourceSkill is not ProjectileSkill!");
             return;
         }
 
         BaseDamage = skill.DirectDamage;
+        _totalDamage = BaseDamage;
 
         // Apply upgrade bonuses
-        var damageBonus = caster.GetUpgradeValue(UpgradeType.DamagePercent);
-        var pierceUpgrade = caster.GetUpgradeValue(UpgradeType.ProjectilePierce);
-        _totalDamage = BaseDamage * (1 + damageBonus);
-        _maxPierce = (int)pierceUpgrade;
+        var stats = caster.GetNode<StatsManager>("StatsManager");
+        _maxPierce = stats.ProjectilePierceCount;
 
         // Apply mastery bonuses
         ApplyMasteryBonuses();
@@ -78,7 +78,7 @@ public partial class BasicProjectile : CollisionSkillEffect
         if (body is Enemy enemy)
         {
             float healthBefore = enemy.Health;
-            enemy.TakeDamage(_totalDamage);
+            enemy.TakeDamage(CombatSystem.CalculateDamage(_totalDamage, _caster));
 
             // Track kill if enemy died
             if (healthBefore > 0 && enemy.Health <= 0)
@@ -87,7 +87,7 @@ public partial class BasicProjectile : CollisionSkillEffect
             }
 
             _pierceCount++;
-            if (_pierceCount >= _maxPierce)
+            if (_pierceCount > _maxPierce)
             {
                 QueueFree();
             }

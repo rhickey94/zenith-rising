@@ -3,6 +3,19 @@ using Godot;
 
 namespace SpaceTower.Scripts.PlayerScripts.Components;
 
+public struct StatModifiers
+{
+    public float MovementSpeedBonus; // Percentage increase (e.g., 0.1 for +10%)
+    public float AttackSpeedBonus;   // Percentage decrease in attack interval (e.g., 0.1 for -10%)
+    public float MaxHealthBonus;     // Flat increase in max health
+    public float BaseSpeedBonus;     // Flat increase in base speed
+    public float DamagePercentBonus;
+    public float CritChanceBonus;
+    public float PickupRadiusBonus;
+    public float HealthRegenBonus;
+    public int ProjectilePierceBonus;
+}
+
 [GlobalClass]
 public partial class StatsManager : Node
 {
@@ -18,6 +31,12 @@ public partial class StatsManager : Node
     public float Speed { get; private set; }
     public float FireRate { get; private set; }
     public float MeleeRate { get; private set; }
+    // Combat stats (cached from upgrades)
+    public float DamageMultiplier { get; private set; } = 1.0f;
+    public float CritChance { get; private set; } = 0f;
+    public float PickupRadius { get; private set; } = 80f;
+    public float HealthRegenPerSecond { get; private set; } = 0f;
+    public int ProjectilePierceCount { get; private set; } = 0;
 
     // Progression
     [Export] public int Level { get; private set; } = 1;
@@ -41,10 +60,24 @@ public partial class StatsManager : Node
         Health = MaxHealth;
     }
 
+    public override void _Process(double delta)
+    {
+        if (Health < MaxHealth && HealthRegenPerSecond > 0)
+        {
+            Health += HealthRegenPerSecond * (float)delta;
+            if (Health > MaxHealth)
+            {
+                Health = MaxHealth;
+            }
+            EmitHealthUpdate();
+        }
+    }
+
     public void Initialize()
     {
+
         // Set initial stat values (no upgrades yet)
-        RecalculateStats(0f, 0f, 0f, 0f);
+        RecalculateStats(new StatModifiers());
 
         EmitHealthUpdate();
         EmitExperienceUpdate();
@@ -78,18 +111,30 @@ public partial class StatsManager : Node
         EmitExperienceUpdate();
     }
 
-    public void RecalculateStats(float movementSpeedBonus, float attackSpeedBonus, float maxHealthBonus, float baseSpeedBonus)
+    public void RecalculateStats(StatModifiers modifiers)
     {
-        GD.Print($"RecalculateStats called: maxHealthBonus={maxHealthBonus}, Level={Level}"); // ← ADD THIS
+        GD.Print($"RecalculateStats called: maxHealthBonus={modifiers.MaxHealthBonus}, Level={Level}");
+
+        // Calculate health percentage BEFORE changing MaxHealth
+        float healthPercentage = MaxHealth > 0 ? Health / MaxHealth : 1f;
+
         // Apply upgrade bonuses to base values
-        Speed = (BaseSpeed + baseSpeedBonus) * (1 + movementSpeedBonus);
-        FireRate = BaseFireRate * (1 - attackSpeedBonus);
-        MeleeRate = BaseMeleeRate * (1 - attackSpeedBonus);
-        MaxHealth = BaseMaxHealth + maxHealthBonus + CalculateLevelHealthBonus();
+        Speed = (BaseSpeed + modifiers.BaseSpeedBonus) * (1 + modifiers.MovementSpeedBonus);
+        FireRate = BaseFireRate * (1 - modifiers.AttackSpeedBonus);
+        MeleeRate = BaseMeleeRate * (1 - modifiers.AttackSpeedBonus);
+        MaxHealth = BaseMaxHealth + modifiers.MaxHealthBonus + CalculateLevelHealthBonus();
+        DamageMultiplier = 1.0f + modifiers.DamagePercentBonus;
+        CritChance = Mathf.Clamp(modifiers.CritChanceBonus, 0f, 1f);
+        PickupRadius = 80f + modifiers.PickupRadiusBonus;
+        HealthRegenPerSecond = modifiers.HealthRegenBonus;
+        ProjectilePierceCount = modifiers.ProjectilePierceBonus;
 
-        GD.Print($"New MaxHealth: {MaxHealth}"); // ← ADD THIS
+        GD.Print($"New MaxHealth: {MaxHealth}");
 
-        // Don't reduce current health, only increase max if needed
+        // Maintain health percentage
+        Health = MaxHealth * healthPercentage;
+
+        // Ensure we don't exceed max (safety check)
         if (Health > MaxHealth)
         {
             Health = MaxHealth;

@@ -1,15 +1,17 @@
 using Godot;
 using SpaceTower.Scripts.PlayerScripts;
+using SpaceTower.Scripts.PlayerScripts.Components;
 
 namespace SpaceTower.Scripts.Items.Collectibles;
 
 public partial class ExperienceShard : Area2D
 {
-    [Export] public int ExperienceValue = 10;
     [Export] public float MoveSpeed = 300.0f;
     [Export] public float PickupRadius = 80.0f;
 
+    public int ExperienceValue { get; set; } = 10;
     private Player _player;
+    private StatsManager _statsManager;
     private bool _isBeingCollected = false;
 
     public override void _Ready()
@@ -17,6 +19,14 @@ public partial class ExperienceShard : Area2D
         // Find player
 
         _player = GetTree().GetFirstNodeInGroup("player") as Player;
+        if (_player != null)
+        {
+            _statsManager = _player.GetNode<StatsManager>("StatsManager");
+        }
+        else
+        {
+            GD.PrintErr("ExperienceShard: Could not find Player in scene!");
+        }
 
         // Detect collision with player
 
@@ -38,10 +48,10 @@ public partial class ExperienceShard : Area2D
         }
 
         // Move toward player if close enough
-
+        float pickupRadius = _statsManager?.PickupRadius ?? 80.0f;
 
         float distance = GlobalPosition.DistanceTo(_player.GlobalPosition);
-        if (distance < PickupRadius)
+        if (distance < pickupRadius)
         {
             Vector2 direction = (_player.GlobalPosition - GlobalPosition).Normalized();
             GlobalPosition += direction * MoveSpeed * (float)delta;

@@ -1,4 +1,5 @@
 using Godot;
+using SpaceTower.Scripts.Core;
 using SpaceTower.Scripts.Enemies.Base;
 using SpaceTower.Scripts.PlayerScripts;
 using SpaceTower.Scripts.Skills.Base;
@@ -82,7 +83,7 @@ public partial class WhirlwindEffect : SkillEffect
                 if (distance < _radius)
                 {
                     float healthBefore = enemy.Health;
-                    enemy.TakeDamage(_damage);
+                    enemy.TakeDamage(CombatSystem.CalculateDamage(_damage, _caster));
                     hitCount++;
 
                     // Track kill if enemy died

@@ -10,9 +10,8 @@ size = Vector2(40, 40)
 size = Vector2(40, 40)
 
 [node name="enemy" type="CharacterBody2D"]
-collision_layer = 1
-collision_mask = 1
 script = ExtResource("1_hghv2")
+ExperienceReward = 100
 ExperienceShardScene = ExtResource("2_1f0kj")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
