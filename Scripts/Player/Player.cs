@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Godot;
 using SpaceTower.Progression.Upgrades;
 using SpaceTower.Scripts.PlayerScripts.Components;
-using SpaceTower.Scripts.Skills.Effects;
 using SpaceTower.Scripts.UI.Menus;
 
 namespace SpaceTower.Scripts.PlayerScripts;
@@ -113,12 +112,9 @@ public partial class Player : CharacterBody2D
 
     private void OnLeveledUp()
     {
-        GD.Print("OnLeveledUp called!");
-
         if (LevelUpPanel != null)
         {
             var upgradeOptions = GetRandomUpgrades(3);
-            GD.Print($"Got {upgradeOptions.Count} upgrade options");
 
             LevelUpPanel.ShowUpgrades(upgradeOptions);
         }
@@ -132,11 +128,6 @@ public partial class Player : CharacterBody2D
     private List<Upgrade> GetRandomUpgrades(int count)
     {
         return _upgradeManager?.GetRandomUpgrades(count);
-    }
-
-    public float GetUpgradeValue(UpgradeType type)
-    {
-        return _upgradeManager?.GetUpgradeValue(type) ?? 0f;
     }
 
     private void EmitResourcesUpdate(int gold, int cores, int components, int fragments)

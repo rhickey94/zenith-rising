@@ -65,12 +65,5 @@ public partial class Game : Node
         AddChild(enemy);
 
         _enemiesSpawned++;
-
-        // Increase difficulty over time (optional)
-        // if (_enemiesSpawned % 10 == 0 && _spawnTimer.WaitTime > 0.5f)
-        // {
-        //   _spawnTimer.WaitTime *= 0.95f; // Spawn 5% faster every 10 enemies
-        // }
-
     }
 }

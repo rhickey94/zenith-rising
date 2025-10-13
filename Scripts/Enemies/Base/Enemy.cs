@@ -53,7 +53,7 @@ public partial class Enemy : CharacterBody2D
 
         Vector2 direction = (_player.GlobalPosition - GlobalPosition).Normalized();
         Velocity = direction * Speed;
-        // Rotation = direction.Angle();
+        Rotation = direction.Angle();
 
         MoveAndSlide();
 

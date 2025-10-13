@@ -1,5 +1,4 @@
 using Godot;
-using SpaceTower.Progression.Upgrades;
 using SpaceTower.Scripts.Core;
 using SpaceTower.Scripts.Enemies.Base;
 using SpaceTower.Scripts.PlayerScripts;

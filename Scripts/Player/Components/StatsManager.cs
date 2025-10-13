@@ -113,8 +113,6 @@ public partial class StatsManager : Node
 
     public void RecalculateStats(StatModifiers modifiers)
     {
-        GD.Print($"RecalculateStats called: maxHealthBonus={modifiers.MaxHealthBonus}, Level={Level}");
-
         // Calculate health percentage BEFORE changing MaxHealth
         float healthPercentage = MaxHealth > 0 ? Health / MaxHealth : 1f;
 
@@ -128,8 +126,6 @@ public partial class StatsManager : Node
         PickupRadius = 80f + modifiers.PickupRadiusBonus;
         HealthRegenPerSecond = modifiers.HealthRegenBonus;
         ProjectilePierceCount = modifiers.ProjectilePierceBonus;
-
-        GD.Print($"New MaxHealth: {MaxHealth}");
 
         // Maintain health percentage
         Health = MaxHealth * healthPercentage;

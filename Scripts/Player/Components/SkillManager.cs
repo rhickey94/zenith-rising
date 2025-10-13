@@ -65,12 +65,8 @@ public partial class SkillManager : Node
     {
         if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
         {
-            GD.Print($"Mouse clicked! Button: {mouseEvent.ButtonIndex}");  // ← ADD THIS
-            GD.Print($"BasicAttackSkill is null: {BasicAttackSkill == null}");  // ← ADD THIS
-
             if (mouseEvent.ButtonIndex == MouseButton.Left && BasicAttackSkill != null)
             {
-                GD.Print($"Calling BasicAttackSkill: {BasicAttackSkill.SkillName}");  // ← ADD THIS
                 UseSkill(BasicAttackSkill, ref _basicAttackCooldownTimer);
             }
             else if (mouseEvent.ButtonIndex == MouseButton.Right && SpecialAttackSkill != null)

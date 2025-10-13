@@ -7,7 +7,6 @@ namespace SpaceTower.Scripts.Items.Collectibles;
 public partial class ExperienceShard : Area2D
 {
     [Export] public float MoveSpeed = 300.0f;
-    [Export] public float PickupRadius = 80.0f;
 
     public int ExperienceValue { get; set; } = 10;
     private Player _player;

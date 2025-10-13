@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Godot;
-using SpaceTower.Progression.Upgrades;
 using SpaceTower.Scripts.Core;
 using SpaceTower.Scripts.Enemies.Base;
 using SpaceTower.Scripts.PlayerScripts;
@@ -39,8 +38,6 @@ public partial class MeleeAttackEffect : CollisionSkillEffect
         ApplyMasteryBonuses();
 
         Rotation = direction.Angle();
-
-        GD.Print($"Melee initialized with {_damage} damage");
     }
 
     private void ApplyMasteryBonuses()
@@ -73,15 +70,11 @@ public partial class MeleeAttackEffect : CollisionSkillEffect
 
     private void OnBodyEntered(Node2D body)
     {
-        GD.Print($"Body entered: {body.Name} (type: {body.GetType().Name})");
-
         if (body is Enemy enemy && !_hitEnemies.Contains(enemy))
         {
             float healthBefore = enemy.Health;
             enemy.TakeDamage(CombatSystem.CalculateDamage(_damage, _caster));
             _hitEnemies.Add(enemy);
-
-            GD.Print($"Melee hit {enemy.Name} for {_damage} damage!");
 
             // Track kill if enemy died
             if (healthBefore > 0 && enemy.Health <= 0)
