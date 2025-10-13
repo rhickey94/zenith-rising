@@ -7,7 +7,6 @@ namespace SpaceTower.Scripts.Enemies.Base;
 public partial class Enemy : CharacterBody2D
 {
     // Stats
-
     [Export] public float Speed = 200.0f;
     [Export] public float MaxHealth = 100.0f;
     [Export] public float Damage = 10.0f;
@@ -18,13 +17,51 @@ public partial class Enemy : CharacterBody2D
     public float Health { get; private set; }
 
     // Dependencies
-
     [Export] public PackedScene ExperienceShardScene;
-    private Player _player;
+    protected Player _player;
+    protected float _timeSinceLastAttack = 0f;
+
     private Sprite2D _sprite;
 
+    [Signal] public delegate void EnemyDiedEventHandler(Enemy enemy);
 
-    private float _timeSinceLastAttack = 0f;
+    protected virtual void Attack(Player player)
+    {
+        player.TakeDamage(Damage);
+        _timeSinceLastAttack = 0f;
+    }
+
+    protected virtual Vector2 GetMovementDirection()
+    {
+        return (_player.GlobalPosition - GlobalPosition).Normalized();
+    }
+
+    protected virtual void TryAttack(double delta)
+    {
+        // Attack player on collision
+        _timeSinceLastAttack += (float)delta;
+
+        if (_timeSinceLastAttack >= AttackCooldown)
+        {
+            // Check if touching player
+            for (int i = 0; i < GetSlideCollisionCount(); i++)
+            {
+                var collision = GetSlideCollision(i);
+                if (collision.GetCollider() is Player player)
+                {
+                    Attack(player);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void Initialize(float healthMultiplier, float damageMultiplier)
+    {
+        MaxHealth *= healthMultiplier;
+        Health = MaxHealth;
+        Damage *= damageMultiplier;
+    }
 
     public override void _Ready()
     {
@@ -34,7 +71,6 @@ public partial class Enemy : CharacterBody2D
         _sprite = GetNode<Sprite2D>("Sprite2D");
 
         // Find player via group (singleton pattern)
-
         _player = GetTree().GetFirstNodeInGroup("player") as Player;
 
         if (_player == null)
@@ -50,32 +86,13 @@ public partial class Enemy : CharacterBody2D
             return;
         }
 
-
-        Vector2 direction = (_player.GlobalPosition - GlobalPosition).Normalized();
+        Vector2 direction = GetMovementDirection();
         Velocity = direction * Speed;
         Rotation = direction.Angle();
 
         MoveAndSlide();
 
-        // Attack player on collision
-
-        _timeSinceLastAttack += (float)delta;
-
-        if (_timeSinceLastAttack >= AttackCooldown)
-        {
-            // Check if touching player
-
-            for (int i = 0; i < GetSlideCollisionCount(); i++)
-            {
-                var collision = GetSlideCollision(i);
-                if (collision.GetCollider() is Player player)
-                {
-                    player.TakeDamage(Damage);
-                    _timeSinceLastAttack = 0f;
-                    break;
-                }
-            }
-        }
+        TryAttack(delta);
     }
 
     public void TakeDamage(float damage)
@@ -89,15 +106,16 @@ public partial class Enemy : CharacterBody2D
         }
 
         // Flash effect (only if alive)
-
         if (_sprite != null && IsInstanceValid(_sprite))
         {
+            var originalColor = _sprite.Modulate;
+
             _sprite.Modulate = Colors.White;
             GetTree().CreateTimer(0.1).Timeout += () =>
             {
                 if (IsInstanceValid(_sprite) && !IsQueuedForDeletion())
                 {
-                    _sprite.Modulate = Colors.Red;
+                    _sprite.Modulate = originalColor;
                 }
             };
         }
@@ -105,6 +123,8 @@ public partial class Enemy : CharacterBody2D
 
     private void Die()
     {
+        EmitSignal(SignalName.EnemyDied, this);
+
         CallDeferred(MethodName.SpawnExperienceShards);
 
         QueueFree();

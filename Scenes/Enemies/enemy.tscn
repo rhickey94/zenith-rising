@@ -10,12 +10,12 @@ size = Vector2(40, 40)
 size = Vector2(40, 40)
 
 [node name="enemy" type="CharacterBody2D"]
+modulate = Color(1, 0, 0, 1)
 script = ExtResource("1_hghv2")
 ExperienceReward = 100
 ExperienceShardScene = ExtResource("2_1f0kj")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-modulate = Color(0.97566444, 4.5724214e-06, 1.540184e-06, 1)
 texture = SubResource("PlaceholderTexture2D_1f0kj")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

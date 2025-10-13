@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://jb1p3bafbe1"]
+[gd_scene load_steps=9 format=3 uid="uid://jb1p3bafbe1"]
 
 [ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="1_a3d8c"]
 [ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_xpcdj"]
+[ext_resource type="Resource" uid="uid://y2i2lfbhh0ty" path="res://Resources/Skills/Mage/MageBasicAttack.tres" id="3_dd0ac"]
 [ext_resource type="Resource" uid="uid://ck7w68lb1penv" path="res://Resources/Skills/Mage/Fireball.tres" id="3_htcer"]
 [ext_resource type="Script" uid="uid://b3km77lyp5ba3" path="res://Scripts/Player/Components/StatsManager.cs" id="4_mtuoh"]
 [ext_resource type="Script" uid="uid://cx5d7m8au6iit" path="res://Scripts/Player/Components/UpgradeManager.cs" id="5_htcer"]
@@ -29,6 +30,7 @@ shape = SubResource("RectangleShape2D_4flbx")
 
 [node name="SkillManager" type="Node" parent="."]
 script = ExtResource("1_a3d8c")
+BasicAttackSkill = ExtResource("3_dd0ac")
 PrimarySkill = ExtResource("3_htcer")
 metadata/_custom_type_script = "uid://bvjyaqpu6dell"
 

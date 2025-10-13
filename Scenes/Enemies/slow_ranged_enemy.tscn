@@ -1,0 +1,13 @@
+[gd_scene load_steps=4 format=3 uid="uid://dq8ntx3n735dh"]
+
+[ext_resource type="PackedScene" uid="uid://cvuvmrd8khk2g" path="res://Scenes/Enemies/enemy.tscn" id="1_00308"]
+[ext_resource type="Script" uid="uid://cetc8fe2xgf5s" path="res://Scripts/Enemies/Types/SlowRangedEnemy.cs" id="2_0djtb"]
+[ext_resource type="PackedScene" uid="uid://kdnjd4wirqp8" path="res://Scenes/SkillEffects/enemy_projectile.tscn" id="3_yeubo"]
+
+[node name="enemy" instance=ExtResource("1_00308")]
+modulate = Color(0, 0, 1, 1)
+script = ExtResource("2_0djtb")
+ProjectileScene = ExtResource("3_yeubo")
+AttackRange = 300.0
+PreferredDistance = 250.0
+ExperienceReward = 20

@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://kdnjd4wirqp8"]
+
+[ext_resource type="Script" uid="uid://cnbq2rfm14ly3" path="res://Scripts/Enemies/Effects/EnemyProjectile.cs" id="1_m5ex3"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_w0tuk"]
+size = Vector2(4, 4)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_aia58"]
+radius = 1.0
+
+[node name="EnemyProjectile" type="Area2D"]
+script = ExtResource("1_m5ex3")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.8659646, 0.9674502, 0.2576276, 1)
+texture = SubResource("PlaceholderTexture2D_w0tuk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_aia58")

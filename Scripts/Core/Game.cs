@@ -8,7 +8,7 @@ namespace SpaceTower.Scripts.Core;
 public partial class Game : Node
 {
     // Scenes
-    [Export] public PackedScene EnemyScene;
+    [Export] public PackedScene[] EnemyScenes;
 
     // Dependencies
     [Export] public Player Player;
@@ -28,7 +28,6 @@ public partial class Game : Node
         _spawnTimer.Timeout += SpawnEnemy;
 
         // Validate dependencies
-
         if (Player == null)
         {
             GD.PrintErr("Game: Player not assigned! Drag Player node into Game's Player field.");
@@ -41,9 +40,9 @@ public partial class Game : Node
             return;
         }
 
-        if (EnemyScene == null)
+        if (EnemyScenes == null || EnemyScenes.Length == 0)
         {
-            GD.PrintErr("Game: EnemyScene not assigned!");
+            GD.PrintErr("Game: EnemyScenes not assigned!");
         }
 
         Player.Initialize();
@@ -51,16 +50,16 @@ public partial class Game : Node
 
     private void SpawnEnemy()
     {
-        if (Player == null || EnemyScene == null)
+        if (Player == null || EnemyScenes == null || EnemyScenes.Length == 0)
         {
             return;
         }
 
-
         var angle = GD.Randf() * Mathf.Tau;
         var spawnPosition = Player.Position + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * SpawnDistance;
 
-        var enemy = EnemyScene.Instantiate<Enemy>();
+        var enemyScene = EnemyScenes[GD.Randi() % EnemyScenes.Length];
+        var enemy = enemyScene.Instantiate<Enemy>();
         enemy.Position = spawnPosition;
         AddChild(enemy);
 
