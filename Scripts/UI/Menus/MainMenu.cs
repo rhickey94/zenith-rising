@@ -1,6 +1,6 @@
 using Godot;
 
-namespace SpaceTower.Scripts.UI;
+namespace SpaceTower.Scripts.UI.Menus;
 
 public partial class MainMenu : Control
 {
