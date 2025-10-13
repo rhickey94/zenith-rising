@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://6a6ovxmbcjd1"]
+[gd_scene load_steps=23 format=3 uid="uid://6a6ovxmbcjd1"]
 
 [ext_resource type="Script" uid="uid://ije0l625j2w0" path="res://Scripts/Core/Game.cs" id="1_wrm1d"]
 [ext_resource type="PackedScene" uid="uid://cvuvmrd8khk2g" path="res://Scenes/Enemies/enemy.tscn" id="2_3dryh"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/SkillEffects/projectile.tscn" id="4_i6g32"]
 [ext_resource type="PackedScene" uid="uid://dq8ntx3n735dh" path="res://Scenes/Enemies/slow_ranged_enemy.tscn" id="4_lv4vk"]
 [ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="5_i6g32"]
+[ext_resource type="PackedScene" uid="uid://bjyl4m6ntddcb" path="res://Scenes/Enemies/boss.tscn" id="5_lv4vk"]
 [ext_resource type="PackedScene" uid="uid://fr50f27cq0cp" path="res://Scenes/UI/Menus/level_up_panel.tscn" id="6_i6g32"]
 [ext_resource type="PackedScene" uid="uid://du4yo1vulblyh" path="res://Scenes/SkillEffects/melee_attack.tscn" id="7_o5yvi"]
 [ext_resource type="Script" uid="uid://b3km77lyp5ba3" path="res://Scripts/Player/Components/StatsManager.cs" id="9_h4fw4"]
@@ -72,6 +73,7 @@ size = Vector2(50, 50)
 [node name="Game" type="Node" node_paths=PackedStringArray("Player", "HUD")]
 script = ExtResource("1_wrm1d")
 EnemyScenes = Array[PackedScene]([ExtResource("2_h6qnp"), ExtResource("2_3dryh"), ExtResource("4_lv4vk")])
+BossScene = ExtResource("5_lv4vk")
 Player = NodePath("Player")
 HUD = NodePath("UILayer/HUD")
 

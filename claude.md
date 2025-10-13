@@ -10,7 +10,7 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 - Every run contributes to permanent progression (no wasted time)
 
 ## Current Status: Be Honest
-**Phase:** Early Prototype (~20-25% to MVP)
+**Phase:** Early Prototype (~40% to MVP)
 
 **Actually Working:**
 - ✅ Player movement (WASD) and rotation
@@ -25,27 +25,25 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 - ✅ Skill mastery tracking (kills recorded per skill)
 - ✅ **Stats consolidated in StatsManager** (Speed/FireRate/MeleeRate calculated from base + upgrades)
 - ✅ **Upgrade stacking fixed** (recalculates from base values, no more broken math)
-- ✅ **3 of 8 upgrades work correctly** (MovementSpeed, AttackSpeed, MaxHealth)
+- ✅ **All 8 upgrades work correctly** (MovementSpeed, AttackSpeed, MaxHealth, DamagePercent, PickupRadius, Pierce, Crit, Regen)
+- ✅ **CombatSystem.cs** (centralized damage calculation with crit)
+- ✅ **3 enemy types** (Basic melee, FastMelee, SlowRanged with kiting + projectiles)
+- ✅ **Enemy inheritance system** (virtual Attack/Movement/TryAttack methods)
+- ✅ **Enemy scaling system** (Initialize with health/damage multipliers)
 - ✅ **Core combat validated as fun** (hypothesis proven)
 
-**Broken/Incomplete:**
-- ❌ 5 of 8 upgrades don't work yet (DamagePercent, PickupRadius, Pierce, Crit, Regen)
-- ❌ No centralized damage calculation system
-- ❌ Only 1 enemy type (need 2-3 minimum)
-- ❌ No wave escalation or difficulty scaling
-- ❌ No floor system (just an empty arena with spawning)
-- ❌ No bosses
-- ❌ No gear/equipment system
-- ❌ No materials or idle systems
-- ❌ No save system
-- ❌ Character stat system (STR/DEX/INT/VIT/FOR) not implemented
+**In Progress:**
+- ⏳ Wave/floor tracking system
+- ⏳ Spawn rate escalation (wave-based)
+- ⏳ Boss spawning at 5:00 mark
+- ⏳ Floor transition UI
 
 **Not Started:**
-- Materials system
-- Idle systems (Workshop, Treasury)
-- Gear drops and enhancement
-- Multiple floors with progression
-- Save/load
+- Character stat system (STR/VIT/AGI/RES/FOR)
+- Gear/equipment system
+- Materials or idle systems
+- Save/load system
+- Hub system
 
 ---
 
@@ -54,27 +52,38 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 Build in phases where each phase **proves a hypothesis** before investing in the next.
 
 ### **Phase 1: Prove Combat is Fun (Week 1-2)**
-**Hypothesis:** "Fighting waves with skills and upgrades is engaging for 15+ minutes"
+**Hypothesis:** "Fighting waves with skills and upgrades is engaging for 25+ minutes"
 
 **Tasks:**
-1. Fix all 8 existing upgrades to actually work
-2. Add 2 enemy types:
+1. ✅ Fix all 8 existing upgrades to actually work
+2. ✅ Add 2 enemy types:
    - FastMelee (speed 300, HP 50, melee)
    - SlowRanged (speed 100, HP 150, shoots projectiles)
-3. Implement wave escalation:
-   - Spawn rate increases over time
-   - Enemy HP scales by +30% per wave
-4. Add basic boss after 10 minutes:
-   - Just a tanky enemy with 5x HP and 2x damage for now
-5. Add floor transition (reset arena, +50% enemy stats)
+3. ⏳ Implement wave/floor system:
+   - Each floor = 5 minutes (300 seconds)
+   - 10 waves per floor (30 seconds each)
+   - Spawn rate increases per wave (2.0s → 0.8s)
+   - Enemy HP/damage scales per wave (+10% HP, +5% damage per wave)
+   - Boss spawns at 5:00 mark (5x HP, 2x damage)
+4. ⏳ Add floor transition UI:
+   - **Continue:** Advance to next floor (+50% base stats)
+   - **End Run:** Return to hub with rewards
+   - **Save & Exit:** (Phase 2) Serialize run state, resume later
+5. 5 floors total (Floor 5 boss = victory condition)
 
-**Success Criteria:** You can play 3 floors (~30 min) and it feels engaging. If boring, nothing else matters.
+**Run Structure:**
+- Floor 1-5: 5 min each = 25 minute complete run
+- Each floor escalates: 10 waves → Boss
+- Die or beat Floor 5 → Return to hub
+
+**Success Criteria:** You can play 5 floors (~25 min) and it feels engaging. Boss fights feel earned. If boring, nothing else matters.
 
 **Cut for now:**
 - New skill types beyond the 3 working ones
 - Skill mastery tiers (just track kills)
 - Materials/idle systems
 - Save system
+- Multiple dungeons (Phase 5)
 
 ---
 
@@ -172,21 +181,36 @@ Build in phases where each phase **proves a hypothesis** before investing in the
 ### **Phase 5: Endgame (Week 9-10)**
 
 **Tasks:**
-1. **Infinite floors (6+):**
-   - Floors scale infinitely
-   - +20% enemy stats per floor
+1. **Multiple Dungeons:**
+   - Dungeon 1: Tower Floors (completed in Phase 1)
+   - Dungeon 2: Corrupted Sanctum (melee-heavy, tests tank builds)
+   - Dungeon 3: Void Rifts (bullet hell chaos, tests dodge builds)
+   - Dungeon 4: Endless Ascent (infinite scaling for leaderboards)
+   - Each dungeon: 5 floors, unique enemy types, unique boss
+   - Dungeons unlock based on highest floor reached
 
-2. **Ascension system (simple):**
+2. **Dungeon-specific rewards:**
+   - Different material drop rates per dungeon
+   - Targeted farming (need weapon mods? Run Sanctum)
+   - Higher difficulty = better drop rates
+
+3. **Ascension system (simple):**
    - Gain ascension XP from all kills/clears
    - Spend points on +% stat bonuses
    - 3 trees: Power, Survival, Utility
 
-3. **Weekly challenges:**
-   - Modifiers on floors for bonus rewards
-   - Simple leaderboard
+4. **Weekly challenges:**
+   - Modifiers on dungeons for bonus rewards
+   - Simple leaderboard per dungeon
+
+**Why Dungeons > Infinite Floors:**
+- ✅ Variety (unique themes, enemy types, mechanics)
+- ✅ Replayability (choose based on build/goals)
+- ✅ Content drops (new update = new dungeon)
+- ✅ Avoids infinite scaling math boredom
 
 **Cut forever:**
-- Corruption system (redundant with infinite floors)
+- Corruption system (redundant with multiple dungeons)
 - Gear synergies (mods are enough)
 
 ---
@@ -266,6 +290,50 @@ Never add: Synergies
 ```
 
 Each layer = ~20 hours dev time. Ship with 2 layers, expand if players demand more.
+
+---
+
+### **Dungeon System (Phase 5 Design)**
+
+**Core Concept:** Multiple 5-floor dungeons instead of infinite scaling
+
+**Dungeon 1: Tower Floors (Phase 1 MVP)**
+- Enemy mix: Balanced (melee + ranged)
+- Theme: Classic tower ascent
+- Difficulty: Beginner-friendly
+- Rewards: Balanced material drops
+
+**Future Dungeons (Phase 5):**
+
+**Dungeon 2: Corrupted Sanctum**
+- Enemy mix: 80% melee, 20% ranged
+- Theme: Close-quarters combat
+- Tests: Tank builds, lifesteal, damage reduction
+- Rewards: Armor/defensive gear emphasis
+
+**Dungeon 3: Void Rifts**
+- Enemy mix: 80% ranged, 20% melee
+- Theme: Bullet hell chaos
+- Tests: Dodge builds, movement speed, projectile clear
+- Rewards: Weapon/offensive gear emphasis
+
+**Dungeon 4: Endless Ascent**
+- Infinite floors (no 5-floor cap)
+- Scaling: +20% stats per floor
+- Purpose: Leaderboards, prestige
+- Rewards: Bragging rights
+
+**Unlock System:**
+- Dungeon 1: Always available
+- Dungeon 2: Unlock by clearing Dungeon 1 Floor 3
+- Dungeon 3: Unlock by clearing Dungeon 1 Floor 5
+- Dungeon 4: Unlock by clearing both 2 and 3
+
+**Why This Works:**
+- Content stays fresh (not just bigger numbers)
+- Build diversity matters (some builds excel in certain dungeons)
+- Farming loops (target specific dungeons for specific gear)
+- Expandable (new dungeon = major content update)
 
 ---
 
@@ -544,44 +612,55 @@ Add to Project Settings → Autoload.
 
 ---
 
-## Current Session Progress (Session 2)
+## Current Session Progress (Session 3)
 
-**Completed:**
+**Completed (Session 2):**
 - ✅ Stats consolidation refactor (Speed/FireRate/MeleeRate now in StatsManager)
 - ✅ Fixed upgrade stacking math (recalculates from base + all upgrades)
 - ✅ Fixed MaxHealth level-up bug (now persists correctly)
 - ✅ Architecture discussion: Decided to keep components for Phase 1, add singletons in Phase 2
 - ✅ Core combat validated as fun (no need to test hypothesis)
 
-**Next Session Tasks:**
-1. Add cached upgrade stats to StatsManager (DamageMultiplier, CritChance, PickupRadius, HealthRegenPerSecond, ProjectilePierceCount)
-2. Create CombatSystem.cs (static class for centralized damage calculation)
-3. Fix 5 broken upgrades:
-   - DamagePercent (apply in CombatSystem.CalculateDamage)
-   - CritChance (apply in CombatSystem.CalculateDamage)
-   - PickupRadius (ExperienceShard reads from StatsManager)
-   - ProjectilePierce (projectiles track pierce count)
-   - HealthRegen (StatsManager._Process() ticks HP every second)
-4. Add FastMelee enemy type
-5. Add SlowRanged enemy type
-6. Implement wave escalation (spawn rate + HP scaling)
+**Completed (Session 3):**
+- ✅ Added cached upgrade stats to StatsManager (DamageMultiplier, CritChance, PickupRadius, etc.)
+- ✅ Created CombatSystem.cs for centralized damage calculation
+- ✅ Fixed all 5 broken upgrades (DamagePercent, CritChance, PickupRadius, Pierce, HealthRegen)
+- ✅ Implemented StatModifiers struct to avoid parameter explosion
+- ✅ Updated all skill effects to use CombatSystem.CalculateDamage
+- ✅ Added FastMeleeEnemy (speed variant, stat-based)
+- ✅ Added SlowRangedEnemy (kiting behavior + projectile attacks)
+- ✅ Created EnemyProjectile.cs for enemy ranged attacks
+- ✅ Implemented virtual Attack/Movement/TryAttack in Enemy.cs
+- ✅ Added Enemy.Initialize(healthMult, damageMult) for scaling
+- ✅ Fixed enemy sprite color system (removed Sprite2D modulate conflict)
+- ✅ Design decisions: 5-floor dungeons, 10 waves per floor, multiple dungeons in Phase 5
 
-**Workflow per task:**
-1. Implement (20-30 min)
-2. **Quick code review** (5 min) - Check for bugs, test in-game, verify it actually works
-3. Move to next task
+**Current Tasks (Wave/Floor System):**
+1. ⏳ Add wave and floor tracking to Game.cs
+2. Implement 30-second wave timer system
+3. Add spawn rate escalation per wave (2.0s → 0.8s)
+4. Wire up Enemy.Initialize() with wave/floor multipliers
+5. Display current floor/wave in HUD
+6. Create basic boss enemy (tanky variant)
+7. Add boss spawn at 5:00 mark
+8. Implement floor transition choice UI (Continue/End Run)
 
-**Each task cycle: ~25-35 minutes.**
+**Next Session (Phase 1 Completion):**
+- Complete wave/floor system
+- Playtest full 5-floor run (~25 min)
+- Balance spawn rates and scaling
+- Move to Phase 2: Character stats + gear drops
 
 ---
 
 ## Known Issues
-- 5 of 8 upgrades don't work (need CombatSystem + cached stats)
-- Only 1 enemy type
-- No difficulty scaling
-- No floor system
-- No centralized damage calculation
+- No wave/floor tracking system yet (in progress)
+- No boss enemy type
+- No floor transition UI
+- No save system
 - Skill.Execute() should be in SkillSystem, not Resource (deferred to Phase 2)
+- No hub system
+- No character stat system (STR/VIT/AGI/RES/FOR)
 
 ---
 
