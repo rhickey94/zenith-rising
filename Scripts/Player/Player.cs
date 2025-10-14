@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Godot;
-using SpaceTower.Progression.Upgrades;
+using SpaceTower.Scripts.Progression.Upgrades;
 using SpaceTower.Scripts.PlayerScripts.Components;
-using SpaceTower.Scripts.UI.Menus;
+using SpaceTower.Scripts.UI.Panels;
 
 namespace SpaceTower.Scripts.PlayerScripts;
 

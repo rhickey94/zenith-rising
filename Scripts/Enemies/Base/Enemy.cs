@@ -77,6 +77,11 @@ public partial class Enemy : CharacterBody2D
         {
             GD.PrintErr("Enemy: No player found! Ensure Player is in 'player' group.");
         }
+
+        if (ExperienceShardScene == null)
+        {
+            GD.PrintErr("Enemy: ExperienceShardScene not assigned!");
+        }
     }
 
     public override void _PhysicsProcess(double delta)

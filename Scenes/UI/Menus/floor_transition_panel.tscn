@@ -1,0 +1,212 @@
+[gd_scene load_steps=9 format=3 uid="uid://bchf7gpesikn"]
+
+[ext_resource type="Script" uid="uid://wqw1k7llxs37" path="res://Scripts/UI/Panels/FloorTransitionPanel.cs" id="1_1j1nh"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kxgbq"]
+bg_color = Color(0.17254902, 0.24313726, 0.3137255, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2901961, 0.5647059, 0.8862745, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+shadow_color = Color(0, 0, 0, 0.5058824)
+shadow_size = 16
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1j1nh"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.15294118, 0.68235296, 0.3764706, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.18039216, 0.8, 0.44313726, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u660r"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.11764706, 0.5176471, 0.28627452, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.15294118, 0.68235296, 0.3764706, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1nhw1"]
+content_margin_left = 18.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.18039216, 0.8, 0.44313726, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.32156864, 0.8509804, 0.54901963, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+shadow_color = Color(0.18039216, 0.8, 0.44313726, 0.3137255)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o4vu6"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.20392157, 0.28627452, 0.36862746, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2901961, 0.5647059, 0.8862745, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tdih0"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.9019608, 0.49411765, 0.13333334, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.827451, 0.32941177, 0, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4l20f"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.24313726, 0.31764707, 0.3882353, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3529412, 0.6392157, 1, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+shadow_color = Color(0.2901961, 0.5647059, 0.8862745, 0.3137255)
+shadow_size = 4
+
+[node name="FloorTransitionPanel" type="Control"]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_1j1nh")
+
+[node name="Overlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.8)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContentPanel" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(600, 400)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_kxgbq")
+
+[node name="ContentVBox" type="VBoxContainer" parent="CenterContainer/ContentPanel"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/ContentPanel/ContentVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.18039216, 0.8, 0.44313726, 1)
+theme_override_font_sizes/font_size = 48
+text = "Floor Cleared"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FloorInfoLabel" type="Label" parent="CenterContainer/ContentPanel/ContentVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9254902, 0.9411765, 0.94509804, 1)
+theme_override_font_sizes/font_size = 24
+text = "Floor 1 → Floor 2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="CenterContainer/ContentPanel/ContentVBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="ButtonsContainer" type="VBoxContainer" parent="CenterContainer/ContentPanel/ContentVBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 16
+
+[node name="ContinueButton" type="Button" parent="CenterContainer/ContentPanel/ContentVBox/ButtonsContainer"]
+custom_minimum_size = Vector2(400, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9254902, 0.9411765, 0.94509804, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_1j1nh")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_u660r")
+theme_override_styles/hover = SubResource("StyleBoxFlat_1nhw1")
+text = "Continue to Floor 2"
+
+[node name="EndRunButton" type="Button" parent="CenterContainer/ContentPanel/ContentVBox/ButtonsContainer"]
+custom_minimum_size = Vector2(400, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9254902, 0.9411765, 0.94509804, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_o4vu6")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tdih0")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4l20f")
+text = "End Run"
+
+[node name="HintLabel" type="Label" parent="CenterContainer/ContentPanel/ContentVBox"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.58431375, 0.64705884, 0.6509804, 1)
+theme_override_font_sizes/font_size = 14
+text = "Enemies get stronger each floor"
+horizontal_alignment = 1
+vertical_alignment = 1

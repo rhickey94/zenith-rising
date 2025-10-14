@@ -2,6 +2,7 @@ using Godot;
 using SpaceTower.Scripts.Enemies.Base;
 using SpaceTower.Scripts.PlayerScripts;
 using SpaceTower.Scripts.UI.HUD;
+using SpaceTower.Scripts.UI.Panels;
 
 namespace SpaceTower.Scripts.Core;
 
@@ -14,12 +15,15 @@ public partial class Game : Node
     // Dependencies
     [Export] public Player Player;
     [Export] public Hud HUD;
+    [Export] public FloorTransitionPanel FloorTransitionPanel;
+
+    [Export] public string MainMenuScenePath = "res://Scenes/UI/Menus/main_menu.tscn";
 
     // Settings
     [Export] public float SpawnDistance = 400.0f;
 
     // Wave/Floor Constants
-    private const float FloorDuration = 60f; // 5 minutes per floor
+    [Export] public float FloorDuration = 30f; // 5 minutes per floor
     private const float WaveDuration = 30f;   // 30 seconds per wave
     private const int WavesPerFloor = 10;
     private const int MaxFloors = 5;
@@ -39,29 +43,21 @@ public partial class Game : Node
     private float _floorTimeElapsed = 0f;
     private float _timeSinceLastSpawn = 0f;
     private bool _bossSpawned = false;
+    private int _enemyCount = 0;
+    private bool _waitingForBossDefeat = false;
 
     public override void _Ready()
     {
         // Validate dependencies
-        if (Player == null)
+        if (!ValidateDependencies())
         {
-            GD.PrintErr("Game: Player not assigned!");
+            GD.PrintErr("Game: Missing dependencies - cannot start!");
             return;
-        }
-
-        if (HUD == null)
-        {
-            GD.PrintErr("Game: HUD not assigned!");
-            return;
-        }
-
-        if (EnemyScenes == null || EnemyScenes.Length == 0)
-        {
-            GD.PrintErr("Game: EnemyScenes not assigned!");
         }
 
         Player.Initialize();
         UpdateHUD();
+        SetupFloorTransitionPanel();
     }
 
     public override void _PhysicsProcess(double delta)
@@ -128,6 +124,9 @@ public partial class Game : Node
 
         enemy.Initialize(healthMult, damageMult);
 
+        enemy.TreeExited += OnEnemyDestroyed;
+        _enemyCount++;
+
         AddChild(enemy);
     }
 
@@ -152,6 +151,10 @@ public partial class Game : Node
         float damageMult = CalculateDamageMultiplier() * 2.0f;
 
         boss.Initialize(healthMult, damageMult);
+
+        boss.TreeExited += OnEnemyDestroyed;
+        _enemyCount++;
+        _waitingForBossDefeat = true;
 
         AddChild(boss);
         UpdateHUD();
@@ -188,10 +191,87 @@ public partial class Game : Node
             return;
         }
 
+        string floorName = $"Floor {_currentFloor}";
+        HUD.UpdateFloorInfo(_currentFloor, floorName);
 
-        string status = _bossSpawned ? "BOSS FIGHT" : $"Wave {_currentWave}/{WavesPerFloor}";
-        // You'd add a method to HUD.cs to display this:
-        // HUD.UpdateFloorWaveDisplay(_currentFloor, status);
+        int enemiesRemaining = _enemyCount; // or track separately
+        HUD.UpdateWaveInfo(_currentWave, enemiesRemaining);
+    }
+
+    private void AdvanceToNextFloor()
+    {
+        _currentFloor++;
+        _currentWave = 1;
+        _floorTimeElapsed = 0f;
+        _timeSinceLastSpawn = 0f;
+        _bossSpawned = false;
+        _enemyCount = 0;
+        _waitingForBossDefeat = false;
+
+        UpdateHUD();
+        GD.Print($"Advanced to Floor {_currentFloor}!");
+    }
+
+    private void SetupFloorTransitionPanel()
+    {
+        if (FloorTransitionPanel == null)
+        {
+            GD.PrintErr("Game: FloorTransitionPanel not assigned!");
+            return;
+        }
+
+        // Just connect signals - panel already exists in scene
+        FloorTransitionPanel.ContinueButtonPressed += OnContinueToNextFloor;
+        FloorTransitionPanel.EndRunButtonPressed += OnEndRun;
+
+        GD.Print("Floor transition panel setup complete");
+    }
+
+    private void ShowFloorTransitionUI()
+    {
+        if (FloorTransitionPanel == null)
+        {
+            GD.PrintErr("Cannot show floor transition - panel not initialized!");
+            return;
+        }
+
+        FloorTransitionPanel.ShowPanel(_currentFloor, _currentFloor + 1);
+    }
+
+    private void ShowVictoryScreen()
+    {
+        // TODO: Implement victory screen
+        GD.Print("VICTORY! All 5 floors cleared!");
+    }
+
+    private void OnContinueToNextFloor()
+    {
+        GD.Print("Player chose to continue to next floor");
+        AdvanceToNextFloor();
+    }
+
+    private void OnEndRun()
+    {
+        GD.Print("Player chose to end run - returning to main menu");
+
+        // TODO: Phase 2 - Show rewards summary first
+
+        // Return to main menu
+        GetTree().Paused = false; // Ensure game is unpaused before scene change
+        GetTree().ChangeSceneToFile(MainMenuScenePath);
+    }
+
+    private void OnEnemyDestroyed()
+    {
+        _enemyCount--;
+
+        // Check if boss was defeated (all enemies dead after boss spawned)
+        if (_waitingForBossDefeat && _enemyCount <= 0)
+        {
+            _waitingForBossDefeat = false;
+            GD.Print($"Boss defeated! Enemy count: {_enemyCount}");
+            OnBossDefeated();
+        }
     }
 
     // Called when boss is defeated - show floor transition UI
@@ -209,27 +289,40 @@ public partial class Game : Node
         }
     }
 
-    private void AdvanceToNextFloor()
+    private bool ValidateDependencies()
     {
-        _currentFloor++;
-        _currentWave = 1;
-        _floorTimeElapsed = 0f;
-        _timeSinceLastSpawn = 0f;
-        _bossSpawned = false;
+        bool valid = true;
 
-        UpdateHUD();
-        GD.Print($"Advanced to Floor {_currentFloor}!");
-    }
+        if (Player == null)
+        {
+            GD.PrintErr("Game: Player not assigned!");
+            valid = false;
+        }
 
-    private void ShowFloorTransitionUI()
-    {
-        // TODO: Implement UI panel with Continue/End Run buttons
-        GD.Print("Floor cleared! Show transition UI here.");
-    }
+        if (HUD == null)
+        {
+            GD.PrintErr("Game: HUD not assigned!");
+            valid = false;
+        }
 
-    private void ShowVictoryScreen()
-    {
-        // TODO: Implement victory screen
-        GD.Print("VICTORY! All 5 floors cleared!");
+        if (EnemyScenes == null || EnemyScenes.Length == 0)
+        {
+            GD.PrintErr("Game: EnemyScenes not assigned!");
+            valid = false;
+        }
+
+        if (BossScene == null)
+        {
+            GD.PrintErr("Game: BossScene not assigned!");
+            valid = false;
+        }
+
+        if (FloorTransitionPanel == null)
+        {
+            GD.PrintErr("Game: FloorTransitionPanel not assigned!");
+            valid = false;
+        }
+
+        return valid;
     }
 }

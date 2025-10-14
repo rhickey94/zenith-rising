@@ -1,6 +1,6 @@
 using Godot;
 
-namespace SpaceTower.Progression.Upgrades;
+namespace SpaceTower.Scripts.Progression.Upgrades;
 
 [GlobalClass]
 public partial class Upgrade : Resource
