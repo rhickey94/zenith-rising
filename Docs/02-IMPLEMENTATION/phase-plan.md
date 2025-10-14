@@ -132,12 +132,56 @@
 
 ## Phase 5: Endgame 📝 PLANNED
 
-**Hypothesis:** "Multiple dungeons sustain long-term interest"
+**Hypothesis:** "Multiple dungeons with varying lengths sustain long-term interest and respect player time"
 
 ### Tasks
-1. **Multiple Dungeons** (4 total)
-2. **Ascension system**
-3. **Weekly challenges**
+
+1. **Multiple Dungeons (6 total)** - Varying lengths for different session times
+   - **Research Station Kepler** (4 floors, 20-25 min) - Quick challenge dungeon
+   - **Military Blacksite Omega** (7 floors, 35-40 min) - Extended commitment dungeon
+   - **Megacity New Babel** (8 floors, 40-45 min) - Epic run dungeon
+   - **Frost Grave** (6 floors, 30-35 min) - Mind-bender dungeon
+   - **Verdant Tomb** (9 floors, 45-50 min) - Ultimate challenge dungeon
+   - Note: Zenith Station (5 floors, 25-30 min) is the MVP dungeon built in Phases 1-3
+
+2. **Ascension System**
+   - Unlocks at character level 50+
+   - Reset to level 1, keep gear and skill mastery
+   - Gain +5% permanent damage per ascension
+   - Unlock new upgrade tiers and cosmetics
+
+3. **Difficulty Tiers**
+   - Normal dungeons (current)
+   - True difficulty (higher enemy scaling, 2x loot)
+   - Nightmare difficulty (extreme scaling, 5x loot)
+
+4. **Weekly Challenges** (stretch goal)
+   - Special modifiers on dungeons
+   - Leaderboards
+   - Exclusive rewards
+
+### Design Philosophy
+**Respect player time through content variety:**
+- Players with 20 minutes? Run Research Station (4 floors)
+- Players with 30 minutes? Run Zenith or Frost Grave (5-6 floors)
+- Players with 45+ minutes? Run Verdant Tomb (9 floors)
+- All session lengths provide meaningful progression
+
+### Success Criteria
+- 20% 3-month retention
+- Players engage with multiple dungeons (not just farming one)
+- Average 5+ different dungeon completions per week
+- Positive feedback on "respecting time" in reviews
+
+### Implementation Priority
+**Ship dungeons sequentially, not all at once:**
+1. Research Station + Military Blacksite (update 1)
+2. Megacity + Frost Grave (update 2)
+3. Verdant Tomb + Ascension system (update 3)
+
+**Each release = content update = renewed player engagement**
+
+**See [`../01-GAME-DESIGN/dungeon-structure.md`](../01-GAME-DESIGN/dungeon-structure.md) for complete dungeon designs**
 
 ---
 

@@ -25,6 +25,12 @@ public partial class StatsManager : Node
     [Export] public float BaseSpeed { get; set; } = 300.0f;
     [Export] public float BaseFireRate { get; set; } = 0.2f;
     [Export] public float BaseMeleeRate { get; set; } = 0.5f;
+    [Export] public int BaseStrength { get; set; } = 0;
+    [Export] public int BaseVitality { get; set; } = 0;
+    [Export] public int BaseAgility { get; set; } = 0;
+    [Export] public int BaseResilience { get; set; } = 0;
+    [Export] public int BaseFortune { get; set; } = 0;
+    [Export] public int UnallocatedStatPoints { get; set; } = 0;
 
     // Calculated stats (modified by upgrades)
     public float MaxHealth { get; private set; } = 100.0f;
@@ -32,6 +38,14 @@ public partial class StatsManager : Node
     public float Speed { get; private set; }
     public float FireRate { get; private set; }
     public float MeleeRate { get; private set; }
+
+    // Derived stat calculations from character stats
+    public float GetStrengthDamageMultiplier() => 1.0f + (BaseStrength * 0.03f);
+    public float GetVitalityHealthBonus() => BaseVitality * 25f;
+    public float GetAgilityCooldownMultiplier() => 1.0f / (1.0f + BaseAgility * 0.02f);
+    public float GetResilienceDamageReduction() => Mathf.Min(BaseResilience * 0.01f, 0.5f); // Capped at 50%
+    public float GetFortuneCritChance() => Mathf.Min(BaseFortune * 0.02f, 0.5f); // Capped at 50%
+
     // Combat stats (cached from upgrades)
     public float DamageMultiplier { get; private set; } = 1.0f;
     public float CritChance { get; private set; } = 0f;
@@ -121,7 +135,7 @@ public partial class StatsManager : Node
         Speed = (BaseSpeed + modifiers.BaseSpeedBonus) * (1 + modifiers.MovementSpeedBonus);
         FireRate = BaseFireRate * (1 - modifiers.AttackSpeedBonus);
         MeleeRate = BaseMeleeRate * (1 - modifiers.AttackSpeedBonus);
-        MaxHealth = BaseMaxHealth + modifiers.MaxHealthBonus + CalculateLevelHealthBonus();
+        MaxHealth = BaseMaxHealth + modifiers.MaxHealthBonus + CalculateLevelHealthBonus() + GetVitalityHealthBonus();
         DamageMultiplier = 1.0f + modifiers.DamagePercentBonus;
         CritChance = Mathf.Clamp(modifiers.CritChanceBonus, 0f, 1f);
         PickupRadius = 80f + modifiers.PickupRadiusBonus;
@@ -153,7 +167,7 @@ public partial class StatsManager : Node
         ExperienceToNextLevel = (int)(ExperienceToNextLevel * 1.5);
 
         // Update MaxHealth immediately with level bonus (upgrade bonuses added when RecalculateStats is called)
-        MaxHealth = BaseMaxHealth + CalculateLevelHealthBonus();
+        MaxHealth = BaseMaxHealth + CalculateLevelHealthBonus() + GetVitalityHealthBonus();
         Health = MaxHealth;  // Full heal on level up
 
         GD.Print($"Leveled up to {Level}!");

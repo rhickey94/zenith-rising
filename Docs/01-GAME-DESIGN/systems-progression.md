@@ -2,9 +2,10 @@
 
 ## Overview
 
-Tower Ascension uses a **stat-based power system** where everything scales from 5 core character stats. Gear provides stats, skills scale from stats, and upgrades modify stats or add effects.
+Zenith Rising uses a **stat-based power system** where everything scales from 5 core character stats. Gear provides stats, skills scale from stats, and upgrades modify stats or add effects.
 
 **Design Philosophy:**
+
 - Stats are the universal language
 - Gear = stats, Enhancement = more stats
 - Simple to understand, deep to optimize
@@ -16,64 +17,135 @@ Tower Ascension uses a **stat-based power system** where everything scales from 
 
 ### The 5 Core Stats
 
-Every character has 5 base stats that ALL power scales from:
+Every character has 5 base stats that define their combat capabilities:
 
-#### **Strength (STR)**
-**What it does:** +3% ALL damage per point
-- Physical attacks scale with STR
-- Skills that deal damage scale with STR
-- Clear, simple, always useful
+#### **Strength (STR)** - Physical Power
 
-#### **Vitality (VIT)**
-**What it does:** +25 max HP per point
-- More health = survive longer
-- No secondary effects (pure survival)
-- Valuable for all playstyles
+**Primary Effect:** +3% Physical Damage per point
+**Secondary Effect:** +10 Max HP per point
 
-#### **Agility (AGI)**
-**What it does:** +2% attack speed per point
+- Scales physical weapon attacks
+- Scales physical skills (Whirlwind, melee abilities)
+- Warriors prioritize this
+- No cap
+
+#### **Intelligence (INT)** - Magical Power
+
+**Primary Effect:** +3% Magical Damage per point
+**Secondary Effect:** +2% Skill Cooldown Reduction per point
+
+- Scales magical weapon attacks
+- Scales magical skills (Fireball, elemental abilities)
+- Mages (Elias) prioritize this
+- No cap
+
+#### **Agility (AGI)** - Speed & Precision
+
+**Primary Effect:** +2% Attack Speed per point
+**Secondary Effect:** +1% Crit Chance per point
+
 - Faster basic attacks
-- Faster skill cooldowns (indirect)
-- Movement speed bonus
+- Faster skill animations
+- More frequent crits
+- Rangers (Aria) prioritize this
+- Crit Chance capped at 50%
 
-#### **Resilience (RES)**
-**What it does:** +1% damage reduction per point (cap 50%)
-- Reduces incoming damage
-- Diminishing returns prevent invincibility
+#### **Vitality (VIT)** - Survivability
+
+**Primary Effect:** +25 Max HP per point
+**Secondary Effect:** +0.5 HP Regeneration per second per point
+
+- Pure survival stat
+- Valuable for all playstyles
 - Tank builds prioritize this
+- No cap
 
-#### **Fortune (FOR)**
-**What it does:** +2% crit chance per point (cap 50%)
-- Critical hits deal 200% damage (base)
-- Affects all damage sources
-- High-risk, high-reward stat
+#### **Fortune (FOR)** - High-Risk Reward
+
+**Primary Effect:** +2% Crit Damage per point
+**Secondary Effect:** +1% Rare Drop Rate per point
+
+- Bigger crits (base crit damage is 150%)
+- Better loot quality
+- Synergizes with AGI (crit chance)
+- Crit-focused builds prioritize this
+- No cap on crit damage
+
+### Damage Types
+
+**Physical Damage:**
+
+- Scales with STR
+- Weapon-based attacks (most weapons)
+- Melee skills, physical projectiles
+- Examples: Whirlwind, basic sword attacks
+
+**Magical Damage:**
+
+- Scales with INT
+- Spell-based attacks (staves, wands)
+- Elemental skills, magical projectiles
+- Examples: Fireball, lightning skills
+
+**Weapon Determines Damage Type:**
+
+- Basic Attack (Left Click): Uses weapon's damage type
+- Special Attack (Right Click): Uses weapon's damage type
+- Active Abilities (Q/W/E/R): Individual damage type per skill
+
+### Class Affinities
+
+**Marcus (Warrior):**
+
+- Prioritizes: STR, VIT
+- Playstyle: Physical damage, tanky
+- Example spread: 8 STR, 5 VIT, 2 AGI
+
+**Aria (Ranger):**
+
+- Prioritizes: AGI, FOR
+- Playstyle: Fast attacks, high crits
+- Example spread: 6 AGI, 6 FOR, 3 STR
+
+**Elias (Mage):**
+
+- Prioritizes: INT, FOR
+- Playstyle: Magical damage, big crits
+- Example spread: 8 INT, 5 FOR, 2 VIT
 
 ### Starting Stats
 
-**All classes start at 0 in all stats.**
+**All characters start at 0/0/0/0/0 base stats.**
 
 **Character Creation:**
-- Distribute 15 points freely
-- No class restrictions
-- Choose your own identity
 
-**Examples:**
-- Warrior build: 5 STR, 5 VIT, 2 AGI, 3 RES, 0 FOR
-- Glass cannon: 10 STR, 0 VIT, 0 AGI, 0 RES, 5 FOR
+- Distribute 15 points freely
+- No class restrictions (can build Marcus as mage)
+- Establish your initial build identity
+
+**Example Distributions:**
+
+- Tank Warrior: 5 STR, 0 INT, 0 AGI, 8 VIT, 2 FOR
+- Glass Cannon Mage: 0 STR, 10 INT, 0 AGI, 0 VIT, 5 FOR
+- Hybrid Ranger: 3 STR, 3 INT, 6 AGI, 3 VIT, 0 FOR
 - Balanced: 3/3/3/3/3
 
 ### Stat Growth
 
 **Permanent Progression:**
+
 - Gain +1 stat point per character level
 - Level cap: 100 (for MVP, expandable)
-- Respec available (costs gold)
+- Total possible: 115 stat points (15 starting + 100 levels)
+- Respec available (costs 100 gold × character level)
 
 **Why This Works:**
-- Clear choices (each stat does ONE thing)
-- Build diversity (no "correct" distribution)
-- Meaningful decisions (respec costs encourage commitment)
-- Long-term goals (100 levels of growth)
+
+- Clear choices (primary + secondary effects)
+- Class identity (STR for warriors, INT for mages, AGI for rangers)
+- Hybrid builds viable (split points between multiple stats)
+- Respec is expensive but not prohibitive
+- Long-term goals (100 levels of customization)
 
 ---
 
@@ -92,15 +164,16 @@ Every character has 5 base stats that ALL power scales from:
 
 Equipment drops in 5 rarity tiers:
 
-| Rarity | Color | Primary Stat | Secondary Stats | Enchant Slots |
-|--------|-------|--------------|-----------------|---------------|
-| Common | Gray | 1 | 0 | 0 |
-| Uncommon | Green | 1 | 1 | 0 |
-| Rare | Blue | 1 | 2 | 0 |
-| Epic | Purple | 1 | 3 | 1 |
-| Legendary | Orange | 1 | 3 | 2 |
+| Rarity    | Color  | Primary Stat | Secondary Stats | Enchant Slots |
+| --------- | ------ | ------------ | --------------- | ------------- |
+| Common    | Gray   | 1            | 0               | 0             |
+| Uncommon  | Green  | 1            | 1               | 0             |
+| Rare      | Blue   | 1            | 2               | 0             |
+| Epic      | Purple | 1            | 3               | 1             |
+| Legendary | Orange | 1            | 3               | 2             |
 
 **Drop Rates:**
+
 - Common: 60%
 - Uncommon: 25%
 - Rare: 10%
@@ -108,6 +181,7 @@ Equipment drops in 5 rarity tiers:
 - Legendary: 1%
 
 **Boss Drops:**
+
 - Guaranteed gear drop
 - 50% chance for Rare+
 - 10% chance for Epic+
@@ -118,9 +192,11 @@ Equipment drops in 5 rarity tiers:
 Each piece has multiple layers:
 
 #### **1. Primary Stat (Always Present)**
+
 The main stat bonus for this gear type
 
 **Examples:**
+
 - Iron Sword: +15 Strength
 - Leather Armor: +10 Vitality
 - Amulet: +8 Agility
@@ -128,9 +204,11 @@ The main stat bonus for this gear type
 Scales with item level and rarity.
 
 #### **2. Secondary Stats (0-3 Random)**
+
 Additional stat bonuses rolled on drop
 
 **Examples:**
+
 - +8 Vitality
 - +5 Agility
 - +3 Resilience
@@ -139,6 +217,7 @@ Lower values than primary stat.
 Number depends on rarity (see table above).
 
 #### **3. Enhancement Level (0-10)**
+
 **Added via Workshop in Phase 3**
 
 - Each level: +10% to ALL stats on item
@@ -146,6 +225,7 @@ Number depends on rarity (see table above).
 - Max +10 = +100% stats (item stats × 2)
 
 **Example:**
+
 ```
 Iron Sword (Base):
 +15 STR, +5 VIT, +3 AGI
@@ -158,11 +238,13 @@ Iron Sword +10:
 ```
 
 #### **4. Enchantment Slots (0-3)**
+
 **Added in Phase 4**
 
 Special effects added via Workshop
 
 **Examples:**
+
 - "+15% Physical Damage"
 - "Restore 2% HP on kill"
 - "Attacks have 10% chance to stun"
@@ -173,11 +255,13 @@ Add enchantments with refined components.
 ### Gear Acquisition
 
 **Drops Only (No Crafting):**
+
 - Enemies drop gear at random
 - Bosses guaranteed drops
 - Elites have higher quality drops
 
 **Why No Crafting:**
+
 - Keeps excitement of drops
 - Simpler system
 - Enhancement provides long-term goals
@@ -186,17 +270,20 @@ Add enchantments with refined components.
 ### Gear Management
 
 **Inventory:**
+
 - Unlimited storage (for MVP)
 - Sort by rarity, type, level
 - Quick-equip from inventory
 
 **Salvaging:**
+
 - Convert unwanted gear → gold
 - Returns 50% of enhancement investment
 - Prevents inventory bloat
 - Gives bad drops purpose
 
 **Respec-Friendly:**
+
 - Can freely swap gear
 - Try different builds
 - No gear binding or soulbound
@@ -208,12 +295,14 @@ Add enchantments with refined components.
 ### Design Philosophy
 
 **Problem with complex systems:**
+
 - 3 materials × 2 states = 6 item types
 - Confusing purposes
 - Multiple conversion paths
 - Analysis paralysis
 
 **Our solution:**
+
 - **Phase 3:** ONE material type (Energy Cores)
 - **Phase 4:** Add second material (Modification Chips)
 - **Never:** Add third material
@@ -223,6 +312,7 @@ Add enchantments with refined components.
 **Energy Cores** (THE core material)
 
 **Drops from:**
+
 - All enemies (100% drop rate)
 - Amount scales with enemy tier
 - Basic: 1-2 cores
@@ -230,17 +320,20 @@ Add enchantments with refined components.
 - Boss: 10-15 cores
 
 **Raw → Refined:**
+
 - Raw Energy Core → Refined Energy Core
 - Takes 30 minutes in Workshop
 - Process offline via DateTime
 - Queue up to 3 refinements
 
 **Used for:**
+
 - Gear enhancement only (+10% stats per level)
 - Clear, single purpose
 - Always valuable
 
 **Why This Works:**
+
 - Simple to understand
 - One decision: "Enhance which gear?"
 - No complex material webs
@@ -251,15 +344,18 @@ Add enchantments with refined components.
 **Modification Chips** (optional complexity)
 
 **Drops from:**
+
 - Bosses only (50% chance)
 - Guaranteed from Floor 5 boss
 
 **Used for:**
+
 - Adding enchantments to gear
 - One enchantment per item
 - Choose from pool of 10-15 effects
 
 **Why Add This:**
+
 - Build customization
 - Chase mechanic (rare drops)
 - Doesn't confuse core loop
@@ -268,16 +364,19 @@ Add enchantments with refined components.
 ### Never Adding
 
 **❌ Third Material Type**
+
 - Two materials is enough
 - More = complexity creep
 - Diminishing returns on engagement
 
 **❌ Material Conversions**
+
 - No core → chip conversion
 - No chip → core conversion
 - Keeps each material valuable
 
 **❌ Material Types Per Slot**
+
 - No "weapon materials" vs "armor materials"
 - Same materials for all slots
 - Reduces inventory bloat
@@ -289,6 +388,7 @@ Add enchantments with refined components.
 ### Design Constraints
 
 **Golden Rules:**
+
 1. Only processes what you actively farmed
 2. Caps at 8 hours maximum
 3. Never more rewarding than active play
@@ -300,6 +400,7 @@ Add enchantments with refined components.
 **Purpose:** Convert raw materials → refined components
 
 **How It Works:**
+
 ```
 Raw Energy Core → Refined Energy Core
 Time: 30 minutes per core
@@ -308,6 +409,7 @@ Queue: Up to 3 refinements simultaneously
 ```
 
 **Process:**
+
 1. Finish combat run, collect Raw Cores
 2. Open Workshop, add cores to queue
 3. Close game
@@ -316,11 +418,13 @@ Queue: Up to 3 refinements simultaneously
 6. Use at Blacksmith to enhance gear
 
 **Upgrades (Phase 4):**
+
 - Faster refinement (−5 min per level, min 15 min)
 - More queue slots (+1 slot per level, max 5)
 - Batch refinement (refine 5 at once)
 
 **Why This Works:**
+
 - Clear input → output
 - Respects active grinding (only refines what you earned)
 - Has cap (queue fills, then stops)
@@ -331,6 +435,7 @@ Queue: Up to 3 refinements simultaneously
 **Purpose:** Provide steady income for flexible spending
 
 **How It Works:**
+
 ```
 Generation Rate = Highest Floor Cleared × 10 gold/hour
 Cap Duration: 8 hours
@@ -338,23 +443,27 @@ Max Accumulation: Rate × 8
 ```
 
 **Examples:**
+
 - Floor 3 cleared = 30 gold/hour, max 240
 - Floor 5 cleared = 50 gold/hour, max 400
 - Floor 10 cleared = 100 gold/hour, max 800
 
 **Collection:**
+
 - Open Treasury UI
 - See accumulated gold
 - Click "Collect" button
 - Gold added to total
 
 **Why 8-Hour Cap:**
+
 - Encourages daily check-ins (not week-long AFK)
 - Prevents runaway passive income
 - Respects player time (don't miss much if busy)
 - Active play still better (combat drops gold too)
 
 **Gold Uses:**
+
 1. **Respec stats** (100g × character level)
 2. **Buy consumables** (health potions, buffs)
 3. **Salvage gear** (convert to gold)
@@ -362,18 +471,20 @@ Max Accumulation: Rate × 8
 5. **Base upgrades** (Workshop/Treasury improvements)
 
 **Upgrades (Phase 4):**
+
 - Increase rate (+10 gold/hour per level)
 - Increase cap (8h → 10h → 12h)
 - Interest system (unspent gold gains 5% daily, cap 1000)
 
 ### Workshop vs Treasury Comparison
 
-| System | Active Input | Passive Output | Purpose |
-|--------|-------------|----------------|---------|
+| System   | Active Input  | Passive Output    | Purpose              |
+| -------- | ------------- | ----------------- | -------------------- |
 | Workshop | Raw materials | Refined materials | Enable gear upgrades |
-| Treasury | Floor clears | Gold | Flexible spending |
+| Treasury | Floor clears  | Gold              | Flexible spending    |
 
 **Both respect the same rules:**
+
 - ✅ Only rewards past active play
 - ✅ Caps prevent FOMO
 - ✅ Offline-friendly (DateTime)
@@ -384,6 +495,7 @@ Max Accumulation: Rate × 8
 ## Progression Loops
 
 ### Short-Term Loop (Per Run)
+
 ```
 Enter Floor
   ↓
@@ -402,6 +514,7 @@ Repeat
 **Rewards:** Immediate power (upgrades), loot drops
 
 ### Mid-Term Loop (Session)
+
 ```
 Multiple Runs
   ↓
@@ -420,6 +533,7 @@ Repeat
 **Rewards:** Permanent power (stats, gear)
 
 ### Long-Term Loop (Days/Weeks)
+
 ```
 Daily Check-In
   ↓
@@ -446,24 +560,28 @@ Repeat
 ### Phase 2 Targets (MVP)
 
 **Character Levels:**
+
 - Level 1-10: 2-3 hours (early game)
 - Level 10-25: 10-15 hours (mid game)
 - Level 25-50: 40-60 hours (end game)
 - Level 50+: Slow burn (prestige content)
 
 **Gear Progression:**
+
 - First full set: 3-5 hours
 - Full Rare set: 10-15 hours
 - Full Epic set: 30-40 hours
 - Any Legendary: 50+ hours
 
 **Floor Progression:**
+
 - Floor 1: Always accessible
 - Floor 3: ~5 hours
 - Floor 5: ~15 hours
 - Consistent clears: ~30 hours
 
 **Enhancement:**
+
 - +5 gear: 5-10 hours per piece
 - +10 gear: 30-40 hours per piece
 - Full +10 set: 100+ hours
@@ -471,18 +589,21 @@ Repeat
 ### Retention Goals
 
 **1 Week:**
+
 - 60% of players still playing
 - Average: Floor 3-4 clears
 - 2-3 gear pieces +5
 - Character level 15-20
 
 **1 Month:**
+
 - 30% of players still playing
 - Average: Floor 5 consistent clears
 - Most gear +8 or higher
 - Character level 35-45
 
 **3 Months:**
+
 - 10% of players still playing
 - Full +10 gear
 - Character level 50+
@@ -497,6 +618,7 @@ Repeat
 **Core Principle:** Never sell power
 
 **What We Can Sell:**
+
 - ✅ Cosmetic skins (characters, weapons)
 - ✅ Visual effects (death animations, auras)
 - ✅ Battle pass (cosmetics + small XP boost)
@@ -504,6 +626,7 @@ Repeat
 - ✅ Inventory tabs (organization)
 
 **What We NEVER Sell:**
+
 - ❌ Stats or damage
 - ❌ Gear or materials
 - ❌ Character levels
@@ -513,11 +636,13 @@ Repeat
 ### Battle Pass Example
 
 **Free Track (All Players):**
+
 - Cosmetic rewards every 5 levels
 - Small gold bonuses
 - 1-2 free skins
 
 **Premium Track ($10):**
+
 - More cosmetics every level
 - +10% XP boost (not power, faster progression)
 - Exclusive skins
@@ -531,6 +656,7 @@ Repeat
 ## Next Steps
 
 **Related Documentation:**
+
 - Combat details: [`combat-skills.md`](combat-skills.md)
 - Narrative context: [`narrative-framework.md`](narrative-framework.md)
 - Technical implementation: [`../02-IMPLEMENTATION/skill-system-architecture.md`](../02-IMPLEMENTATION/skill-system-architecture.md)
@@ -540,5 +666,5 @@ See [`CLAUDE.md`](../../CLAUDE.md) for what's actually built vs planned.
 
 ---
 
-*Last updated: Full documentation reorganization*
-*Living document - Update when systems change*
+_Last updated: Full documentation reorganization_
+_Living document - Update when systems change_
