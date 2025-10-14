@@ -1,6 +1,7 @@
 using Godot;
 using SpaceTower.Scripts.Enemies.Base;
 using SpaceTower.Scripts.PlayerScripts;
+using SpaceTower.Scripts.PlayerScripts.Components;
 using SpaceTower.Scripts.UI.HUD;
 using SpaceTower.Scripts.UI.Panels;
 
@@ -16,6 +17,8 @@ public partial class Game : Node
     [Export] public Player Player;
     [Export] public Hud HUD;
     [Export] public FloorTransitionPanel FloorTransitionPanel;
+    [Export] private Control _victoryScreen;
+    [Export] private Control _deathScreen;
 
     [Export] public string MainMenuScenePath = "res://Scenes/UI/Menus/main_menu.tscn";
 
@@ -45,6 +48,8 @@ public partial class Game : Node
     private bool _bossSpawned = false;
     private int _enemyCount = 0;
     private bool _waitingForBossDefeat = false;
+    private float _totalGameTime = 0f;
+    private int _enemiesKilled = 0;
 
     public override void _Ready()
     {
@@ -64,6 +69,7 @@ public partial class Game : Node
     {
         _floorTimeElapsed += (float)delta;
         _timeSinceLastSpawn += (float)delta;
+        _totalGameTime += (float)delta;
 
         // Update wave progression
         UpdateWaveProgression();
@@ -82,6 +88,13 @@ public partial class Game : Node
             SpawnEnemy();
             _timeSinceLastSpawn = 0f;
         }
+    }
+
+    public void OnPlayerDeath()
+    {
+        var deathScreen = _deathScreen as DeathScreen;
+        int playerLevel = Player?.GetNode<StatsManager>("StatsManager")?.Level ?? 1;
+        deathScreen?.ShowScreen(_totalGameTime, _enemiesKilled, playerLevel, _currentFloor);
     }
 
     private void UpdateWaveProgression()
@@ -214,12 +227,6 @@ public partial class Game : Node
 
     private void SetupFloorTransitionPanel()
     {
-        if (FloorTransitionPanel == null)
-        {
-            GD.PrintErr("Game: FloorTransitionPanel not assigned!");
-            return;
-        }
-
         // Just connect signals - panel already exists in scene
         FloorTransitionPanel.ContinueButtonPressed += OnContinueToNextFloor;
         FloorTransitionPanel.EndRunButtonPressed += OnEndRun;
@@ -229,19 +236,16 @@ public partial class Game : Node
 
     private void ShowFloorTransitionUI()
     {
-        if (FloorTransitionPanel == null)
-        {
-            GD.PrintErr("Cannot show floor transition - panel not initialized!");
-            return;
-        }
-
         FloorTransitionPanel.ShowPanel(_currentFloor, _currentFloor + 1);
     }
 
     private void ShowVictoryScreen()
     {
-        // TODO: Implement victory screen
-        GD.Print("VICTORY! All 5 floors cleared!");
+        var victoryScreen = _victoryScreen as VictoryScreen;
+        var playerLevel = Player?.GetNode<StatsManager>("StatsManager")?.Level ?? 1;
+
+        victoryScreen?.ShowScreen(_totalGameTime, _enemiesKilled, playerLevel, _currentFloor);
+        GD.Print("Victory! Player has completed all floors.");
     }
 
     private void OnContinueToNextFloor()
@@ -264,6 +268,7 @@ public partial class Game : Node
     private void OnEnemyDestroyed()
     {
         _enemyCount--;
+        _enemiesKilled++;
 
         // Check if boss was defeated (all enemies dead after boss spawned)
         if (_waitingForBossDefeat && _enemyCount <= 0)
@@ -320,6 +325,18 @@ public partial class Game : Node
         if (FloorTransitionPanel == null)
         {
             GD.PrintErr("Game: FloorTransitionPanel not assigned!");
+            valid = false;
+        }
+
+        if (_victoryScreen == null)
+        {
+            GD.PrintErr("Game: VictoryScreen not assigned!");
+            valid = false;
+        }
+
+        if (_deathScreen == null)
+        {
+            GD.PrintErr("Game: DeathScreen not assigned!");
             valid = false;
         }
 

@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using SpaceTower.Scripts.Core;
 
 namespace SpaceTower.Scripts.PlayerScripts.Components;
 
@@ -167,7 +168,18 @@ public partial class StatsManager : Node
     private void Die()
     {
         GD.Print("Player died!");
-        GetTree().ReloadCurrentScene();
+
+        // Find Game node and notify it
+        var game = GetTree().Root.GetNode<Game>("Game");
+        if (game != null)
+        {
+            game.OnPlayerDeath();
+        }
+        else
+        {
+            GD.PrintErr("Could not find Game node!");
+            GetTree().ReloadCurrentScene(); // Fallback
+        }
     }
 
     private void EmitHealthUpdate()

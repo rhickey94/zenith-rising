@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://6a6ovxmbcjd1"]
+[gd_scene load_steps=26 format=3 uid="uid://6a6ovxmbcjd1"]
 
 [ext_resource type="Script" uid="uid://ije0l625j2w0" path="res://Scripts/Core/Game.cs" id="1_wrm1d"]
 [ext_resource type="PackedScene" uid="uid://cvuvmrd8khk2g" path="res://Scenes/Enemies/enemy.tscn" id="2_3dryh"]
@@ -12,8 +12,10 @@
 [ext_resource type="PackedScene" uid="uid://fr50f27cq0cp" path="res://Scenes/UI/Panels/level_up_panel.tscn" id="6_i6g32"]
 [ext_resource type="PackedScene" uid="uid://bchf7gpesikn" path="res://Scenes/UI/Menus/floor_transition_panel.tscn" id="6_ku1f2"]
 [ext_resource type="PackedScene" uid="uid://du4yo1vulblyh" path="res://Scenes/SkillEffects/melee_attack.tscn" id="7_o5yvi"]
+[ext_resource type="PackedScene" uid="uid://dty6h4j6yf7im" path="res://Scenes/UI/Panels/victory_screen.tscn" id="9_csbrd"]
 [ext_resource type="Script" uid="uid://b3km77lyp5ba3" path="res://Scripts/Player/Components/StatsManager.cs" id="9_h4fw4"]
 [ext_resource type="Resource" uid="uid://y2i2lfbhh0ty" path="res://Resources/Skills/Mage/MageBasicAttack.tres" id="9_hps8g"]
+[ext_resource type="PackedScene" uid="uid://cisrthaqdv1p7" path="res://Scenes/UI/Panels/death_screen.tscn" id="10_cuk5j"]
 [ext_resource type="Resource" uid="uid://ck7w68lb1penv" path="res://Resources/Skills/Mage/Fireball.tres" id="10_e5gjp"]
 [ext_resource type="Script" uid="uid://cx5d7m8au6iit" path="res://Scripts/Player/Components/UpgradeManager.cs" id="10_ldgsr"]
 
@@ -71,13 +73,15 @@ size = Vector2(50, 50)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
 size = Vector2(50, 50)
 
-[node name="Game" type="Node" node_paths=PackedStringArray("Player", "HUD", "FloorTransitionPanel")]
+[node name="Game" type="Node" node_paths=PackedStringArray("Player", "HUD", "FloorTransitionPanel", "_victoryScreen", "_deathScreen")]
 script = ExtResource("1_wrm1d")
 EnemyScenes = Array[PackedScene]([ExtResource("2_h6qnp"), ExtResource("2_3dryh"), ExtResource("4_lv4vk")])
 BossScene = ExtResource("5_lv4vk")
 Player = NodePath("Player")
 HUD = NodePath("UILayer/HUD")
 FloorTransitionPanel = NodePath("UILayer/FloorTransitionPanel")
+_victoryScreen = NodePath("UILayer/VictoryScreen")
+_deathScreen = NodePath("UILayer/DeathScreen")
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 layer = 100
@@ -230,6 +234,12 @@ horizontal_alignment = 1
 process_mode = 3
 
 [node name="FloorTransitionPanel" parent="UILayer" instance=ExtResource("6_ku1f2")]
+
+[node name="VictoryScreen" parent="UILayer" instance=ExtResource("9_csbrd")]
+visible = false
+
+[node name="DeathScreen" parent="UILayer" instance=ExtResource("10_cuk5j")]
+visible = false
 
 [node name="Player" type="CharacterBody2D" parent="." node_paths=PackedStringArray("LevelUpPanel") groups=["player"]]
 script = ExtResource("3_wowpa")
