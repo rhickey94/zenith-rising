@@ -134,10 +134,10 @@ Every character has 5 base stats that define their combat capabilities:
 
 **Permanent Progression:**
 
-- Gain +1 stat point per character level
-- Level cap: 100 (for MVP, expandable)
-- Total possible: 115 stat points (15 starting + 100 levels)
-- Respec available (costs 100 gold × character level)
+- Gain +1 stat point per Character Level
+- Character Level cap: 100 (for MVP, expandable)
+- Total possible: 115 stat points (15 starting + 100 Character Levels)
+- Respec available (costs 100 gold × Character Level)
 
 **Why This Works:**
 
@@ -464,7 +464,7 @@ Max Accumulation: Rate × 8
 
 **Gold Uses:**
 
-1. **Respec stats** (100g × character level)
+1. **Respec stats** (100g × Character Level)
 2. **Buy consumables** (health potions, buffs)
 3. **Salvage gear** (convert to gold)
 4. **Rush Workshop** (10g per minute remaining)
@@ -499,7 +499,7 @@ Max Accumulation: Rate × 8
 ```
 Enter Floor
   ↓
-Fight Waves → Collect XP → Level Up → Choose Upgrades
+Fight Waves → Collect Power XP → Gain Power Levels → Choose Power Upgrades
   ↓
 Defeat Boss → Collect Loot (gear, materials, gold)
   ↓
@@ -511,18 +511,18 @@ Repeat
 ```
 
 **Duration:** 25-30 minutes per full run
-**Rewards:** Immediate power (upgrades), loot drops
+**Rewards:** Immediate temporary power (Power Upgrades), loot drops, Character XP
 
 ### Mid-Term Loop (Session)
 
 ```
 Multiple Runs
   ↓
-Gain Character Levels → Allocate Stat Points
+Gain Character Levels → Allocate Stat Points (permanent)
   ↓
-Find Better Gear → Equip Upgrades
+Find Better Gear → Equip Upgrades (persistent)
   ↓
-Collect Refined Materials → Enhance Gear
+Collect Refined Materials → Enhance Gear (permanent)
   ↓
 Feel Permanently Stronger
   ↓
@@ -530,7 +530,7 @@ Repeat
 ```
 
 **Duration:** 1-2 hours per session
-**Rewards:** Permanent power (stats, gear)
+**Rewards:** Permanent power (Character stats, enhanced gear)
 
 ### Long-Term Loop (Days/Weeks)
 

@@ -54,14 +54,14 @@
 
 1. Enter a tower floor
 2. Fight waves of monsters (Vampire Survivors-style + manual aim)
-3. Collect XP shards → Level up → Choose upgrades
+3. Collect Power XP shards → Gain Power Levels → Choose Power Upgrades
 4. Gather loot (materials, gear, gold)
 5. Defeat floor boss (5 minutes per floor)
 6. Choose: **Extract** (safe) or **Continue** (risk/reward)
 
 **What You Gain:**
 
-- Character XP and levels (permanent)
+- Character XP and Character Levels (permanent)
 - Skill mastery progress (permanent)
 - Equipment drops (persistent)
 - Raw materials (for refinement)
@@ -200,7 +200,7 @@
 
 - 3 classes with distinct playstyles
 - 10+ skills per class
-- 20+ upgrade types
+- 20+ Power Upgrade types (temporary, in-run)
 - 3 enemy types + boss
 - 5 floors
 - Wave/boss system
@@ -285,7 +285,7 @@
 
 - ✅ **PROVEN** - Multiple successful playtests
 - Players want "one more run"
-- Upgrade choices feel meaningful
+- Power Upgrade choices feel meaningful
 - Enemy variety creates interesting challenges
 
 ### Phase 2 (Progression Hook)

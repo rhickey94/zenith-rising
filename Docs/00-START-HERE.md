@@ -50,7 +50,7 @@ Combat is fun and engaging through multiple playtests. The core loop works.
 
 - Player movement and combat
 - 3 enemy types with distinct behaviors
-- XP/level-up system with 8 working upgrades
+- Power XP/Power Level system (1-20) with 8 working Power Upgrades
 - Skill system (Whirlwind, Fireball, basic attacks)
 - Wave/floor progression system
 - Boss spawning

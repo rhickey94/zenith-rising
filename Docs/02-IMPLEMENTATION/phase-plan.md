@@ -35,8 +35,8 @@
 - 3 enemy types (Basic, FastMelee, SlowRanged)
 - Enemy AI with virtual methods (Attack/Movement/TryAttack)
 - Health/damage system with crit
-- XP/level-up flow
-- 8 working upgrades (stacking fixed)
+- Power XP/Power Level flow (1-20 per run)
+- 8 working Power Upgrades (stacking fixed)
 - 3 functional skills (Whirlwind, Fireball, basic attacks)
 - Wave/floor system (10 waves + boss per floor)
 - Enemy scaling (HP/damage mult per wave/floor)
@@ -51,7 +51,7 @@
 
 ### Success Criteria ✅ Met
 - Combat feels engaging
-- Upgrades matter
+- Power Upgrades matter
 - Enemy variety works
 - Want to play "one more run"
 
@@ -75,21 +75,28 @@
 1. **Character Stats System**
    - 5 stats: STR/VIT/AGI/RES/FOR
    - Each stat does ONE thing (simplified)
-   - +1 point per character level
+   - +1 point per Character Level (permanent progression)
    - Distribute freely in stat screen UI
 
-2. **Save/Load System**
-   - Save character level + stat allocation to JSON
+2. **Character XP & Leveling**
+   - Track Character XP separately from Power XP
+   - Award Character XP at end of run based on performance
+   - Character Level increases between runs only
+   - Results screen shows Character XP earned
+
+3. **Save/Load System**
+   - Save Character Level + stat allocation to JSON
+   - Save Character XP progress
    - Save highest floor reached
    - Persist between runs
 
-3. **Basic Gear Drops**
+4. **Basic Gear Drops**
    - 3 slots: Weapon, Armor, Accessory
    - 3 rarities: Common, Rare, Epic
    - Flat stats only
    - Drops from bosses (100%) and elites (10%)
 
-4. **5 Distinct Floors**
+5. **5 Distinct Floors**
    - Different enemy mix per floor
    - Visual distinction
    - Boss at end of each floor
@@ -145,10 +152,10 @@
    - Note: Zenith Station (5 floors, 25-30 min) is the MVP dungeon built in Phases 1-3
 
 2. **Ascension System**
-   - Unlocks at character level 50+
-   - Reset to level 1, keep gear and skill mastery
+   - Unlocks at Character Level 50+
+   - Reset to Character Level 1, keep gear and skill mastery
    - Gain +5% permanent damage per ascension
-   - Unlock new upgrade tiers and cosmetics
+   - Unlock new Power Upgrade tiers and cosmetics
 
 3. **Difficulty Tiers**
    - Normal dungeons (current)

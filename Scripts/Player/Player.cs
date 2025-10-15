@@ -96,7 +96,7 @@ public partial class Player : CharacterBody2D
         // Read speed from StatsManager
         if (_statsManager != null)
         {
-            Velocity = direction * _statsManager.Speed;
+            Velocity = direction * _statsManager.CurrentSpeed;
         }
         else
         {
@@ -121,7 +121,7 @@ public partial class Player : CharacterBody2D
 
     public void AddExperience(int amount)
     {
-        _statsManager?.AddExperience(amount);
+        _statsManager?.AddPowerExperience(amount);
     }
 
     private void OnLeveledUp()

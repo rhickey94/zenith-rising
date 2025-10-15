@@ -34,11 +34,11 @@ Enemies stumble backward
 
 Narrative:
 "Crowd control. Make space, control the fight."
-Upgrade Progression:
+Power Upgrade Progression:
 
-Lv1: Base version
-Lv2: +30% radius, enemies grounded (can't fly/dash for 2s)
-Lv3: Leaves damaging field for 4s (damage over time zone)
+Base: Base version
+Upgrade 1: +30% radius, enemies grounded (can't fly/dash for 2s)
+Upgrade 2: Leaves damaging field for 4s (damage over time zone)
 
 
 E Skill (12s cooldown, 5s duration) - "Hardlight Barrier"

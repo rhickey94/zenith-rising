@@ -42,6 +42,7 @@ public partial class Game : Node
 
     // State tracking
     private int _currentFloor = 1;
+    private int _floorsCleared = 0;
     private int _currentWave = 1;
     private float _floorTimeElapsed = 0f;
     private float _timeSinceLastSpawn = 0f;
@@ -50,6 +51,8 @@ public partial class Game : Node
     private bool _waitingForBossDefeat = false;
     private float _totalGameTime = 0f;
     private int _enemiesKilled = 0;
+    private int _bossesKilled = 0;
+    private bool _finalBossDefeated = false;
 
     public override void _Ready()
     {
@@ -60,6 +63,7 @@ public partial class Game : Node
             return;
         }
 
+        ResetRunTracking();
         Player.Initialize();
         UpdateHUD();
         SetupFloorTransitionPanel();
@@ -92,8 +96,18 @@ public partial class Game : Node
 
     public void OnPlayerDeath()
     {
+        // Calculate and award character XP BEFORE showing screen
+        int characterXP = CalculateCharacterXP();
+
+        var statsManager = Player?.GetNode<StatsManager>("StatsManager");
+        if (statsManager != null)
+        {
+            statsManager.AddCharacterExperience(characterXP);
+            GD.Print($"Awarded {characterXP} character XP!");
+        }
+
         var deathScreen = _deathScreen as DeathScreen;
-        int playerLevel = Player?.GetNode<StatsManager>("StatsManager")?.RunLevel ?? 1;
+        int playerLevel = Player?.GetNode<StatsManager>("StatsManager")?.PowerLevel ?? 1;
         deathScreen?.ShowScreen(_totalGameTime, _enemiesKilled, playerLevel, _currentFloor);
     }
 
@@ -220,6 +234,7 @@ public partial class Game : Node
         _bossSpawned = false;
         _enemyCount = 0;
         _waitingForBossDefeat = false;
+        _floorsCleared = _currentFloor - 1;
 
         UpdateHUD();
         GD.Print($"Advanced to Floor {_currentFloor}!");
@@ -241,8 +256,17 @@ public partial class Game : Node
 
     private void ShowVictoryScreen()
     {
+        // Calculate and award character XP BEFORE showing screen
+        int characterXP = CalculateCharacterXP();
+
+        var statsManager = Player?.GetNode<StatsManager>("StatsManager");
+        if (statsManager != null)
+        {
+            statsManager.AddCharacterExperience(characterXP);
+            GD.Print($"Awarded {characterXP} character XP!");
+        }
         var victoryScreen = _victoryScreen as VictoryScreen;
-        var playerLevel = Player?.GetNode<StatsManager>("StatsManager")?.RunLevel ?? 1;
+        var playerLevel = Player?.GetNode<StatsManager>("StatsManager")?.PowerLevel ?? 1;
 
         victoryScreen?.ShowScreen(_totalGameTime, _enemiesKilled, playerLevel, _currentFloor);
         GD.Print("Victory! Player has completed all floors.");
@@ -282,9 +306,14 @@ public partial class Game : Node
     // Called when boss is defeated - show floor transition UI
     private void OnBossDefeated()
     {
+        // Track boss kill for character XP calculation
+        _bossesKilled++;
+        GD.Print($"Boss defeated! Total bosses killed: {_bossesKilled}");
+
         if (_currentFloor >= MaxFloors)
         {
             // Victory! Beat all 5 floors
+            _finalBossDefeated = true;
             ShowVictoryScreen();
         }
         else
@@ -292,6 +321,36 @@ public partial class Game : Node
             // Show Continue/End Run choice
             ShowFloorTransitionUI();
         }
+    }
+
+    private int CalculateCharacterXP()
+    {
+        int xp = 50; // Base participation
+        xp += _floorsCleared * 100; // Per floor cleared
+        xp += _bossesKilled * 150; // Per boss killed
+
+        if (_finalBossDefeated)
+        {
+            xp += 500; // Victory bonus
+        }
+
+        // TODO Phase 3: Optional performance bonuses
+        // if (_totalGameTime < 900f) xp += 100; // Speed clear bonus (< 15 min)
+        // if (player never died) xp += 150; // No death bonus
+
+        // Log breakdown for debugging
+        GD.Print($"Character XP Calculation: Base=50, Floors={_floorsCleared}x100={_floorsCleared * 100}, Bosses={_bossesKilled}x150={_bossesKilled * 150}, Victory={(_finalBossDefeated ? 500 : 0)} → Total={xp}");
+
+        return xp;
+    }
+
+    private void ResetRunTracking()
+    {
+        _floorsCleared = 0;
+        _bossesKilled = 0;
+        _finalBossDefeated = false;
+        _enemiesKilled = 0;
+        _totalGameTime = 0f;
     }
 
     private bool ValidateDependencies()

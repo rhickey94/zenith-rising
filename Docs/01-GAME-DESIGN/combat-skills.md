@@ -2,12 +2,12 @@
 
 ## Overview
 
-Zenith Rising uses a **hybrid skill system** combining pre-run customization with in-run evolution. You choose your loadout before each run, then random upgrades modify your abilities as you level up.
+Zenith Rising uses a **hybrid skill system** combining pre-run customization with in-run evolution. You choose your loadout before each run, then random Power Upgrades modify your abilities as you gain Power Levels.
 
 **Design Philosophy:**
 
 - Foundation = Your choice (skill loadout)
-- Spice = RNG (in-run upgrades)
+- Spice = RNG (Power Upgrades during run)
 - Result = Same class, different every run
 
 ---
@@ -176,23 +176,23 @@ Gold (200 kills):
 
 ## In-Run Progression (Roguelite Layer)
 
-### Level-Up System
+### Power Level System
 
 **How It Works:**
 
-1. Kill enemies → Drop XP shards
-2. Collect shards → Fill XP bar
-3. Level up → Game pauses
-4. Choose 1 upgrade from 3 random options
-5. Resume combat with upgrade applied
+1. Kill enemies → Drop Power XP shards
+2. Collect shards → Fill Power XP bar
+3. Gain Power Level → Game pauses
+4. Choose 1 Power Upgrade from 3 random options
+5. Resume combat with Power Upgrade applied
 
-**Max Level Per Run:** 20
+**Max Power Level Per Run:** 20
 
 - Prevents infinite scaling
 - Keeps runs ~30 minutes
 - Resets each run
 
-### Upgrade Types (3 Categories)
+### Power Upgrade Types (3 Categories)
 
 #### **1. Skill Modifiers (40% chance)**
 
@@ -249,7 +249,7 @@ Temporary stat increases
 - No unique gameplay changes
 - Lower spawn rate to favor modifiers
 
-### Upgrade Rarity System
+### Power Upgrade Rarity System
 
 **Rarity Distribution:**
 
@@ -285,10 +285,10 @@ Temporary stat increases
 - Feels like YOUR character
 - Consistent class identity
 
-**In-Run Upgrades (Spice):**
+**In-Run Power Upgrades (Spice):**
 
 - Every run plays differently
-- Exciting level-up moments
+- Exciting Power Level moments
 - Adaptation challenges
 - Replayability
 
@@ -297,7 +297,7 @@ Temporary stat increases
 - Control foundation, RNG adds variety
 - Bad RNG doesn't ruin run (still have core skills)
 - Good RNG makes you feel OP
-- Can pivot build based on upgrades offered
+- Can pivot build based on Power Upgrades offered
 
 ### Build Diversity Examples
 

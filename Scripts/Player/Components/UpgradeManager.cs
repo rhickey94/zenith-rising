@@ -83,7 +83,7 @@ public partial class UpgradeManager : Node
         float movementSpeedBonus = GetUpgradeValue(UpgradeType.MovementSpeed);
         float attackSpeedBonus = GetUpgradeValue(UpgradeType.AttackSpeed);
         float maxHealthBonus = GetUpgradeValue(UpgradeType.MaxHealth);
-        float baseSpeedBonus = 10f * _statsManager.RunLevel; // Level up bonus (+10 speed per level)
+        float baseSpeedBonus = 10f * _statsManager.PowerLevel; // Level up bonus (+10 speed per level)
 
         float damagePercentBonus = GetUpgradeValue(UpgradeType.DamagePercent);
         float critChanceBonus = GetUpgradeValue(UpgradeType.CritChance);

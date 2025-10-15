@@ -37,6 +37,8 @@ public partial class StatsManager : Node
     // ===== PERMANENT CHARACTER PROGRESSION (save these) =====
     [ExportGroup("Character Progression")]
     [Export] public int CharacterLevel { get; private set; } = 1;
+    [Export] public int CharacterExperience { get; private set; } = 0;
+    [Export] public int CharacterExperienceToNextLevel { get; private set; } = 500;
     [Export] public int UnallocatedStatPoints { get; private set; } = 15;
     [Export] public int Strength { get => _strength; private set => _strength = Mathf.Max(0, value); }       // STR: +3% Physical Dmg, +10 HP
     [Export] public int Intelligence { get => _intelligence; private set => _intelligence = Mathf.Max(0, value); }   // INT: +3% Magical Dmg, +2% CDR
@@ -45,12 +47,18 @@ public partial class StatsManager : Node
     [Export] public int Fortune { get => _fortune; private set => _fortune = Mathf.Max(0, value); }        // FOR: +2% Crit Dmg, +1% Drop Rate
     [Export] public int HighestFloorReached { get; private set; } = 0;
 
+    // Progression
+    [ExportGroup("Run Progression")]
+    [Export] public int PowerLevel { get; private set; } = 1;
+    [Export] public int PowerExperience { get; private set; } = 0;
+    [Export] public int PowerExperienceToNextLevel { get; private set; } = 100;
+
     // Calculated stats (modified by upgrades)
-    public float MaxHealth { get; private set; } = 100.0f;
-    public float Health { get; private set; } = 100.0f;
-    public float Speed { get; private set; }
-    public float FireRate { get; private set; }
-    public float MeleeRate { get; private set; }
+    public float CurrentMaxHealth { get; private set; } = 100.0f;
+    public float CurrentHealth { get; private set; } = 100.0f;
+    public float CurrentSpeed { get; private set; }
+    public float CurrentFireRate { get; private set; }
+    public float CurrentMeleeRate { get; private set; }
 
     // Combat stats (cached from upgrades)
     public float DamageMultiplier { get; private set; } = 1.0f;
@@ -61,11 +69,6 @@ public partial class StatsManager : Node
     public float PickupRadius { get; private set; } = 80f;
     public float HealthRegenPerSecond { get; private set; } = 0f;
     public int ProjectilePierceCount { get; private set; } = 0;
-
-    // Progression
-    [Export] public int RunLevel { get; private set; } = 1;
-    [Export] public int Experience { get; private set; } = 0;
-    [Export] public int ExperienceToNextLevel { get; private set; } = 100;
 
     // Event for level up (Player will listen)
     [Signal] public delegate void LeveledUpEventHandler();
@@ -96,19 +99,20 @@ public partial class StatsManager : Node
             GD.PrintErr("StatsManager: Could not find Player parent!");
         }
 
-        MaxHealth = BaseMaxHealth;
-        Health = MaxHealth;
+        CurrentMaxHealth = BaseMaxHealth;
+        CurrentHealth = CurrentMaxHealth;
     }
 
     public override void _Process(double delta)
     {
-        if (Health < MaxHealth && HealthRegenPerSecond > 0)
+        if (CurrentHealth < CurrentMaxHealth && HealthRegenPerSecond > 0)
         {
-            Health += HealthRegenPerSecond * (float)delta;
-            if (Health > MaxHealth)
+            CurrentHealth += HealthRegenPerSecond * (float)delta;
+            if (CurrentHealth > CurrentMaxHealth)
             {
-                Health = MaxHealth;
+                CurrentHealth = CurrentMaxHealth;
             }
+
             EmitHealthUpdate();
         }
     }
@@ -124,49 +128,60 @@ public partial class StatsManager : Node
 
     public void TakeDamage(float damage)
     {
-        Health -= damage;
-        if (Health < 0)
+        CurrentHealth -= damage;
+        if (CurrentHealth < 0)
         {
-            Health = 0;
+            CurrentHealth = 0;
         }
 
         EmitHealthUpdate();
 
-        if (Health <= 0)
+        if (CurrentHealth <= 0)
         {
             Die();
         }
     }
 
-    public void AddExperience(int amount)
+    public void AddPowerExperience(int amount)
     {
-        Experience += amount;
+        PowerExperience += amount;
 
-        while (Experience >= ExperienceToNextLevel)
+        while (PowerExperience >= PowerExperienceToNextLevel)
         {
-            LevelUp();
+            PowerLevelUp();
         }
 
         EmitExperienceUpdate();
     }
 
+    public void AddCharacterExperience(int amount)
+    {
+        CharacterExperience += amount;
+
+        // Handle level ups (support multiple levels in one award)
+        while (CharacterExperience >= CharacterExperienceToNextLevel)
+        {
+            AddCharacterLevel(1);
+        }
+    }
+
     public void RecalculateStats(StatModifiers modifiers)
     {
         // Calculate health percentage BEFORE changing MaxHealth
-        float healthPercentage = MaxHealth > 0 ? Health / MaxHealth : 1f;
+        float healthPercentage = CurrentMaxHealth > 0 ? CurrentHealth / CurrentMaxHealth : 1f;
 
         // Apply upgrade bonuses to base values
-        Speed = (BaseSpeed + modifiers.BaseSpeedBonus) * (1 + modifiers.MovementSpeedBonus);
+        CurrentSpeed = (BaseSpeed + modifiers.BaseSpeedBonus) * (1 + modifiers.MovementSpeedBonus);
 
         // Attack speed: AGI bonus + upgrade bonuses
         float agiSpeedBonus = Agility * AGI_ATTACK_SPEED_PER_POINT;
         float totalAttackSpeedBonus = modifiers.AttackSpeedBonus + agiSpeedBonus;
-        FireRate = BaseFireRate * (1 - totalAttackSpeedBonus);
-        MeleeRate = BaseMeleeRate * (1 - totalAttackSpeedBonus);
+        CurrentFireRate = BaseFireRate * (1 - totalAttackSpeedBonus);
+        CurrentMeleeRate = BaseMeleeRate * (1 - totalAttackSpeedBonus);
 
         // Max Health: Base + Run level + Upgrades + Character stats (VIT + STR)
         float characterHealthBonus = (Vitality * VIT_HEALTH_PER_POINT) + (Strength * STR_HEALTH_PER_POINT);
-        MaxHealth = BaseMaxHealth + CalculateRunLevelHealthBonus() + modifiers.MaxHealthBonus + characterHealthBonus;
+        CurrentMaxHealth = BaseMaxHealth + CalculateRunLevelHealthBonus() + modifiers.MaxHealthBonus + characterHealthBonus;
 
         // Damage: Upgrades + Character stats (STR/INT)
         DamageMultiplier = 1.0f + modifiers.DamagePercentBonus;
@@ -186,10 +201,10 @@ public partial class StatsManager : Node
         ProjectilePierceCount = modifiers.ProjectilePierceBonus;
 
         // Maintain health percentage
-        Health = MaxHealth * healthPercentage;
-        if (Health > MaxHealth)
+        CurrentHealth = CurrentMaxHealth * healthPercentage;
+        if (CurrentHealth > CurrentMaxHealth)
         {
-            Health = MaxHealth;
+            CurrentHealth = CurrentMaxHealth;
         }
 
         EmitHealthUpdate();
@@ -242,10 +257,12 @@ public partial class StatsManager : Node
 
     public void AddCharacterLevel(int levels = 1)
     {
+        CharacterExperience -= CharacterExperienceToNextLevel;
         CharacterLevel += levels;
         UnallocatedStatPoints += levels;
 
         GD.Print($"Character leveled up to {CharacterLevel}! Gained {levels} stat point(s).");
+        CharacterExperienceToNextLevel = CalculateCharacterXPForNextLevel();
 
         EmitSignal(SignalName.CharacterLeveledUp);
     }
@@ -264,24 +281,34 @@ public partial class StatsManager : Node
         return (1.0f - (1.0f / (1.0f + Intelligence * INT_CDR_PER_POINT))) * 100f;
     }
 
+    private int CalculateCharacterXPForNextLevel()
+    {
+        // Exponential curve: each level requires ~10% more XP than previous
+        // Level 1→2: 500 XP
+        // Level 10→11: ~1,300 XP
+        // Level 50→51: ~58,000 XP
+        // Level 100: Total ~13.8 million XP (balanced for long-term play)
+        return (int)(500 * Mathf.Pow(1.1f, CharacterLevel - 1));
+    }
+
     private float CalculateRunLevelHealthBonus()
     {
         // +20 HP per level (Level 1 = 0 bonus, Level 2 = 20, Level 3 = 40, etc.)
-        return 20f * (RunLevel - 1);
+        return 20f * (PowerLevel - 1);
     }
 
-    private void LevelUp()
+    private void PowerLevelUp()
     {
-        Experience -= ExperienceToNextLevel;
-        RunLevel++;
-        ExperienceToNextLevel = (int)(ExperienceToNextLevel * 1.5);
+        PowerExperience -= PowerExperienceToNextLevel;
+        PowerLevel++;
+        PowerExperienceToNextLevel = (int)(PowerExperienceToNextLevel * 1.5);
 
         // Recalculate MaxHealth with new run level (UpgradeManager will call RecalculateStats, but update now for heal)
         float characterHealthBonus = (Vitality * 25f) + (Strength * 10f);
-        MaxHealth = BaseMaxHealth + CalculateRunLevelHealthBonus() + characterHealthBonus;
-        Health = MaxHealth;  // Full heal on level up
+        CurrentMaxHealth = BaseMaxHealth + CalculateRunLevelHealthBonus() + characterHealthBonus;
+        CurrentHealth = CurrentMaxHealth;  // Full heal on level up
 
-        GD.Print($"Run leveled up to {RunLevel}!");
+        GD.Print($"Run leveled up to {PowerLevel}!");
 
         EmitHealthUpdate();
         EmitExperienceUpdate();
@@ -308,11 +335,11 @@ public partial class StatsManager : Node
 
     private void EmitHealthUpdate()
     {
-        _player?.EmitSignal(Player.SignalName.HealthChanged, Health, MaxHealth);
+        _player?.EmitSignal(Player.SignalName.HealthChanged, CurrentHealth, CurrentMaxHealth);
     }
 
     private void EmitExperienceUpdate()
     {
-        _player?.EmitSignal(Player.SignalName.ExperienceChanged, Experience, ExperienceToNextLevel, RunLevel);
+        _player?.EmitSignal(Player.SignalName.ExperienceChanged, PowerExperience, PowerExperienceToNextLevel, PowerLevel);
     }
 }
