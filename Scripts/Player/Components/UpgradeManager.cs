@@ -71,7 +71,7 @@ public partial class UpgradeManager : Node
         return _activeUpgrades.GetValueOrDefault(type, 0f);
     }
 
-    private void RecalculateAllStats()
+    public void RecalculateAllStats()
     {
         if (_statsManager == null)
         {

@@ -38,11 +38,11 @@ public partial class StatsManager : Node
     [ExportGroup("Character Progression")]
     [Export] public int CharacterLevel { get; private set; } = 1;
     [Export] public int UnallocatedStatPoints { get; private set; } = 15;
-    [Export] public int Strength { get; private set; } = 0;       // STR: +3% Physical Dmg, +10 HP
-    [Export] public int Intelligence { get; private set; } = 0;   // INT: +3% Magical Dmg, +2% CDR
-    [Export] public int Agility { get; private set; } = 0;        // AGI: +2% Attack Speed, +1% Crit
-    [Export] public int Vitality { get; private set; } = 0;       // VIT: +25 HP, +0.5 HP/sec
-    [Export] public int Fortune { get; private set; } = 0;        // FOR: +2% Crit Dmg, +1% Drop Rate
+    [Export] public int Strength { get => _strength; private set => _strength = Mathf.Max(0, value); }       // STR: +3% Physical Dmg, +10 HP
+    [Export] public int Intelligence { get => _intelligence; private set => _intelligence = Mathf.Max(0, value); }   // INT: +3% Magical Dmg, +2% CDR
+    [Export] public int Agility { get => _agility; private set => _agility = Mathf.Max(0, value); }        // AGI: +2% Attack Speed, +1% Crit
+    [Export] public int Vitality { get => _vitality; private set => _vitality = Mathf.Max(0, value); }       // VIT: +25 HP, +0.5 HP/sec
+    [Export] public int Fortune { get => _fortune; private set => _fortune = Mathf.Max(0, value); }        // FOR: +2% Crit Dmg, +1% Drop Rate
     [Export] public int HighestFloorReached { get; private set; } = 0;
 
     // Calculated stats (modified by upgrades)
@@ -73,6 +73,19 @@ public partial class StatsManager : Node
     [Signal] public delegate void StatAllocatedEventHandler(int statType);
 
     private Player _player;
+    private int _strength = 0;
+    private int _intelligence = 0;
+    private int _agility = 0;
+    private int _vitality = 0;
+    private int _fortune = 0;
+    private const float STR_DAMAGE_PER_POINT = 0.03f;
+    private const float STR_HEALTH_PER_POINT = 10f;
+    private const float INT_DAMAGE_PER_POINT = 0.03f;
+    private const float AGI_ATTACK_SPEED_PER_POINT = 0.02f;
+    private const float AGI_CRIT_PER_POINT = 0.01f;
+    private const float VIT_HEALTH_PER_POINT = 25f;
+    private const float VIT_REGEN_PER_POINT = 0.5f;
+    private const float FOR_CRIT_DMG_PER_POINT = 0.02f;
 
     public override void _Ready()
     {
@@ -101,7 +114,6 @@ public partial class StatsManager : Node
 
     public void Initialize()
     {
-
         // Set initial stat values (no upgrades yet)
         RecalculateStats(new StatModifiers());
 
@@ -146,27 +158,27 @@ public partial class StatsManager : Node
         Speed = (BaseSpeed + modifiers.BaseSpeedBonus) * (1 + modifiers.MovementSpeedBonus);
 
         // Attack speed: AGI bonus + upgrade bonuses
-        float agiSpeedBonus = Agility * 0.02f;
+        float agiSpeedBonus = Agility * AGI_ATTACK_SPEED_PER_POINT;
         float totalAttackSpeedBonus = modifiers.AttackSpeedBonus + agiSpeedBonus;
         FireRate = BaseFireRate * (1 - totalAttackSpeedBonus);
         MeleeRate = BaseMeleeRate * (1 - totalAttackSpeedBonus);
 
         // Max Health: Base + Run level + Upgrades + Character stats (VIT + STR)
-        float characterHealthBonus = (Vitality * 25f) + (Strength * 10f);
+        float characterHealthBonus = (Vitality * VIT_HEALTH_PER_POINT) + (Strength * STR_HEALTH_PER_POINT);
         MaxHealth = BaseMaxHealth + CalculateRunLevelHealthBonus() + modifiers.MaxHealthBonus + characterHealthBonus;
 
         // Damage: Upgrades + Character stats (STR/INT)
         DamageMultiplier = 1.0f + modifiers.DamagePercentBonus;
-        PhysicalDamageMultiplier = 1.0f + (Strength * 0.03f);
-        MagicalDamageMultiplier = 1.0f + (Intelligence * 0.03f);
+        PhysicalDamageMultiplier = 1.0f + (Strength * STR_DAMAGE_PER_POINT);
+        MagicalDamageMultiplier = 1.0f + (Intelligence * INT_DAMAGE_PER_POINT);
 
         // Crit: Upgrades + Character stats (AGI + FOR)
-        float characterCritChance = Mathf.Min(Agility * 0.01f, 0.5f); // Cap at 50%
+        float characterCritChance = Mathf.Min(Agility * AGI_CRIT_PER_POINT, 0.5f); // Cap at 50%
         CritChance = Mathf.Clamp(modifiers.CritChanceBonus + characterCritChance, 0f, 1f);
-        CritDamageMultiplier = 1.5f + (Fortune * 0.02f); // Base 150% + FOR bonus
+        CritDamageMultiplier = 1.5f + (Fortune * FOR_CRIT_DMG_PER_POINT); // Base 150% + FOR bonus
 
         // Regen: Upgrades + Character stats (VIT)
-        float characterRegen = Vitality * 0.5f;
+        float characterRegen = Vitality * VIT_REGEN_PER_POINT;
         HealthRegenPerSecond = modifiers.HealthRegenBonus + characterRegen;
 
         PickupRadius = 80f + modifiers.PickupRadiusBonus;
@@ -246,6 +258,11 @@ public partial class StatsManager : Node
         }
     }
 
+    public float GetCooldownReduction()
+    {
+        return (1.0f - (1.0f / (1.0f + Intelligence * 0.02f))) * 100f;
+    }
+
     private float CalculateRunLevelHealthBonus()
     {
         // +20 HP per level (Level 1 = 0 bonus, Level 2 = 20, Level 3 = 40, etc.)
@@ -290,11 +307,11 @@ public partial class StatsManager : Node
 
     private void EmitHealthUpdate()
     {
-        _player.EmitSignal(Player.SignalName.HealthChanged, Health, MaxHealth);
+        _player?.EmitSignal(Player.SignalName.HealthChanged, Health, MaxHealth);
     }
 
     private void EmitExperienceUpdate()
     {
-        _player.EmitSignal(Player.SignalName.ExperienceChanged, Experience, ExperienceToNextLevel, RunLevel);
+        _player?.EmitSignal(Player.SignalName.ExperienceChanged, Experience, ExperienceToNextLevel, RunLevel);
     }
 }

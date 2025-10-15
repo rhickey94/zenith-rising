@@ -83,8 +83,9 @@ public partial class WhirlwindEffect : SkillEffect
                 if (distance < _radius)
                 {
                     float healthBefore = enemy.Health;
-                    enemy.TakeDamage(CalculateDamage(_damage));
-                    GD.Print($"Whirlwind hit enemy for {CalculateDamage(_damage)} damage");
+                    float damage = CalculateDamage(_damage);
+                    enemy.TakeDamage(damage);
+                    GD.Print($"Whirlwind hit enemy for {damage} damage");
                     hitCount++;
 
                     // Track kill if enemy died

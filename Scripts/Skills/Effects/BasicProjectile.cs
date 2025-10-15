@@ -76,8 +76,9 @@ public partial class BasicProjectile : CollisionSkillEffect
         if (body is Enemy enemy)
         {
             float healthBefore = enemy.Health;
-            enemy.TakeDamage(CalculateDamage(_totalDamage));
-            GD.Print($"Basic projectile hit enemy for {CalculateDamage(_totalDamage)} damage");
+            float damage = CalculateDamage(_totalDamage);
+            enemy.TakeDamage(damage);
+            GD.Print($"Basic projectile hit enemy for {damage} damage");
 
             // Track kill if enemy died
             if (healthBefore > 0 && enemy.Health <= 0)

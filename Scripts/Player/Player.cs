@@ -16,6 +16,7 @@ public partial class Player : CharacterBody2D
 
     // UI Dependencies
     [Export] public LevelUpPanel LevelUpPanel;
+    [Export] public StatAllocationPanel StatAllocationPanel;
 
     // Signals for HUD updates
     [Signal] public delegate void HealthChangedEventHandler(float currentHealth, float maxHealth);
@@ -80,6 +81,12 @@ public partial class Player : CharacterBody2D
     public override void _UnhandledInput(InputEvent @event)
     {
         _skillManager?.HandleInput(@event);
+
+        // Open stat allocation panel with 'C' key
+        if (@event.IsActionPressed("open_stats"))
+        {
+            StatAllocationPanel?.ShowPanel(_statsManager, _upgradeManager);
+        }
     }
 
     public override void _PhysicsProcess(double delta)
@@ -87,7 +94,14 @@ public partial class Player : CharacterBody2D
         Vector2 direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
 
         // Read speed from StatsManager
-        Velocity = direction * _statsManager.Speed;
+        if (_statsManager != null)
+        {
+            Velocity = direction * _statsManager.Speed;
+        }
+        else
+        {
+            Velocity = direction * 100; // Default speed if StatsManager missing
+        }
 
         if (direction != Vector2.Zero)
         {

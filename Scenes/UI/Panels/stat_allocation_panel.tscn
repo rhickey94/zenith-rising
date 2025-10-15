@@ -1,0 +1,208 @@
+[gd_scene load_steps=2 format=3 uid="uid://cggfbynyfbjc"]
+
+[ext_resource type="Script" uid="uid://b6imayemljkfh" path="res://Scripts/UI/Panels/StatAllocationPanel.cs" id="1_33ei4"]
+
+[node name="StatAllocationPanel" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_33ei4")
+
+[node name="Background" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.7254902)
+
+[node name="CenterPanel" type="Panel" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(500, 600)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -300.0
+offset_right = 250.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Content" type="VBoxContainer" parent="CenterPanel"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -117.5
+offset_top = -212.5
+offset_right = 117.5
+offset_bottom = 212.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="CenterPanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Allocate Stat Points"
+horizontal_alignment = 1
+
+[node name="UnallocatedLabel" type="Label" parent="CenterPanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Unallocated Points: 15"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterPanel/Content"]
+layout_mode = 2
+
+[node name="StatRow_Strength" type="HBoxContainer" parent="CenterPanel/Content"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterPanel/Content/StatRow_Strength"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StrengthValueLabel" type="Label" parent="CenterPanel/Content/StatRow_Strength/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Strength (STR): 0"
+
+[node name="StrengthBonusLabel" type="Label" parent="CenterPanel/Content/StatRow_Strength/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "Physical Damage +0%, HP +0"
+
+[node name="StrengthButton" type="Button" parent="CenterPanel/Content/StatRow_Strength"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+text = "+"
+
+[node name="StatRow_Intelligence" type="HBoxContainer" parent="CenterPanel/Content"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterPanel/Content/StatRow_Intelligence"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="IntelligenceValueLabel" type="Label" parent="CenterPanel/Content/StatRow_Intelligence/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Intelligence (INT): 0"
+
+[node name="IntelligenceBonusLabel" type="Label" parent="CenterPanel/Content/StatRow_Intelligence/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "Magic Damage +0%, CDR +0%"
+
+[node name="IntelligenceButton" type="Button" parent="CenterPanel/Content/StatRow_Intelligence"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+text = "+"
+
+[node name="StatRow_Agility" type="HBoxContainer" parent="CenterPanel/Content"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterPanel/Content/StatRow_Agility"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AgilityValueLabel" type="Label" parent="CenterPanel/Content/StatRow_Agility/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Agility (AGI): 0"
+
+[node name="AgilityBonusLabel" type="Label" parent="CenterPanel/Content/StatRow_Agility/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "Attack Speed +0%, Crit +0%"
+
+[node name="AgilityButton" type="Button" parent="CenterPanel/Content/StatRow_Agility"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+text = "+"
+
+[node name="StatRow_Vitality" type="HBoxContainer" parent="CenterPanel/Content"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterPanel/Content/StatRow_Vitality"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VitalityValueLabel" type="Label" parent="CenterPanel/Content/StatRow_Vitality/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Vitality (VIT): 0"
+
+[node name="VitalityBonusLabel" type="Label" parent="CenterPanel/Content/StatRow_Vitality/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "HP +0, Regen +0/sec"
+
+[node name="VitalityButton" type="Button" parent="CenterPanel/Content/StatRow_Vitality"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+text = "+"
+
+[node name="StatRow_Fortune" type="HBoxContainer" parent="CenterPanel/Content"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterPanel/Content/StatRow_Fortune"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FortuneValueLabel" type="Label" parent="CenterPanel/Content/StatRow_Fortune/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Frotune (FOR): 0"
+
+[node name="FortuneBonusLabel" type="Label" parent="CenterPanel/Content/StatRow_Fortune/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "Crit Damage +0%, Drop Rate +0%"
+
+[node name="FortuneButton" type="Button" parent="CenterPanel/Content/StatRow_Fortune"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+text = "+"
+
+[node name="HSeparator2" type="HSeparator" parent="CenterPanel/Content"]
+layout_mode = 2
+
+[node name="CloseButton" type="Button" parent="CenterPanel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Close"

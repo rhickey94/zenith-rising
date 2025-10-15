@@ -73,8 +73,9 @@ public partial class MeleeAttackEffect : CollisionSkillEffect
         if (body is Enemy enemy && !_hitEnemies.Contains(enemy))
         {
             float healthBefore = enemy.Health;
-            enemy.TakeDamage(CalculateDamage(_damage));
-            GD.Print($"Melee attack hit enemy for {CalculateDamage(_damage)} damage");
+            float damage = CalculateDamage(_damage);
+            enemy.TakeDamage(damage);
+            GD.Print($"Melee attack hit enemy for {damage} damage");
             _hitEnemies.Add(enemy);
 
             // Track kill if enemy died
