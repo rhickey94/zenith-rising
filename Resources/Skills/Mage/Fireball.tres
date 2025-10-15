@@ -5,6 +5,10 @@
 
 [resource]
 script = ExtResource("2_dich7")
+SkillName = "Fireball"
+Description = "Hurls a ball of fire that explodes at the target"
+Cooldown = 1.0
+DamageType = 1
 AllowedClass = 1
 Slot = 2
 SkillEffectScene = ExtResource("1_dich7")

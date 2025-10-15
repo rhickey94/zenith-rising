@@ -1,4 +1,3 @@
-using System;
 using Godot;
 using SpaceTower.Scripts.Core;
 
@@ -17,6 +16,15 @@ public struct StatModifiers
     public int ProjectilePierceBonus;
 }
 
+public enum StatType
+{
+    Strength,
+    Intelligence,
+    Agility,
+    Vitality,
+    Fortune
+}
+
 [GlobalClass]
 public partial class StatsManager : Node
 {
@@ -25,12 +33,17 @@ public partial class StatsManager : Node
     [Export] public float BaseSpeed { get; set; } = 300.0f;
     [Export] public float BaseFireRate { get; set; } = 0.2f;
     [Export] public float BaseMeleeRate { get; set; } = 0.5f;
-    [Export] public int BaseStrength { get; set; } = 0;
-    [Export] public int BaseVitality { get; set; } = 0;
-    [Export] public int BaseAgility { get; set; } = 0;
-    [Export] public int BaseResilience { get; set; } = 0;
-    [Export] public int BaseFortune { get; set; } = 0;
-    [Export] public int UnallocatedStatPoints { get; set; } = 0;
+
+    // ===== PERMANENT CHARACTER PROGRESSION (save these) =====
+    [ExportGroup("Character Progression")]
+    [Export] public int CharacterLevel { get; private set; } = 1;
+    [Export] public int UnallocatedStatPoints { get; private set; } = 15;
+    [Export] public int Strength { get; private set; } = 0;       // STR: +3% Physical Dmg, +10 HP
+    [Export] public int Intelligence { get; private set; } = 0;   // INT: +3% Magical Dmg, +2% CDR
+    [Export] public int Agility { get; private set; } = 0;        // AGI: +2% Attack Speed, +1% Crit
+    [Export] public int Vitality { get; private set; } = 0;       // VIT: +25 HP, +0.5 HP/sec
+    [Export] public int Fortune { get; private set; } = 0;        // FOR: +2% Crit Dmg, +1% Drop Rate
+    [Export] public int HighestFloorReached { get; private set; } = 0;
 
     // Calculated stats (modified by upgrades)
     public float MaxHealth { get; private set; } = 100.0f;
@@ -39,27 +52,25 @@ public partial class StatsManager : Node
     public float FireRate { get; private set; }
     public float MeleeRate { get; private set; }
 
-    // Derived stat calculations from character stats
-    public float GetStrengthDamageMultiplier() => 1.0f + (BaseStrength * 0.03f);
-    public float GetVitalityHealthBonus() => BaseVitality * 25f;
-    public float GetAgilityCooldownMultiplier() => 1.0f / (1.0f + BaseAgility * 0.02f);
-    public float GetResilienceDamageReduction() => Mathf.Min(BaseResilience * 0.01f, 0.5f); // Capped at 50%
-    public float GetFortuneCritChance() => Mathf.Min(BaseFortune * 0.02f, 0.5f); // Capped at 50%
-
     // Combat stats (cached from upgrades)
     public float DamageMultiplier { get; private set; } = 1.0f;
+    public float PhysicalDamageMultiplier { get; private set; } = 1.0f;
+    public float MagicalDamageMultiplier { get; private set; } = 1.0f;
+    public float CritDamageMultiplier { get; private set; } = 1.5f;
     public float CritChance { get; private set; } = 0f;
     public float PickupRadius { get; private set; } = 80f;
     public float HealthRegenPerSecond { get; private set; } = 0f;
     public int ProjectilePierceCount { get; private set; } = 0;
 
     // Progression
-    [Export] public int Level { get; private set; } = 1;
+    [Export] public int RunLevel { get; private set; } = 1;
     [Export] public int Experience { get; private set; } = 0;
     [Export] public int ExperienceToNextLevel { get; private set; } = 100;
 
     // Event for level up (Player will listen)
-    public event Action LeveledUp;
+    [Signal] public delegate void LeveledUpEventHandler();
+    [Signal] public delegate void CharacterLeveledUpEventHandler();
+    [Signal] public delegate void StatAllocatedEventHandler(int statType);
 
     private Player _player;
 
@@ -133,19 +144,36 @@ public partial class StatsManager : Node
 
         // Apply upgrade bonuses to base values
         Speed = (BaseSpeed + modifiers.BaseSpeedBonus) * (1 + modifiers.MovementSpeedBonus);
-        FireRate = BaseFireRate * (1 - modifiers.AttackSpeedBonus);
-        MeleeRate = BaseMeleeRate * (1 - modifiers.AttackSpeedBonus);
-        MaxHealth = BaseMaxHealth + modifiers.MaxHealthBonus + CalculateLevelHealthBonus() + GetVitalityHealthBonus();
+
+        // Attack speed: AGI bonus + upgrade bonuses
+        float agiSpeedBonus = Agility * 0.02f;
+        float totalAttackSpeedBonus = modifiers.AttackSpeedBonus + agiSpeedBonus;
+        FireRate = BaseFireRate * (1 - totalAttackSpeedBonus);
+        MeleeRate = BaseMeleeRate * (1 - totalAttackSpeedBonus);
+
+        // Max Health: Base + Run level + Upgrades + Character stats (VIT + STR)
+        float characterHealthBonus = (Vitality * 25f) + (Strength * 10f);
+        MaxHealth = BaseMaxHealth + CalculateRunLevelHealthBonus() + modifiers.MaxHealthBonus + characterHealthBonus;
+
+        // Damage: Upgrades + Character stats (STR/INT)
         DamageMultiplier = 1.0f + modifiers.DamagePercentBonus;
-        CritChance = Mathf.Clamp(modifiers.CritChanceBonus, 0f, 1f);
+        PhysicalDamageMultiplier = 1.0f + (Strength * 0.03f);
+        MagicalDamageMultiplier = 1.0f + (Intelligence * 0.03f);
+
+        // Crit: Upgrades + Character stats (AGI + FOR)
+        float characterCritChance = Mathf.Min(Agility * 0.01f, 0.5f); // Cap at 50%
+        CritChance = Mathf.Clamp(modifiers.CritChanceBonus + characterCritChance, 0f, 1f);
+        CritDamageMultiplier = 1.5f + (Fortune * 0.02f); // Base 150% + FOR bonus
+
+        // Regen: Upgrades + Character stats (VIT)
+        float characterRegen = Vitality * 0.5f;
+        HealthRegenPerSecond = modifiers.HealthRegenBonus + characterRegen;
+
         PickupRadius = 80f + modifiers.PickupRadiusBonus;
-        HealthRegenPerSecond = modifiers.HealthRegenBonus;
         ProjectilePierceCount = modifiers.ProjectilePierceBonus;
 
         // Maintain health percentage
         Health = MaxHealth * healthPercentage;
-
-        // Ensure we don't exceed max (safety check)
         if (Health > MaxHealth)
         {
             Health = MaxHealth;
@@ -154,29 +182,93 @@ public partial class StatsManager : Node
         EmitHealthUpdate();
     }
 
-    private float CalculateLevelHealthBonus()
+    public bool CanAllocateStat()
+    {
+        return UnallocatedStatPoints > 0;
+    }
+
+    public void AllocateStat(StatType statType, int amount = 1)
+    {
+        if (!CanAllocateStat())
+        {
+            GD.PrintErr("StatsManager: No unallocated stat points!");
+            return;
+        }
+
+        if (amount > UnallocatedStatPoints)
+        {
+            GD.PrintErr($"StatsManager: Trying to allocate {amount} points but only {UnallocatedStatPoints} available!");
+            return;
+        }
+
+        switch (statType)
+        {
+            case StatType.Strength:
+                Strength += amount;
+                break;
+            case StatType.Intelligence:
+                Intelligence += amount;
+                break;
+            case StatType.Agility:
+                Agility += amount;
+                break;
+            case StatType.Vitality:
+                Vitality += amount;
+                break;
+            case StatType.Fortune:
+                Fortune += amount;
+                break;
+        }
+
+        UnallocatedStatPoints -= amount;
+
+        GD.Print($"Allocated {amount} point(s) to {statType}. {UnallocatedStatPoints} points remaining.");
+
+        EmitSignal(SignalName.StatAllocated, (int)statType);
+    }
+
+    public void AddCharacterLevel(int levels = 1)
+    {
+        CharacterLevel += levels;
+        UnallocatedStatPoints += levels;
+
+        GD.Print($"Character leveled up to {CharacterLevel}! Gained {levels} stat point(s).");
+
+        EmitSignal(SignalName.CharacterLeveledUp);
+    }
+
+    public void UpdateHighestFloor(int floor)
+    {
+        if (floor > HighestFloorReached)
+        {
+            HighestFloorReached = floor;
+            GD.Print($"New highest floor reached: {HighestFloorReached}");
+        }
+    }
+
+    private float CalculateRunLevelHealthBonus()
     {
         // +20 HP per level (Level 1 = 0 bonus, Level 2 = 20, Level 3 = 40, etc.)
-        return 20f * (Level - 1);
+        return 20f * (RunLevel - 1);
     }
 
     private void LevelUp()
     {
         Experience -= ExperienceToNextLevel;
-        Level++;
+        RunLevel++;
         ExperienceToNextLevel = (int)(ExperienceToNextLevel * 1.5);
 
-        // Update MaxHealth immediately with level bonus (upgrade bonuses added when RecalculateStats is called)
-        MaxHealth = BaseMaxHealth + CalculateLevelHealthBonus() + GetVitalityHealthBonus();
+        // Recalculate MaxHealth with new run level (UpgradeManager will call RecalculateStats, but update now for heal)
+        float characterHealthBonus = (Vitality * 25f) + (Strength * 10f);
+        MaxHealth = BaseMaxHealth + CalculateRunLevelHealthBonus() + characterHealthBonus;
         Health = MaxHealth;  // Full heal on level up
 
-        GD.Print($"Leveled up to {Level}!");
+        GD.Print($"Run leveled up to {RunLevel}!");
 
         EmitHealthUpdate();
         EmitExperienceUpdate();
 
-        // Notify Player that level up occurred (this will trigger upgrade panel)
-        LeveledUp?.Invoke();
+        EmitSignal(SignalName.LeveledUp);
     }
 
     private void Die()
@@ -203,6 +295,6 @@ public partial class StatsManager : Node
 
     private void EmitExperienceUpdate()
     {
-        _player.EmitSignal(Player.SignalName.ExperienceChanged, Experience, ExperienceToNextLevel, Level);
+        _player.EmitSignal(Player.SignalName.ExperienceChanged, Experience, ExperienceToNextLevel, RunLevel);
     }
 }

@@ -1,6 +1,8 @@
 using Godot;
+using SpaceTower.Scripts.Core;
 using SpaceTower.Scripts.Enemies.Base;
 using SpaceTower.Scripts.PlayerScripts;
+using SpaceTower.Scripts.PlayerScripts.Components;
 using SpaceTower.Scripts.Skills.Base;
 
 namespace SpaceTower.Scripts.Skills.Effects;
@@ -13,6 +15,7 @@ public abstract partial class SkillEffect : Node2D
 {
     protected Skill _sourceSkill;
     protected Player _caster;
+    protected StatsManager _statsManager;
     protected Vector2 _direction;
 
     /// <summary>
@@ -27,6 +30,24 @@ public abstract partial class SkillEffect : Node2D
         _sourceSkill = sourceSkill;
         _caster = caster;
         _direction = direction;
+
+        _statsManager = _caster.GetNode<StatsManager>("StatsManager");
+        if (_statsManager == null)
+        {
+            GD.PrintErr("SkillEffect.Initialize: Could not find StatsManager on caster!");
+        }
+    }
+
+    // Helper method for standardized damage calculation
+    protected float CalculateDamage(float baseDamage, bool forceCrit = false)
+    {
+        if (_sourceSkill == null || _statsManager == null)
+        {
+            GD.PrintErr($"{GetType().Name}: Cannot calculate damage - missing skill or stats!");
+            return baseDamage;
+        }
+
+        return CombatSystem.CalculateDamage(baseDamage, _statsManager, _sourceSkill.DamageType, forceCrit);
     }
 
     /// <summary>

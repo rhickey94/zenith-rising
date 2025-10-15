@@ -32,8 +32,7 @@ public partial class BasicProjectile : CollisionSkillEffect
         _totalDamage = BaseDamage;
 
         // Apply upgrade bonuses
-        var stats = caster.GetNode<StatsManager>("StatsManager");
-        _maxPierce = stats.ProjectilePierceCount;
+        _maxPierce = _statsManager.ProjectilePierceCount;
 
         // Apply mastery bonuses
         ApplyMasteryBonuses();
@@ -77,7 +76,8 @@ public partial class BasicProjectile : CollisionSkillEffect
         if (body is Enemy enemy)
         {
             float healthBefore = enemy.Health;
-            enemy.TakeDamage(CombatSystem.CalculateDamage(_totalDamage, _caster));
+            enemy.TakeDamage(CalculateDamage(_totalDamage));
+            GD.Print($"Basic projectile hit enemy for {CalculateDamage(_totalDamage)} damage");
 
             // Track kill if enemy died
             if (healthBefore > 0 && enemy.Health <= 0)

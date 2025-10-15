@@ -4,28 +4,53 @@ using SpaceTower.Scripts.PlayerScripts.Components;
 
 namespace SpaceTower.Scripts.Core;
 
+public enum DamageType
+{
+    Physical,
+    Magical
+}
+
 public static class CombatSystem
 {
-    public static float CalculateDamage(float baseDamage, Player player)
+    public static float CalculateDamage(
+      float baseDamage,
+      StatsManager attackerStats,
+      DamageType damageType,  // NEW parameter
+      bool forceCrit = false)
     {
-        if (player == null)
+        if (attackerStats == null)
         {
-            GD.PrintErr("Game: Player not assigned!");
+            GD.PrintErr("CombatSystem.CalculateDamage: attackerStats is null!");
+            return baseDamage;
         }
 
-        var stats = player.GetNode<StatsManager>("StatsManager");
+        // Apply damage type multiplier (Physical = STR, Magical = INT)
+        float damageTypeMultiplier = damageType == DamageType.Physical
+            ? attackerStats.PhysicalDamageMultiplier
+            : attackerStats.MagicalDamageMultiplier;
 
-        if (stats == null)
+        // Apply general damage multiplier (from upgrades)
+        float damage = baseDamage * attackerStats.DamageMultiplier * damageTypeMultiplier;
+
+        // Crit calculation (now uses Fortune stat for crit damage)
+        bool isCrit = forceCrit || (GD.Randf() < attackerStats.CritChance);
+        if (isCrit)
         {
-            GD.PrintErr("CombatSystem: Player StatsManager not found!");
-            return baseDamage; // Fallback to base damage
+            damage *= attackerStats.CritDamageMultiplier;
+            GD.Print($"CRIT! Damage: {damage:F1} (Multiplier: {attackerStats.CritDamageMultiplier:F2}x)");
         }
 
-        float damage = baseDamage * stats.DamageMultiplier;
-        if (GD.Randf() <= stats.CritChance)
-        {
-            damage *= 2.0f; // Critical hits deal double damage
-        }
         return damage;
+    }
+
+    // Helper methods for convenience
+    public static float CalculatePhysicalDamage(float baseDamage, StatsManager attackerStats, bool forceCrit = false)
+    {
+        return CalculateDamage(baseDamage, attackerStats, DamageType.Physical, forceCrit);
+    }
+
+    public static float CalculateMagicalDamage(float baseDamage, StatsManager attackerStats, bool forceCrit = false)
+    {
+        return CalculateDamage(baseDamage, attackerStats, DamageType.Magical, forceCrit);
     }
 }

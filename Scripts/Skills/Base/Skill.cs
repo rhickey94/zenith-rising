@@ -1,4 +1,5 @@
 using Godot;
+using SpaceTower.Scripts.Core;
 using SpaceTower.Scripts.PlayerScripts;
 using SpaceTower.Scripts.Skills.Executors;
 
@@ -11,6 +12,7 @@ public partial class Skill : Resource
     [Export] public string Description { get; set; }
     [Export] public SkillType Type { get; set; }
     [Export] public float Cooldown { get; set; } = 0f; // For active skills
+    [Export] public DamageType DamageType { get; set; } = DamageType.Physical;
 
     [Export] public PlayerClass AllowedClass { get; set; }
     [Export] public SkillSlot Slot { get; set; }

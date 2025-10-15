@@ -93,7 +93,8 @@ public partial class FireballProjectile : CollisionSkillEffect
         {
             // Deal direct hit damage
             float healthBefore = enemy.Health;
-            enemy.TakeDamage(CombatSystem.CalculateDamage(_directDamage, _caster));
+            enemy.TakeDamage(CalculateDamage(_directDamage));
+            GD.Print($"Fireball hit enemy for {CalculateDamage(_directDamage)} damage");
 
             // Track kill if enemy died from direct hit
             if (healthBefore > 0 && enemy.Health <= 0)
@@ -137,7 +138,8 @@ public partial class FireballProjectile : CollisionSkillEffect
                 if (distance <= _explosionRadius)
                 {
                     float healthBefore = enemy.Health;
-                    enemy.TakeDamage(CombatSystem.CalculateDamage(_explosionDamage, _caster));
+                    enemy.TakeDamage(CalculateDamage(_explosionDamage));
+                    GD.Print($"Explosion hit enemy for {CalculateDamage(_explosionDamage)} damage");
                     hitCount++;
 
                     // Track kill if enemy died from explosion

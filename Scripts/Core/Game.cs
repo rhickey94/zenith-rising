@@ -93,7 +93,7 @@ public partial class Game : Node
     public void OnPlayerDeath()
     {
         var deathScreen = _deathScreen as DeathScreen;
-        int playerLevel = Player?.GetNode<StatsManager>("StatsManager")?.Level ?? 1;
+        int playerLevel = Player?.GetNode<StatsManager>("StatsManager")?.RunLevel ?? 1;
         deathScreen?.ShowScreen(_totalGameTime, _enemiesKilled, playerLevel, _currentFloor);
     }
 
@@ -242,7 +242,7 @@ public partial class Game : Node
     private void ShowVictoryScreen()
     {
         var victoryScreen = _victoryScreen as VictoryScreen;
-        var playerLevel = Player?.GetNode<StatsManager>("StatsManager")?.Level ?? 1;
+        var playerLevel = Player?.GetNode<StatsManager>("StatsManager")?.RunLevel ?? 1;
 
         victoryScreen?.ShowScreen(_totalGameTime, _enemiesKilled, playerLevel, _currentFloor);
         GD.Print("Victory! Player has completed all floors.");

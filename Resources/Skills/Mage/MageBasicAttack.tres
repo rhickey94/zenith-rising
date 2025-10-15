@@ -5,5 +5,8 @@
 
 [resource]
 script = ExtResource("1_r07p1")
+SkillName = "Magic Bolt"
+Description = "Fires a basic bolt of magic"
+DamageType = 1
 AllowedClass = 1
 SkillEffectScene = ExtResource("1_gbvqq")

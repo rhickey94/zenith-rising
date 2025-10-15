@@ -5,6 +5,8 @@
 
 [resource]
 script = ExtResource("2_72mrr")
+SkillName = "Whirlwind"
+Description = "Deals damage in an area around the player"
 Slot = 2
 SkillEffectScene = ExtResource("1_72mrr")
 metadata/_custom_type_script = "uid://dff1q4v5i7rpk"

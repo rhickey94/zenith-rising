@@ -5,4 +5,6 @@
 
 [resource]
 script = ExtResource("2_ejf0k")
+SkillName = "Fusion Cutter"
+Description = "Basic melee attack"
 SkillEffectScene = ExtResource("1_ejf0k")
