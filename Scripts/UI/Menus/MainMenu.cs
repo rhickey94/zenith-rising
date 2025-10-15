@@ -1,20 +1,30 @@
+using System.Collections.Generic;
 using Godot;
+using SpaceTower.Scripts.Core;
 
 namespace SpaceTower.Scripts.UI.Menus;
 
 public partial class MainMenu : Control
 {
-    // UI References
+    // ===== CONSTANTS =====
+    private const float HoverScaleAmount = 1.05f;
+    private const float HoverAnimationDuration = 0.15f;
+
+    // ===== EXPORT FIELDS =====
+    [Export] public string GameScenePath = "res://Scenes/Core/game.tscn";
+    [Export] public string HubScenePath = "res://Scenes/Core/hub.tscn"; // For Phase 2
+
+    // ===== PRIVATE FIELDS - UI References =====
     private Button _startButton;
     private Button _continueButton;
     private Button _settingsButton;
     private Button _quitButton;
     private Label _progressLabel;
 
-    // Scenes to load
-    [Export] public string GameScenePath = "res://Scenes/Core/game.tscn";
-    [Export] public string HubScenePath = "res://Scenes/Core/hub.tscn"; // For Phase 2
+    // ===== PRIVATE FIELDS - State =====
+    private readonly Dictionary<Button, Tween> _activeHoverTweens = new();
 
+    // ===== LIFECYCLE METHODS =====
     public override void _Ready()
     {
         // Get node references
@@ -43,47 +53,50 @@ public partial class MainMenu : Control
         SetupButtonHoverEffect(_quitButton);
     }
 
+    // ===== PRIVATE HELPERS - Save System =====
     private void CheckForSaveFile()
     {
-        // TODO: Phase 2 - Check for actual save file
-        // For now, hide Continue button
-        _continueButton.Visible = false;
+        bool saveExists = SaveManager.Instance?.SaveExists() ?? false;
+        _continueButton.Visible = saveExists;
 
-        // Example of how to check for save in Phase 2:
-        // bool saveExists = FileAccess.FileExists("user://save_game.json");
-        // _continueButton.Visible = saveExists;
+        GD.Print($"Save file exists: {saveExists}");
     }
-
     private void UpdateProgressDisplay()
     {
-        // TODO: Phase 2 - Load actual progress from save file
-        // For now, show placeholder
-        _progressLabel.Text = "Floor 1 | 0 Runs";
+        if (SaveManager.Instance == null || !SaveManager.Instance.SaveExists())
+        {
+            _progressLabel.Text = "No Save Data";
+            return;
+        }
 
-        // Example Phase 2 implementation:
-        // var saveData = LoadSaveData();
-        // _progressLabel.Text = $"Floor {saveData.HighestFloor} | {saveData.TotalRuns} Runs";
+        SaveData? saveData = SaveManager.Instance.LoadGame();
+        if (saveData.HasValue)
+        {
+            var data = saveData.Value;
+            _progressLabel.Text = $"Level {data.CharacterLevel} | Floor {data.HighestFloorReached}";
+        }
+        else
+        {
+            _progressLabel.Text = "Save Load Error";
+        }
     }
 
+    // ===== BUTTON HANDLERS =====
     private void OnStartPressed()
     {
         GD.Print("Starting new game...");
 
-        // Phase 1: Load directly into game
-        GetTree().ChangeSceneToFile(GameScenePath);
+        // Delete existing save for fresh start
+        SaveManager.Instance?.DeleteSave();
 
-        // Phase 2: Load into hub instead
-        // GetTree().ChangeSceneToFile(HubScenePath);
+        GetTree().ChangeSceneToFile(GameScenePath);
     }
 
     private void OnContinuePressed()
     {
         GD.Print("Continuing saved game...");
 
-        // TODO: Phase 2 - Load save data before transitioning
-        // var saveData = LoadSaveData();
-        // ApplySaveData(saveData);
-
+        // Load will happen in Game._Ready() via Player.Initialize()
         GetTree().ChangeSceneToFile(GameScenePath);
     }
 
@@ -123,18 +136,26 @@ public partial class MainMenu : Control
 
     private void OnButtonHover(Button button, bool isHovering)
     {
+        // Kill existing tween to prevent memory leak
+        if (_activeHoverTweens.TryGetValue(button, out var oldTween))
+        {
+            oldTween?.Kill();
+        }
+
         // Create smooth scale animation
         var tween = CreateTween();
+        _activeHoverTweens[button] = tween;
+
         tween.SetEase(Tween.EaseType.Out);
         tween.SetTrans(Tween.TransitionType.Cubic);
 
         if (isHovering)
         {
-            tween.TweenProperty(button, "scale", new Vector2(1.05f, 1.05f), 0.15);
+            tween.TweenProperty(button, "scale", new Vector2(HoverScaleAmount, HoverScaleAmount), HoverAnimationDuration);
         }
         else
         {
-            tween.TweenProperty(button, "scale", Vector2.One, 0.15);
+            tween.TweenProperty(button, "scale", Vector2.One, HoverAnimationDuration);
         }
     }
 }

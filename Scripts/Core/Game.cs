@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 using SpaceTower.Scripts.Enemies.Base;
 using SpaceTower.Scripts.PlayerScripts;
@@ -9,11 +10,21 @@ namespace SpaceTower.Scripts.Core;
 
 public partial class Game : Node
 {
-    // Scenes
-    [Export] public PackedScene[] EnemyScenes;
-    [Export] public PackedScene BossScene; // NEW: Boss enemy scene
+    // ===== CONSTANTS =====
+    private const float WaveDuration = 30f;
+    private const int WavesPerFloor = 10;
+    private const int MaxFloors = 5;
+    private const float InitialSpawnInterval = 2.0f;
+    private const float FinalSpawnInterval = 0.8f;
+    private const float HealthPerWave = 0.10f;
+    private const float DamagePerWave = 0.05f;
+    private const float StatsPerFloor = 0.50f;
 
-    // Dependencies
+    // ===== EXPORT FIELDS - Scenes =====
+    [Export] public PackedScene[] EnemyScenes;
+    [Export] public PackedScene BossScene;
+
+    // ===== EXPORT FIELDS - Dependencies =====
     [Export] public Player Player;
     [Export] public Hud HUD;
     [Export] public FloorTransitionPanel FloorTransitionPanel;
@@ -21,41 +32,31 @@ public partial class Game : Node
     [Export] private DeathScreen _deathScreen;
     [Export] private ResultsScreen _resultsScreen;
 
+    // ===== EXPORT FIELDS - Settings =====
     [Export] public string MainMenuScenePath = "res://Scenes/UI/Menus/main_menu.tscn";
-
-    // Settings
     [Export] public float SpawnDistance = 400.0f;
+    [Export] public float FloorDuration = 30f;
 
-    // Wave/Floor Constants
-    [Export] public float FloorDuration = 30f; // 5 minutes per floor
-    private const float WaveDuration = 30f;   // 30 seconds per wave
-    private const int WavesPerFloor = 10;
-    private const int MaxFloors = 5;
-
-    // Spawn rate progression (2.0s → 0.8s over 10 waves)
-    private const float InitialSpawnInterval = 2.0f;
-    private const float FinalSpawnInterval = 0.8f;
-
-    // Scaling constants
-    private const float HealthPerWave = 0.10f;    // +10% HP per wave
-    private const float DamagePerWave = 0.05f;    // +5% damage per wave
-    private const float StatsPerFloor = 0.50f;    // +50% per floor
-
-    // State tracking
+    // ===== PRIVATE STATE - Floor/Wave Tracking =====
     private int _currentFloor = 1;
-    private int _floorsCleared = 0;
     private int _currentWave = 1;
     private float _floorTimeElapsed = 0f;
     private float _timeSinceLastSpawn = 0f;
     private bool _bossSpawned = false;
+
+    // ===== PRIVATE STATE - Enemy Tracking =====
     private int _enemyCount = 0;
     private bool _waitingForBossDefeat = false;
-    private float _totalGameTime = 0f;
-    private int _enemiesKilled = 0;
+
+    // ===== PRIVATE STATE - Run Stats =====
+    private int _floorsCleared = 0;
     private int _bossesKilled = 0;
+    private int _enemiesKilled = 0;
+    private float _totalGameTime = 0f;
     private bool _finalBossDefeated = false;
     private int _lastCharacterXPAwarded = 0;
 
+    // ===== LIFECYCLE METHODS =====
     public override void _Ready()
     {
         // Validate dependencies
@@ -98,9 +99,10 @@ public partial class Game : Node
         }
     }
 
+    // ===== PUBLIC API =====
     public void OnPlayerDeath()
     {
-        // Calculate and award character XP BEFORE showing screen
+        // Calculate and award character XP
         int characterXP = CalculateCharacterXP();
         _lastCharacterXPAwarded = characterXP;
 
@@ -109,31 +111,75 @@ public partial class Game : Node
         {
             statsManager.AddCharacterExperience(_lastCharacterXPAwarded);
             GD.Print($"Awarded {_lastCharacterXPAwarded} character XP!");
+
+            // Reset run state BEFORE saving (death ends run)
+            var upgradeManager = Player?.GetNode<UpgradeManager>("UpgradeManager");
+            upgradeManager?.ClearUpgrades();
+
+            // Reset power level
+            statsManager.PowerLevel = 1;
+            statsManager.PowerExperience = 0;
+
+            // NOW save with cleared run state
+            SaveCharacterProgress();
         }
 
-        int playerLevel = Player?.GetNode<StatsManager>("StatsManager")?.PowerLevel ?? 1;
+        int playerLevel = statsManager?.PowerLevel ?? 1;
         _deathScreen?.ShowScreen(_totalGameTime, _enemiesKilled, playerLevel, _currentFloor);
     }
 
-    private void UpdateWaveProgression()
+    // ===== SCREEN MANAGEMENT =====
+    private void ShowVictoryScreen()
     {
-        int newWave = Mathf.Min((int)(_floorTimeElapsed / WaveDuration) + 1, WavesPerFloor);
+        int characterXP = CalculateCharacterXP();
+        _lastCharacterXPAwarded = characterXP;
 
-        if (newWave != _currentWave)
+        var statsManager = Player?.GetNode<StatsManager>("StatsManager");
+        if (statsManager != null)
         {
-            _currentWave = newWave;
-            GD.Print($"Wave {_currentWave} started!");
-            UpdateHUD();
+            statsManager.AddCharacterExperience(_lastCharacterXPAwarded);
+            GD.Print($"Awarded {_lastCharacterXPAwarded} character XP!");
+
+            // Reset run state BEFORE saving (victory ends run)
+            var upgradeManager = Player?.GetNode<UpgradeManager>("UpgradeManager");
+            upgradeManager?.ClearUpgrades();
+
+            statsManager.PowerLevel = 1;
+            statsManager.PowerExperience = 0;
+
+            // NOW save with cleared run state
+            SaveCharacterProgress();
         }
+
+        var playerLevel = statsManager?.PowerLevel ?? 1;
+        _victoryScreen?.ShowScreen(_totalGameTime, _enemiesKilled, playerLevel, _currentFloor);
     }
 
-    private float GetCurrentSpawnInterval()
+    private void ShowResultsScreen()
     {
-        // Linear interpolation from 2.0s to 0.8s over 10 waves
-        float t = (_currentWave - 1) / (float)(WavesPerFloor - 1);
-        return Mathf.Lerp(InitialSpawnInterval, FinalSpawnInterval, t);
+        var statsManager = Player?.GetNode<StatsManager>("StatsManager");
+        if (statsManager == null || _resultsScreen == null)
+        {
+            GD.PrintErr("Cannot show results screen - missing dependencies");
+            return;
+        }
+
+        _resultsScreen.ShowScreen(
+            _totalGameTime,
+            _enemiesKilled,
+            _floorsCleared,
+            _bossesKilled,
+            _lastCharacterXPAwarded,
+            statsManager
+        );
     }
 
+    private void ShowFloorTransitionUI()
+    {
+        FloorTransitionPanel.ShowPanel(_currentFloor, _currentFloor + 1);
+    }
+
+    // ===== GAME LOOP - Spawning =====
     private void SpawnEnemy()
     {
         if (Player == null || EnemyScenes == null || EnemyScenes.Length == 0)
@@ -191,6 +237,122 @@ public partial class Game : Node
         UpdateHUD();
     }
 
+    private void OnEnemyDestroyed()
+    {
+        // If we're being destroyed or scene is changing, ignore this signal
+        if (!IsInsideTree() || IsQueuedForDeletion())
+        {
+            return;
+        }
+
+        _enemyCount--;
+        _enemiesKilled++;
+
+        // Check if boss was defeated (all enemies dead after boss spawned)
+        if (_waitingForBossDefeat && _enemyCount <= 0)
+        {
+            _waitingForBossDefeat = false;
+            GD.Print($"Boss defeated! Enemy count: {_enemyCount}");
+            OnBossDefeated();
+        }
+    }
+
+    // ===== GAME LOOP - Wave/Floor Progression =====
+    private void UpdateWaveProgression()
+    {
+        int newWave = Mathf.Min((int)(_floorTimeElapsed / WaveDuration) + 1, WavesPerFloor);
+
+        if (newWave != _currentWave)
+        {
+            _currentWave = newWave;
+            GD.Print($"Wave {_currentWave} started!");
+            UpdateHUD();
+        }
+    }
+
+    private void AdvanceToNextFloor()
+    {
+        _currentFloor++;
+        _currentWave = 1;
+        _floorTimeElapsed = 0f;
+        _timeSinceLastSpawn = 0f;
+        _bossSpawned = false;
+        _enemyCount = 0;
+        _waitingForBossDefeat = false;
+        _floorsCleared = _currentFloor - 1;
+
+        UpdateHUD();
+        GD.Print($"Advanced to Floor {_currentFloor}!");
+    }
+
+    private void OnBossDefeated()
+    {
+        _bossesKilled++;
+
+        // Update highest floor (checkpoint at floor COMPLETION)
+        var statsManager = Player?.GetNode<StatsManager>("StatsManager");
+        if (statsManager != null)
+        {
+            statsManager.UpdateHighestFloor(_currentFloor); // Current floor completed
+        }
+
+        // SAVE CHARACTER PROGRESS (floor completed)
+        SaveCharacterProgress();
+
+        if (_currentFloor >= MaxFloors)
+        {
+            _finalBossDefeated = true;
+            ShowVictoryScreen();
+        }
+        else
+        {
+            ShowFloorTransitionUI();
+        }
+    }
+
+    // ===== SIGNAL HANDLERS - Floor Transition =====
+    private void OnContinueToNextFloor()
+    {
+        GD.Print("Player chose to continue to next floor");
+        AdvanceToNextFloor();
+    }
+
+    private void OnEndRun()
+    {
+        GD.Print("Player chose to end run - returning to main menu");
+
+        SaveCharacterProgress();
+        // TODO: Phase 2 - Show rewards summary first
+
+        // Return to main menu
+        GetTree().Paused = false; // Ensure game is unpaused before scene change
+        GetTree().ChangeSceneToFile(MainMenuScenePath);
+    }
+
+    // ===== SIGNAL HANDLERS - Results Screen =====
+    private void OnAllocateStatsRequested()
+    {
+        // Open stat allocation panel
+        Player?.StatAllocationPanel?.ShowPanel(
+            Player.GetNode<StatsManager>("StatsManager"),
+            Player.GetNode<UpgradeManager>("UpgradeManager")
+        );
+    }
+
+    private void OnReturnToMenuFromResults()
+    {
+        // Return to main menu
+        GetTree().ChangeSceneToFile(MainMenuScenePath);
+    }
+
+    // ===== CALCULATION HELPERS =====
+    private float GetCurrentSpawnInterval()
+    {
+        // Linear interpolation from 2.0s to 0.8s over 10 waves
+        float t = (_currentWave - 1) / (float)(WavesPerFloor - 1);
+        return Mathf.Lerp(InitialSpawnInterval, FinalSpawnInterval, t);
+    }
+
     private float CalculateHealthMultiplier()
     {
         // Base = 1.0
@@ -215,137 +377,6 @@ public partial class Game : Node
         return floorMult * waveMult;
     }
 
-    private void UpdateHUD()
-    {
-        if (HUD == null)
-        {
-            return;
-        }
-
-        string floorName = $"Floor {_currentFloor}";
-        HUD.UpdateFloorInfo(_currentFloor, floorName);
-
-        int enemiesRemaining = _enemyCount; // or track separately
-        HUD.UpdateWaveInfo(_currentWave, enemiesRemaining);
-    }
-
-    private void AdvanceToNextFloor()
-    {
-        _currentFloor++;
-        _currentWave = 1;
-        _floorTimeElapsed = 0f;
-        _timeSinceLastSpawn = 0f;
-        _bossSpawned = false;
-        _enemyCount = 0;
-        _waitingForBossDefeat = false;
-        _floorsCleared = _currentFloor - 1;
-
-        UpdateHUD();
-        GD.Print($"Advanced to Floor {_currentFloor}!");
-    }
-
-    private void SetupFloorTransitionPanel()
-    {
-        // Just connect signals - panel already exists in scene
-        FloorTransitionPanel.ContinueButtonPressed += OnContinueToNextFloor;
-        FloorTransitionPanel.EndRunButtonPressed += OnEndRun;
-
-        GD.Print("Floor transition panel setup complete");
-    }
-
-    private void ShowFloorTransitionUI()
-    {
-        FloorTransitionPanel.ShowPanel(_currentFloor, _currentFloor + 1);
-    }
-
-    private void ShowVictoryScreen()
-    {
-        // Calculate and award character XP BEFORE showing screen
-        int characterXP = CalculateCharacterXP();
-        _lastCharacterXPAwarded = characterXP;
-
-        var statsManager = Player?.GetNode<StatsManager>("StatsManager");
-        if (statsManager != null)
-        {
-            statsManager.AddCharacterExperience(_lastCharacterXPAwarded);
-            GD.Print($"Awarded {_lastCharacterXPAwarded} character XP!");
-        }
-        var playerLevel = Player?.GetNode<StatsManager>("StatsManager")?.PowerLevel ?? 1;
-
-        _victoryScreen?.ShowScreen(_totalGameTime, _enemiesKilled, playerLevel, _currentFloor);
-        GD.Print("Victory! Player has completed all floors.");
-    }
-
-    private void ShowResultsScreen()
-    {
-        var statsManager = Player?.GetNode<StatsManager>("StatsManager");
-        if (statsManager == null || _resultsScreen == null)
-        {
-            GD.PrintErr("Cannot show results screen - missing dependencies");
-            return;
-        }
-
-        _resultsScreen.ShowScreen(
-            _totalGameTime,
-            _enemiesKilled,
-            _floorsCleared,
-            _bossesKilled,
-            _lastCharacterXPAwarded,
-            statsManager
-        );
-    }
-
-    private void OnContinueToNextFloor()
-    {
-        GD.Print("Player chose to continue to next floor");
-        AdvanceToNextFloor();
-    }
-
-    private void OnEndRun()
-    {
-        GD.Print("Player chose to end run - returning to main menu");
-
-        // TODO: Phase 2 - Show rewards summary first
-
-        // Return to main menu
-        GetTree().Paused = false; // Ensure game is unpaused before scene change
-        GetTree().ChangeSceneToFile(MainMenuScenePath);
-    }
-
-    private void OnEnemyDestroyed()
-    {
-        _enemyCount--;
-        _enemiesKilled++;
-
-        // Check if boss was defeated (all enemies dead after boss spawned)
-        if (_waitingForBossDefeat && _enemyCount <= 0)
-        {
-            _waitingForBossDefeat = false;
-            GD.Print($"Boss defeated! Enemy count: {_enemyCount}");
-            OnBossDefeated();
-        }
-    }
-
-    // Called when boss is defeated - show floor transition UI
-    private void OnBossDefeated()
-    {
-        // Track boss kill for character XP calculation
-        _bossesKilled++;
-        GD.Print($"Boss defeated! Total bosses killed: {_bossesKilled}");
-
-        if (_currentFloor >= MaxFloors)
-        {
-            // Victory! Beat all 5 floors
-            _finalBossDefeated = true;
-            ShowVictoryScreen();
-        }
-        else
-        {
-            // Show Continue/End Run choice
-            ShowFloorTransitionUI();
-        }
-    }
-
     private int CalculateCharacterXP()
     {
         int xp = 50; // Base participation
@@ -367,13 +398,14 @@ public partial class Game : Node
         return xp;
     }
 
-    private void ResetRunTracking()
+    // ===== INITIALIZATION & SETUP =====
+    private void SetupFloorTransitionPanel()
     {
-        _floorsCleared = 0;
-        _bossesKilled = 0;
-        _finalBossDefeated = false;
-        _enemiesKilled = 0;
-        _totalGameTime = 0f;
+        // Just connect signals - panel already exists in scene
+        FloorTransitionPanel.ContinueButtonPressed += OnContinueToNextFloor;
+        FloorTransitionPanel.EndRunButtonPressed += OnEndRun;
+
+        GD.Print("Floor transition panel setup complete");
     }
 
     private void SetupResultsScreen()
@@ -388,19 +420,27 @@ public partial class Game : Node
         _deathScreen.ContinueButtonPressed += ShowResultsScreen;
     }
 
-    private void OnAllocateStatsRequested()
+    private void ResetRunTracking()
     {
-        // Open stat allocation panel
-        Player?.StatAllocationPanel?.ShowPanel(
-            Player.GetNode<StatsManager>("StatsManager"),
-            Player.GetNode<UpgradeManager>("UpgradeManager")
-        );
+        _floorsCleared = 0;
+        _bossesKilled = 0;
+        _finalBossDefeated = false;
+        _enemiesKilled = 0;
+        _totalGameTime = 0f;
     }
 
-    private void OnReturnToMenuFromResults()
+    private void UpdateHUD()
     {
-        // Return to main menu
-        GetTree().ChangeSceneToFile(MainMenuScenePath);
+        if (HUD == null)
+        {
+            return;
+        }
+
+        string floorName = $"Floor {_currentFloor}";
+        HUD.UpdateFloorInfo(_currentFloor, floorName);
+
+        int enemiesRemaining = _enemyCount; // or track separately
+        HUD.UpdateWaveInfo(_currentWave, enemiesRemaining);
     }
 
     private bool ValidateDependencies()
@@ -456,5 +496,30 @@ public partial class Game : Node
         }
 
         return valid;
+    }
+
+    // ===== PRIVATE HELPERS - Save System =====
+    private void SaveCharacterProgress()
+    {
+        var statsManager = Player?.GetNode<StatsManager>("StatsManager");
+        var upgradeManager = Player?.GetNode<UpgradeManager>("UpgradeManager");
+
+        if (statsManager == null)
+        {
+            GD.PrintErr("Cannot save - StatsManager not found!");
+            return;
+        }
+
+        // Get base data from StatsManager
+        SaveData saveData = statsManager.GetSaveData();
+
+        // Add run state from Game + UpgradeManager
+        saveData.CurrentFloor = _currentFloor;
+        saveData.ActiveUpgrades = upgradeManager?.GetActiveUpgrades() ?? [];
+        saveData.HasActiveRun = saveData.PowerLevel > 1 || saveData.ActiveUpgrades.Count > 0;
+
+        SaveManager.Instance?.SaveGame(saveData);
+
+        GD.Print($"Game saved! Floor {saveData.CurrentFloor}, Power Level {saveData.PowerLevel}, Character Level{saveData.CharacterLevel}");
     }
 }

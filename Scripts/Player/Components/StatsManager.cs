@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using SpaceTower.Scripts.Core;
 
@@ -28,13 +29,33 @@ public enum StatType
 [GlobalClass]
 public partial class StatsManager : Node
 {
-    // Base stats (set in editor)
+    // ===== CONSTANTS - Stat Formulas =====
+    public const float STR_DAMAGE_PER_POINT = 0.03f;
+    public const float STR_HEALTH_PER_POINT = 10f;
+    public const float INT_DAMAGE_PER_POINT = 0.03f;
+    public const float INT_CDR_PER_POINT = 0.02f;
+    public const float AGI_ATTACK_SPEED_PER_POINT = 0.02f;
+    public const float AGI_CRIT_PER_POINT = 0.01f;
+    public const float VIT_HEALTH_PER_POINT = 25f;
+    public const float VIT_REGEN_PER_POINT = 0.5f;
+    public const float FOR_CRIT_DMG_PER_POINT = 0.02f;
+    public const float FOR_DROP_RATE_PER_POINT = 0.01f; // Drop rate bonus (not implemented yet)
+
+    // ===== PRIVATE BACKING FIELDS =====
+    private Player _player;
+    private int _strength = 0;
+    private int _intelligence = 0;
+    private int _agility = 0;
+    private int _vitality = 0;
+    private int _fortune = 0;
+
+    // ===== EXPORT PROPERTIES - Base Stats =====
     [Export] public float BaseMaxHealth { get; set; } = 100.0f;
     [Export] public float BaseSpeed { get; set; } = 300.0f;
     [Export] public float BaseFireRate { get; set; } = 0.2f;
     [Export] public float BaseMeleeRate { get; set; } = 0.5f;
 
-    // ===== PERMANENT CHARACTER PROGRESSION (save these) =====
+    // ===== EXPORT PROPERTIES - Character Progression =====
     [ExportGroup("Character Progression")]
     [Export] public int CharacterLevel { get; private set; } = 1;
     [Export] public int CharacterExperience { get; private set; } = 0;
@@ -47,20 +68,20 @@ public partial class StatsManager : Node
     [Export] public int Fortune { get => _fortune; private set => _fortune = Mathf.Max(0, value); }        // FOR: +2% Crit Dmg, +1% Drop Rate
     [Export] public int HighestFloorReached { get; private set; } = 0;
 
-    // Progression
+    // ===== EXPORT PROPERTIES - Run Progression =====
     [ExportGroup("Run Progression")]
-    [Export] public int PowerLevel { get; private set; } = 1;
-    [Export] public int PowerExperience { get; private set; } = 0;
+    [Export] public int PowerLevel { get; set; } = 1;
+    [Export] public int PowerExperience { get; set; } = 0;
     [Export] public int PowerExperienceToNextLevel { get; private set; } = 100;
 
-    // Calculated stats (modified by upgrades)
+    // ===== PUBLIC PROPERTIES - Calculated Stats =====
     public float CurrentMaxHealth { get; private set; } = 100.0f;
     public float CurrentHealth { get; private set; } = 100.0f;
     public float CurrentSpeed { get; private set; }
     public float CurrentFireRate { get; private set; }
     public float CurrentMeleeRate { get; private set; }
 
-    // Combat stats (cached from upgrades)
+    // ===== PUBLIC PROPERTIES - Combat Stats =====
     public float DamageMultiplier { get; private set; } = 1.0f;
     public float PhysicalDamageMultiplier { get; private set; } = 1.0f;
     public float MagicalDamageMultiplier { get; private set; } = 1.0f;
@@ -70,27 +91,12 @@ public partial class StatsManager : Node
     public float HealthRegenPerSecond { get; private set; } = 0f;
     public int ProjectilePierceCount { get; private set; } = 0;
 
-    // Event for level up (Player will listen)
+    // ===== SIGNALS =====
     [Signal] public delegate void LeveledUpEventHandler();
     [Signal] public delegate void CharacterLeveledUpEventHandler();
     [Signal] public delegate void StatAllocatedEventHandler(int statType);
 
-    private Player _player;
-    private int _strength = 0;
-    private int _intelligence = 0;
-    private int _agility = 0;
-    private int _vitality = 0;
-    private int _fortune = 0;
-    private const float STR_DAMAGE_PER_POINT = 0.03f;
-    private const float STR_HEALTH_PER_POINT = 10f;
-    private const float INT_DAMAGE_PER_POINT = 0.03f;
-    private const float INT_CDR_PER_POINT = 0.02f;
-    private const float AGI_ATTACK_SPEED_PER_POINT = 0.02f;
-    private const float AGI_CRIT_PER_POINT = 0.01f;
-    private const float VIT_HEALTH_PER_POINT = 25f;
-    private const float VIT_REGEN_PER_POINT = 0.5f;
-    private const float FOR_CRIT_DMG_PER_POINT = 0.02f;
-
+    // ===== LIFECYCLE METHODS =====
     public override void _Ready()
     {
         _player = GetParent<Player>();
@@ -117,6 +123,7 @@ public partial class StatsManager : Node
         }
     }
 
+    // ===== PUBLIC API - Initialization =====
     public void Initialize()
     {
         // Set initial stat values (no upgrades yet)
@@ -126,6 +133,7 @@ public partial class StatsManager : Node
         EmitExperienceUpdate();
     }
 
+    // ===== PUBLIC API - Combat =====
     public void TakeDamage(float damage)
     {
         CurrentHealth -= damage;
@@ -142,6 +150,7 @@ public partial class StatsManager : Node
         }
     }
 
+    // ===== PUBLIC API - Progression =====
     public void AddPowerExperience(int amount)
     {
         PowerExperience += amount;
@@ -165,6 +174,28 @@ public partial class StatsManager : Node
         }
     }
 
+    public void AddCharacterLevel(int levels = 1)
+    {
+        CharacterExperience -= CharacterExperienceToNextLevel;
+        CharacterLevel += levels;
+        UnallocatedStatPoints += levels;
+
+        GD.Print($"Character leveled up to {CharacterLevel}! Gained {levels} stat point(s).");
+        CharacterExperienceToNextLevel = CalculateCharacterXPForNextLevel();
+
+        EmitSignal(SignalName.CharacterLeveledUp);
+    }
+
+    public void UpdateHighestFloor(int floor)
+    {
+        if (floor > HighestFloorReached)
+        {
+            HighestFloorReached = floor;
+            GD.Print($"New highest floor reached: {HighestFloorReached}");
+        }
+    }
+
+    // ===== PUBLIC API - Stats =====
     public void RecalculateStats(StatModifiers modifiers)
     {
         // Calculate health percentage BEFORE changing MaxHealth
@@ -255,32 +286,73 @@ public partial class StatsManager : Node
         EmitSignal(SignalName.StatAllocated, (int)statType);
     }
 
-    public void AddCharacterLevel(int levels = 1)
-    {
-        CharacterExperience -= CharacterExperienceToNextLevel;
-        CharacterLevel += levels;
-        UnallocatedStatPoints += levels;
-
-        GD.Print($"Character leveled up to {CharacterLevel}! Gained {levels} stat point(s).");
-        CharacterExperienceToNextLevel = CalculateCharacterXPForNextLevel();
-
-        EmitSignal(SignalName.CharacterLeveledUp);
-    }
-
-    public void UpdateHighestFloor(int floor)
-    {
-        if (floor > HighestFloorReached)
-        {
-            HighestFloorReached = floor;
-            GD.Print($"New highest floor reached: {HighestFloorReached}");
-        }
-    }
-
     public float GetCooldownReduction()
     {
         return (1.0f - (1.0f / (1.0f + Intelligence * INT_CDR_PER_POINT))) * 100f;
     }
 
+    // ===== PUBLIC API - Save/Load =====
+    public SaveData GetSaveData()
+    {
+        return new SaveData
+        {
+            Version = 1,
+            LastSaved = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+
+            // Character stats (StatsManager owns this)
+            Strength = Strength,
+            Intelligence = Intelligence,
+            Agility = Agility,
+            Vitality = Vitality,
+            Fortune = Fortune,
+
+            // Character progression (StatsManager owns this)
+            CharacterLevel = CharacterLevel,
+            CharacterExperience = CharacterExperience,
+            UnallocatedStatPoints = UnallocatedStatPoints,
+            HighestFloorReached = HighestFloorReached,
+
+            // Run state (StatsManager owns PowerLevel)
+            PowerLevel = PowerLevel,
+
+            // These will be filled in by Game.cs:
+            CurrentFloor = 0,  // Game.cs sets this
+            HasActiveRun = false,  // Game.cs sets this
+            ActiveUpgrades = null  // Game.cs sets this
+        };
+    }
+
+
+    public void LoadSaveData(SaveData data)
+    {
+        // Restore character stats
+        _strength = data.Strength;
+        _intelligence = data.Intelligence;
+        _agility = data.Agility;
+        _vitality = data.Vitality;
+        _fortune = data.Fortune;
+
+        // Restore character progression
+        CharacterLevel = data.CharacterLevel;
+        CharacterExperience = data.CharacterExperience;
+        CharacterExperienceToNextLevel = CalculateCharacterXPForNextLevel();
+        UnallocatedStatPoints = data.UnallocatedStatPoints;
+        HighestFloorReached = data.HighestFloorReached;
+
+        // Restore run state (PowerLevel only - StatsManager owns this)
+        PowerLevel = data.PowerLevel;
+        PowerExperience = 0;
+        PowerExperienceToNextLevel = (int)(100 * Mathf.Pow(1.5f, PowerLevel - 1));
+
+        GD.Print($"Loaded character: Level {CharacterLevel}, STR {Strength}, INT {Intelligence}, AGI {Agility}, VIT{Vitality}, FOR {Fortune}");
+        GD.Print($"Run state: Power Level {PowerLevel}");
+
+        // Recalculate base stats (upgrades will be applied separately by Game.cs)
+        RecalculateStats(new StatModifiers());
+    }
+
+
+    // ===== PRIVATE HELPERS - Calculations =====
     private int CalculateCharacterXPForNextLevel()
     {
         // Exponential curve: each level requires ~10% more XP than previous
@@ -297,6 +369,7 @@ public partial class StatsManager : Node
         return 20f * (PowerLevel - 1);
     }
 
+    // ===== PRIVATE HELPERS - Progression =====
     private void PowerLevelUp()
     {
         PowerExperience -= PowerExperienceToNextLevel;
@@ -304,7 +377,7 @@ public partial class StatsManager : Node
         PowerExperienceToNextLevel = (int)(PowerExperienceToNextLevel * 1.5);
 
         // Recalculate MaxHealth with new run level (UpgradeManager will call RecalculateStats, but update now for heal)
-        float characterHealthBonus = (Vitality * 25f) + (Strength * 10f);
+        float characterHealthBonus = (Vitality * VIT_HEALTH_PER_POINT) + (Strength * STR_HEALTH_PER_POINT);
         CurrentMaxHealth = BaseMaxHealth + CalculateRunLevelHealthBonus() + characterHealthBonus;
         CurrentHealth = CurrentMaxHealth;  // Full heal on level up
 
@@ -333,6 +406,7 @@ public partial class StatsManager : Node
         }
     }
 
+    // ===== PRIVATE HELPERS - Signals =====
     private void EmitHealthUpdate()
     {
         _player?.EmitSignal(Player.SignalName.HealthChanged, CurrentHealth, CurrentMaxHealth);

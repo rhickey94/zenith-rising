@@ -3,32 +3,36 @@ using Godot;
 using SpaceTower.Scripts.Progression.Upgrades;
 using SpaceTower.Scripts.PlayerScripts.Components;
 using SpaceTower.Scripts.UI.Panels;
+using SpaceTower.Scripts.Core;
 
 namespace SpaceTower.Scripts.PlayerScripts;
 
 public partial class Player : CharacterBody2D
 {
+    // ===== EXPORT FIELDS - Config =====
     [Export] public PlayerClass CurrentClass = PlayerClass.Warrior;
 
-    // Scenes
+    // ===== EXPORT FIELDS - Scenes =====
     [Export] public PackedScene ProjectileScene;
     [Export] public PackedScene MeleeAttackScene;
 
-    // UI Dependencies
+    // ===== EXPORT FIELDS - UI Dependencies =====
     [Export] public LevelUpPanel LevelUpPanel;
     [Export] public StatAllocationPanel StatAllocationPanel;
 
-    // Signals for HUD updates
+    // ===== SIGNALS =====
     [Signal] public delegate void HealthChangedEventHandler(float currentHealth, float maxHealth);
     [Signal] public delegate void ExperienceChangedEventHandler(int currentXP, int requiredXP, int level);
     [Signal] public delegate void ResourcesChangedEventHandler(int gold, int cores, int components, int fragments);
     [Signal] public delegate void FloorInfoChangedEventHandler(int floorNumber, string floorName);
     [Signal] public delegate void WaveInfoChangedEventHandler(int waveNumber, int enemiesRemaining);
 
+    // ===== PRIVATE FIELDS - Components =====
     private SkillManager _skillManager;
     private StatsManager _statsManager;
     private UpgradeManager _upgradeManager;
 
+    // ===== LIFECYCLE METHODS =====
     public override void _Ready()
     {
         AddToGroup("player");
@@ -69,15 +73,6 @@ public partial class Player : CharacterBody2D
         }
     }
 
-    public void Initialize()
-    {
-        _statsManager?.Initialize();
-
-        EmitResourcesUpdate(0, 0, 0, 0);
-        EmitFloorInfoUpdate(1, "Initialization");
-        EmitWaveInfoUpdate(1, 0);
-    }
-
     public override void _UnhandledInput(InputEvent @event)
     {
         _skillManager?.HandleInput(@event);
@@ -114,6 +109,32 @@ public partial class Player : CharacterBody2D
         MoveAndSlide();
     }
 
+    // ===== PUBLIC API =====
+    public void Initialize()
+    {
+        if (SaveManager.Instance != null && SaveManager.Instance.SaveExists())
+        {
+            SaveData? saveData = SaveManager.Instance.LoadGame();
+            if (saveData.HasValue)
+            {
+                _statsManager?.LoadSaveData(saveData.Value);
+
+                // Restore upgrades if active run
+                if (saveData.Value.HasActiveRun)
+                {
+                    var upgradeManager = GetNode<UpgradeManager>("UpgradeManager");
+                    upgradeManager?.LoadActiveUpgrades(saveData.Value.ActiveUpgrades);
+                }
+
+                GD.Print("Save data loaded successfully!");
+            }
+        }
+
+        EmitResourcesUpdate(0, 0, 0, 0);
+        EmitFloorInfoUpdate(1, "Initialization");
+        EmitWaveInfoUpdate(1, 0);
+    }
+
     public void TakeDamage(float damage)
     {
         _statsManager?.TakeDamage(damage);
@@ -124,6 +145,7 @@ public partial class Player : CharacterBody2D
         _statsManager?.AddPowerExperience(amount);
     }
 
+    // ===== PRIVATE HELPERS - Event Handlers =====
     private void OnLeveledUp()
     {
         if (LevelUpPanel != null)
@@ -139,11 +161,13 @@ public partial class Player : CharacterBody2D
         _upgradeManager?.ApplyUpgrade(upgrade);
     }
 
+    // ===== PRIVATE HELPERS - Upgrades =====
     private List<Upgrade> GetRandomUpgrades(int count)
     {
         return _upgradeManager?.GetRandomUpgrades(count);
     }
 
+    // ===== PRIVATE HELPERS - Signal Emission =====
     private void EmitResourcesUpdate(int gold, int cores, int components, int fragments)
     {
         EmitSignal(SignalName.ResourcesChanged, gold, cores, components, fragments);

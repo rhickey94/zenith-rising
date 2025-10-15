@@ -105,4 +105,33 @@ public partial class UpgradeManager : Node
             ProjectilePierceBonus = (int)projectilePierceBonus
         });
     }
+
+    public Dictionary<UpgradeType, float> GetActiveUpgrades()
+    {
+        return new Dictionary<UpgradeType, float>(_activeUpgrades);
+    }
+
+    public void LoadActiveUpgrades(Dictionary<UpgradeType, float> upgrades)
+    {
+        _activeUpgrades.Clear();
+
+        if (upgrades != null)
+        {
+            foreach (var kvp in upgrades)
+            {
+                _activeUpgrades[kvp.Key] = kvp.Value;
+            }
+
+            GD.Print($"Loaded {_activeUpgrades.Count} active upgrades");
+
+            // Recalculate stats with loaded upgrades
+            RecalculateAllStats();
+        }
+    }
+
+    public void ClearUpgrades()
+    {
+        _activeUpgrades.Clear();
+        GD.Print("Cleared all active upgrades");
+    }
 }

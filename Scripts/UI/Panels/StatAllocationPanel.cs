@@ -105,7 +105,7 @@ public partial class StatAllocationPanel : Control
     private string FormatStrengthBonus(StatsManager stats)
     {
         float physDmg = (stats.PhysicalDamageMultiplier - 1.0f) * 100f;
-        float hp = stats.Strength * 10f;
+        float hp = stats.Strength * StatsManager.STR_HEALTH_PER_POINT;
         return $"Physical Dmg +{physDmg:F0}%, HP +{hp:F0}";
     }
 
@@ -117,22 +117,22 @@ public partial class StatAllocationPanel : Control
 
     private string FormatAgilityBonus(StatsManager stats)
     {
-        float atkSpd = stats.Agility * 0.02f * 100f;
-        float crit = Mathf.Min(stats.Agility * 0.01f, 0.5f) * 100f;
+        float atkSpd = stats.Agility * StatsManager.AGI_ATTACK_SPEED_PER_POINT * 100f;
+        float crit = Mathf.Min(stats.Agility * StatsManager.AGI_CRIT_PER_POINT, 0.5f) * 100f;
         return $"Attack Speed +{atkSpd:F0}%, Crit +{crit:F0}%";
     }
 
     private string FormatVitalityBonus(StatsManager stats)
     {
-        float hp = stats.Vitality * 25f;
-        float regen = stats.Vitality * 0.5f;
+        float hp = stats.Vitality * StatsManager.VIT_HEALTH_PER_POINT;
+        float regen = stats.Vitality * StatsManager.VIT_REGEN_PER_POINT;
         return $"HP +{hp:F0}, Regen +{regen:F1}/sec";
     }
 
     private string FormatFortuneBonus(StatsManager stats)
     {
         float critDmg = (stats.CritDamageMultiplier - 1.5f) * 100f;
-        float dropRate = stats.Fortune * 0.01f * 100f;
+        float dropRate = stats.Fortune * StatsManager.FOR_DROP_RATE_PER_POINT * 100f;
         return $"Crit Dmg +{critDmg:F0}%, Drop Rate +{dropRate:F0}%";
     }
 
