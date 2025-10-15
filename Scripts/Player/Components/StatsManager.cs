@@ -81,6 +81,7 @@ public partial class StatsManager : Node
     private const float STR_DAMAGE_PER_POINT = 0.03f;
     private const float STR_HEALTH_PER_POINT = 10f;
     private const float INT_DAMAGE_PER_POINT = 0.03f;
+    private const float INT_CDR_PER_POINT = 0.02f;
     private const float AGI_ATTACK_SPEED_PER_POINT = 0.02f;
     private const float AGI_CRIT_PER_POINT = 0.01f;
     private const float VIT_HEALTH_PER_POINT = 25f;
@@ -260,7 +261,7 @@ public partial class StatsManager : Node
 
     public float GetCooldownReduction()
     {
-        return (1.0f - (1.0f / (1.0f + Intelligence * 0.02f))) * 100f;
+        return (1.0f - (1.0f / (1.0f + Intelligence * INT_CDR_PER_POINT))) * 100f;
     }
 
     private float CalculateRunLevelHealthBonus()
