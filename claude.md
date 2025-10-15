@@ -51,14 +51,16 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 
 ## Current Status: Be Honest
 
-**Phase:** Phase 1 (Proving Combat) - ✅ **100% COMPLETE**
+**Phase:** Phase 3 (Hub World & First Dungeon) - ⏳ **IN PROGRESS**
 
-**🎉🎉🎉 PHASE 1 SHIPPED! 🎉🎉🎉**
+**🎉 PHASES 1 & 2 COMPLETE! 🎉**
 
-**Hypothesis PROVEN:** Combat is fun and engaging through multiple playtests. The core loop works perfectly.
+**Phase 1 - Combat:** Proven fun and engaging through multiple playtests
+**Phase 2 - Progression:** Character stats, save/load, stat allocation working
 
 ### ✅ Actually Working
 
+**Core Combat (Phase 1):**
 - Player movement (WASD) and rotation
 - Enemy AI (chase player, contact damage)
 - Health/damage system with crits
@@ -76,49 +78,122 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 - **Boss defeat detection** - TreeExited signal tracking, enemy count management
 - **Main menu** - Functional with styled buttons, scene transitions
 - **Floor transition UI** - Continue/End Run panel with hover effects, pause/unpause
-- **HUD integration** - Floor/wave display wired to Game.cs
-- **Victory screen** - Full stats display, return to menu when Floor 5 cleared
-- **Death screen** - Full stats display, return to menu on player death
+- **HUD integration** - Floor/wave display wired to Dungeon.cs
+- **Victory screen** - Full stats display, return to hub when Floor 5 cleared
+- **Death screen** - Full stats display, return to hub on player death
+
+**Character Progression (Phase 2):**
+- **Character stat system** - STR/INT/AGI/VIT/FOR with proper scaling
+- **Stat allocation panel** - UI for spending stat points (press C in-game)
+- **Save/load system** - JSON-based save with character + run state
+- **Character leveling** - XP awards from runs, persistent character progression
+- **Highest floor tracking** - Checkpoint system for floor completion
+
+**Hub World (Phase 3):**
+- **Hub scene** - Safe zone with player spawn
+- **Dungeon portal** - Interact with E key to enter dungeon
+- **Scene transitions** - Main Menu → Hub → Dungeon → Hub
+- **Player initialization** - Proper setup for new and saved games
+- **Save integration** - Hub correctly loads/saves character state
 
 ### ⏳ In Progress
 
-- None - Phase 1 complete!
+- Testing complete hub → dungeon → hub flow
+- Visual polish for hub (background, atmosphere)
 
-### 📝 Not Started (Phase 2+)
+### 📝 Not Started (Phase 4+)
 
-- Character stat system (STR/VIT/AGI/RES/FOR)
 - Gear/equipment drops
 - Materials or idle systems
-- Save/load system
-- Hub world
+- NPC vendors/systems
+- More hub features
 
 ---
 
 ## Current Phase Focus
 
-**Phase 1: Prove Combat is Fun** ✅ **COMPLETE!**
+**Phase 3: Hub World & First Dungeon** ⏳ **IN PROGRESS**
 
-All tasks finished! Full game loop working:
+**Current goals:**
 
-- ✅ Victory screen with stats display
-- ✅ Death screen with stats display
-- ✅ Complete flow: Main Menu → Combat → Level Ups → Floor Transitions → Victory/Death → Main Menu
+1. ✅ Create hub scene as safe zone
+2. ✅ Implement dungeon portal interaction
+3. ✅ Establish scene flow: Main Menu → Hub → Dungeon → Hub
+4. ✅ Fix player initialization for new/saved games
+5. ⏳ Test complete hub → dungeon → hub flow
+6. 📝 Polish hub visuals and atmosphere
+7. 📝 Add placeholder NPCs/vendors (future)
+
+**Completed this phase:**
+- Hub.cs with player initialization
+- hub.tscn scene with player and portal
+- DungeonPortal.cs with interaction system
+- Fixed critical Player.Initialize() bug (new game support)
+- Renamed game.tscn → dungeon.tscn for clarity
+- Updated all scene transitions to use hub
 
 ---
 
-**Ready for Phase 2: Character Progression & Persistence**
+**Next Phase: Gear & Loot System (Phase 4)**
 
-**Next phase goals:**
+**Future goals:**
 
-1. Character stat system (STR/VIT/AGI/RES/FOR)
-2. Save/load system for progression
-3. Basic gear/equipment drops
+1. Item drops from enemies
+2. Equipment slots and inventory
+3. Stat bonuses from gear
 
 **See [`Docs/02-IMPLEMENTATION/phase-plan.md`](Docs/02-IMPLEMENTATION/phase-plan.md) for full phase details.**
 
 ---
 
 ## Session Progress Log
+
+### Session 9 - Hub World & Dungeon Separation 🏠
+
+**Completed:**
+
+- ✅ Renamed game.tscn → dungeon.tscn and Game.cs → Dungeon.cs for architectural clarity
+- ✅ Updated all scene transitions to return to hub instead of main menu
+- ✅ Created Hub.cs script with proper player initialization using CallDeferred
+- ✅ Created hub.tscn scene with player spawn and dungeon portal
+- ✅ Created DungeonPortal.cs with Area2D interaction system ("[E] Enter Dungeon")
+- ✅ Added 'interact' input action (E key) to project settings
+- ✅ **Fixed critical bug in Player.Initialize():**
+  - Previously only handled "load save" case
+  - Added else clause to call StatsManager.Initialize() for new games
+  - Bug prevented player movement (CurrentSpeed = 0) on fresh starts
+- ✅ Updated MainMenu.cs to load hub scene for both New Game and Continue
+- ✅ Updated StatsManager.cs death flow to find Dungeon node (not Game)
+- ✅ Tested player movement in hub successfully
+
+**Achievements:**
+
+- 🎉 **Hub/Dungeon separation complete!** Architectural clarity achieved
+- 🎉 **Scene flow working:** Main Menu → Hub → Dungeon → Hub
+- 🎉 **Player initialization fixed** for both new and saved games
+- 🏗️ **Foundation laid** for meta-progression systems (NPCs, vendors, idle mechanics)
+
+**Lessons Learned:**
+
+- Godot parent _Ready() runs before children, requiring CallDeferred for initialization
+- Player.Initialize() needs to handle BOTH save loading AND fresh initialization
+- Scene renaming (game → dungeon) improved code clarity significantly
+- The bug existed in Phase 1 but wasn't caught due to always having save data during testing
+- No architecture rework needed - hub/dungeon separation was clean
+
+**Debugging Process:**
+
+- Initial symptom: Player couldn't move in hub (CurrentSpeed = 0)
+- Root cause: Player.Initialize() missing else clause for new game case
+- Investigated initialization order, scene structure, StatsManager flow
+- Used sequential thinking to trace through code paths
+- Simple one-line fix resolved complex-seeming issue
+
+**Next Session:**
+
+- Complete hub → dungeon → hub flow testing
+- Polish hub visuals (background, lighting, atmosphere)
+- Consider adding placeholder NPCs or hub features
 
 ### Session 8 - Victory & Death Screens - PHASE 1 COMPLETE! 🎉
 
@@ -276,22 +351,34 @@ All tasks finished! Full game loop working:
 ```
 SpaceTower/
 ├── Scenes/
-│   ├── Core/game.tscn
+│   ├── Core/
+│   │   ├── hub.tscn (Safe zone with portal)
+│   │   └── dungeon.tscn (Combat zone, formerly game.tscn)
 │   ├── Player/player.tscn
 │   ├── Enemies/ (enemy.tscn, fast_melee_enemy.tscn, slow_ranged_enemy.tscn, boss.tscn)
 │   ├── Items/experience_shard.tscn
 │   ├── SkillEffects/ (fireball_projectile.tscn, whirlwind_effect.tscn)
 │   └── UI/
 │       ├── Menus/ (main_menu.tscn, floor_transition_panel.tscn)
-│       ├── Panels/ (level_up_panel.tscn, victory_screen.tscn, death_screen.tscn)
+│       ├── Panels/ (level_up_panel.tscn, victory_screen.tscn, death_screen.tscn, stat_allocation_panel.tscn, results_screen.tscn)
 │       └── hud.tscn
 ├── Scripts/
-│   ├── Core/ (Game.cs, CombatSystem.cs)
-│   ├── Player/Components/ (StatsManager.cs, SkillManager.cs, UpgradeManager.cs)
+│   ├── Core/
+│   │   ├── Hub.cs (Safe zone management)
+│   │   ├── Dungeon.cs (Combat/spawning, formerly Game.cs)
+│   │   ├── DungeonPortal.cs (Interaction system)
+│   │   ├── CombatSystem.cs
+│   │   ├── SaveManager.cs
+│   │   └── SaveData.cs
+│   ├── Player/
+│   │   ├── Player.cs
+│   │   └── Components/ (StatsManager.cs, SkillManager.cs, UpgradeManager.cs)
 │   ├── Skills/ (Skill.cs, executors, effects)
-│   ├── UI/Panels/ (VictoryScreen.cs, DeathScreen.cs, FloorTransitionPanel.cs, LevelUpPanel.cs)
+│   ├── UI/
+│   │   ├── Panels/ (VictoryScreen.cs, DeathScreen.cs, FloorTransitionPanel.cs, LevelUpPanel.cs, StatAllocationPanel.cs, ResultsScreen.cs)
+│   │   └── HUD/ (Hud.cs)
 │   └── Enemies/Base/Enemy.cs
-└── Resources/Skills/ (Fireball.tres, Whirlwind.tres)
+└── Resources/Skills/ (Fireball.tres, Whirlwind.tres, MageBasicAttack.tres)
 ```
 
 ### Enemy Scaling Formula
@@ -301,15 +388,21 @@ float healthMult = (1 + currentWave * 0.1f) * (1 + currentFloor * 0.5f);
 float damageMult = (1 + currentWave * 0.05f) * (1 + currentFloor * 0.5f);
 ```
 
-### Stat System (Phase 2)
+### Character Stat System (Implemented - Phase 2)
 
 ```
-STR: +3% ALL damage per point
-VIT: +25 HP per point
-AGI: +2% attack speed per point
-RES: +1% damage reduction per point (cap 50%)
-FOR: +2% crit chance per point (cap 50%)
+STR (Strength): +3% Physical Dmg, +10 HP per point
+INT (Intelligence): +3% Magical Dmg, +2% CDR per point
+AGI (Agility): +2% Attack Speed, +1% Crit Chance per point (cap 50%)
+VIT (Vitality): +25 HP, +0.5 HP/sec regen per point
+FOR (Fortune): +2% Crit Damage, +1% Drop Rate per point
 ```
+
+**Progression:**
+- Character Level: Permanent, awards 1 stat point per level
+- Character XP: Earned from dungeon runs (50 base + per floor/boss)
+- Power Level: Per-run progression, resets to 1 after death/victory
+- Power XP: Earned from enemies during run
 
 ---
 
@@ -352,5 +445,5 @@ FOR: +2% crit chance per point (cap 50%)
 
 ---
 
-_Last updated: Session 8 - Victory/Death screens complete_
-_🎉 PHASE 1 COMPLETE - Ready for Phase 2! 🎉_
+_Last updated: Session 9 - Hub World implementation_
+_🎉 PHASES 1 & 2 COMPLETE - Phase 3 Hub World in progress! 🎉_

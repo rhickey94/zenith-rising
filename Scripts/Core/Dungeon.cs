@@ -8,7 +8,7 @@ using SpaceTower.Scripts.UI.Panels;
 
 namespace SpaceTower.Scripts.Core;
 
-public partial class Game : Node
+public partial class Dungeon : Node
 {
     // ===== CONSTANTS =====
     private const float WaveDuration = 30f;
@@ -33,7 +33,7 @@ public partial class Game : Node
     [Export] private ResultsScreen _resultsScreen;
 
     // ===== EXPORT FIELDS - Settings =====
-    [Export] public string MainMenuScenePath = "res://Scenes/UI/Menus/main_menu.tscn";
+    [Export] public string HubScenePath = "res://Scenes/Core/hub.tscn";
     [Export] public float SpawnDistance = 400.0f;
     [Export] public float FloorDuration = 30f;
 
@@ -62,7 +62,7 @@ public partial class Game : Node
         // Validate dependencies
         if (!ValidateDependencies())
         {
-            GD.PrintErr("Game: Missing dependencies - cannot start!");
+            GD.PrintErr("Dungeon: Missing dependencies - cannot start!");
             return;
         }
 
@@ -319,14 +319,13 @@ public partial class Game : Node
 
     private void OnEndRun()
     {
-        GD.Print("Player chose to end run - returning to main menu");
+        GD.Print("Player chose to end run - returning to hub");
 
         SaveCharacterProgress();
-        // TODO: Phase 2 - Show rewards summary first
 
-        // Return to main menu
+        // Return to hub
         GetTree().Paused = false; // Ensure game is unpaused before scene change
-        GetTree().ChangeSceneToFile(MainMenuScenePath);
+        GetTree().ChangeSceneToFile(HubScenePath);
     }
 
     // ===== SIGNAL HANDLERS - Results Screen =====
@@ -341,8 +340,8 @@ public partial class Game : Node
 
     private void OnReturnToMenuFromResults()
     {
-        // Return to main menu
-        GetTree().ChangeSceneToFile(MainMenuScenePath);
+        // Return to hub
+        GetTree().ChangeSceneToFile(HubScenePath);
     }
 
     // ===== CALCULATION HELPERS =====
@@ -449,49 +448,49 @@ public partial class Game : Node
 
         if (Player == null)
         {
-            GD.PrintErr("Game: Player not assigned!");
+            GD.PrintErr("Dungeon: Player not assigned!");
             valid = false;
         }
 
         if (HUD == null)
         {
-            GD.PrintErr("Game: HUD not assigned!");
+            GD.PrintErr("Dungeon: HUD not assigned!");
             valid = false;
         }
 
         if (EnemyScenes == null || EnemyScenes.Length == 0)
         {
-            GD.PrintErr("Game: EnemyScenes not assigned!");
+            GD.PrintErr("Dungeon: EnemyScenes not assigned!");
             valid = false;
         }
 
         if (BossScene == null)
         {
-            GD.PrintErr("Game: BossScene not assigned!");
+            GD.PrintErr("Dungeon: BossScene not assigned!");
             valid = false;
         }
 
         if (FloorTransitionPanel == null)
         {
-            GD.PrintErr("Game: FloorTransitionPanel not assigned!");
+            GD.PrintErr("Dungeon: FloorTransitionPanel not assigned!");
             valid = false;
         }
 
         if (_victoryScreen == null)
         {
-            GD.PrintErr("Game: VictoryScreen not assigned!");
+            GD.PrintErr("Dungeon: VictoryScreen not assigned!");
             valid = false;
         }
 
         if (_deathScreen == null)
         {
-            GD.PrintErr("Game: DeathScreen not assigned!");
+            GD.PrintErr("Dungeon: DeathScreen not assigned!");
             valid = false;
         }
 
         if (_resultsScreen == null)
         {
-            GD.PrintErr("Game: ResultsScreen not assigned!");
+            GD.PrintErr("Dungeon: ResultsScreen not assigned!");
             valid = false;
         }
 

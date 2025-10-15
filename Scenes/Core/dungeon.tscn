@@ -1,25 +1,25 @@
 [gd_scene load_steps=28 format=3 uid="uid://6a6ovxmbcjd1"]
 
-[ext_resource type="Script" uid="uid://ije0l625j2w0" path="res://Scripts/Core/Game.cs" id="1_wrm1d"]
-[ext_resource type="PackedScene" uid="uid://cvuvmrd8khk2g" path="res://Scenes/Enemies/enemy.tscn" id="2_3dryh"]
-[ext_resource type="PackedScene" uid="uid://cmd26cuctvrk3" path="res://Scenes/Enemies/fast_melee_enemy.tscn" id="2_h6qnp"]
-[ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="3_wowpa"]
-[ext_resource type="Script" uid="uid://fwkhgpcy2am3" path="res://Scripts/UI/HUD/Hud.cs" id="4_3dryh"]
-[ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/SkillEffects/projectile.tscn" id="4_i6g32"]
-[ext_resource type="PackedScene" uid="uid://dq8ntx3n735dh" path="res://Scenes/Enemies/slow_ranged_enemy.tscn" id="4_lv4vk"]
-[ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="5_i6g32"]
-[ext_resource type="PackedScene" uid="uid://bjyl4m6ntddcb" path="res://Scenes/Enemies/boss.tscn" id="5_lv4vk"]
-[ext_resource type="PackedScene" uid="uid://fr50f27cq0cp" path="res://Scenes/UI/Panels/level_up_panel.tscn" id="6_i6g32"]
-[ext_resource type="PackedScene" uid="uid://bchf7gpesikn" path="res://Scenes/UI/Menus/floor_transition_panel.tscn" id="6_ku1f2"]
-[ext_resource type="PackedScene" uid="uid://du4yo1vulblyh" path="res://Scenes/SkillEffects/melee_attack.tscn" id="7_o5yvi"]
-[ext_resource type="Script" uid="uid://b3km77lyp5ba3" path="res://Scripts/Player/Components/StatsManager.cs" id="9_h4fw4"]
-[ext_resource type="Resource" uid="uid://y2i2lfbhh0ty" path="res://Resources/Skills/Mage/MageBasicAttack.tres" id="9_hps8g"]
-[ext_resource type="Script" uid="uid://bcvin8tqos5yg" path="res://Scripts/UI/Panels/VictoryScreen.cs" id="9_nqya7"]
-[ext_resource type="Script" uid="uid://dbeaf5ogp1y77" path="res://Scripts/UI/Panels/DeathScreen.cs" id="10_cuk5j"]
-[ext_resource type="Resource" uid="uid://ck7w68lb1penv" path="res://Resources/Skills/Mage/Fireball.tres" id="10_e5gjp"]
-[ext_resource type="Script" uid="uid://cx5d7m8au6iit" path="res://Scripts/Player/Components/UpgradeManager.cs" id="10_ldgsr"]
-[ext_resource type="PackedScene" uid="uid://cggfbynyfbjc" path="res://Scenes/UI/Panels/stat_allocation_panel.tscn" id="11_cuk5j"]
-[ext_resource type="PackedScene" uid="uid://c18x5hfiw6axv" path="res://Scenes/UI/Panels/results_screen.tscn" id="12_nqya7"]
+[ext_resource type="Script" uid="uid://ije0l625j2w0" path="res://Scripts/Core/Dungeon.cs" id="1_nxi3e"]
+[ext_resource type="PackedScene" uid="uid://cmd26cuctvrk3" path="res://Scenes/Enemies/fast_melee_enemy.tscn" id="2_1ball"]
+[ext_resource type="PackedScene" uid="uid://cvuvmrd8khk2g" path="res://Scenes/Enemies/enemy.tscn" id="3_b3vbb"]
+[ext_resource type="PackedScene" uid="uid://dq8ntx3n735dh" path="res://Scenes/Enemies/slow_ranged_enemy.tscn" id="4_n4lck"]
+[ext_resource type="PackedScene" uid="uid://bjyl4m6ntddcb" path="res://Scenes/Enemies/boss.tscn" id="5_6rhjy"]
+[ext_resource type="Script" uid="uid://fwkhgpcy2am3" path="res://Scripts/UI/HUD/Hud.cs" id="6_d0mko"]
+[ext_resource type="PackedScene" uid="uid://fr50f27cq0cp" path="res://Scenes/UI/Panels/level_up_panel.tscn" id="7_xi64p"]
+[ext_resource type="PackedScene" uid="uid://bchf7gpesikn" path="res://Scenes/UI/Menus/floor_transition_panel.tscn" id="8_fjca2"]
+[ext_resource type="Script" uid="uid://bcvin8tqos5yg" path="res://Scripts/UI/Panels/VictoryScreen.cs" id="9_526qx"]
+[ext_resource type="Script" uid="uid://dbeaf5ogp1y77" path="res://Scripts/UI/Panels/DeathScreen.cs" id="10_7fxft"]
+[ext_resource type="PackedScene" uid="uid://cggfbynyfbjc" path="res://Scenes/UI/Panels/stat_allocation_panel.tscn" id="11_103gp"]
+[ext_resource type="PackedScene" uid="uid://c18x5hfiw6axv" path="res://Scenes/UI/Panels/results_screen.tscn" id="12_ahhlw"]
+[ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="13_jfnko"]
+[ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/SkillEffects/projectile.tscn" id="14_xh1eq"]
+[ext_resource type="PackedScene" uid="uid://du4yo1vulblyh" path="res://Scenes/SkillEffects/melee_attack.tscn" id="15_vysty"]
+[ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="16_1c77v"]
+[ext_resource type="Resource" uid="uid://y2i2lfbhh0ty" path="res://Resources/Skills/Mage/MageBasicAttack.tres" id="17_811ml"]
+[ext_resource type="Resource" uid="uid://ck7w68lb1penv" path="res://Resources/Skills/Mage/Fireball.tres" id="18_52qhq"]
+[ext_resource type="Script" uid="uid://b3km77lyp5ba3" path="res://Scripts/Player/Components/StatsManager.cs" id="19_sy2cx"]
+[ext_resource type="Script" uid="uid://cx5d7m8au6iit" path="res://Scripts/Player/Components/UpgradeManager.cs" id="20_n6kfg"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3gfia"]
 bg_color = Color(0.16470589, 0.16470589, 0.16470589, 1)
@@ -75,10 +75,10 @@ size = Vector2(50, 50)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
 size = Vector2(50, 50)
 
-[node name="Game" type="Node" node_paths=PackedStringArray("Player", "HUD", "FloorTransitionPanel", "_victoryScreen", "_deathScreen", "_resultsScreen")]
-script = ExtResource("1_wrm1d")
-EnemyScenes = Array[PackedScene]([ExtResource("2_h6qnp"), ExtResource("2_3dryh"), ExtResource("4_lv4vk")])
-BossScene = ExtResource("5_lv4vk")
+[node name="Dungeon" type="Node" node_paths=PackedStringArray("Player", "HUD", "FloorTransitionPanel", "_victoryScreen", "_deathScreen", "_resultsScreen")]
+script = ExtResource("1_nxi3e")
+EnemyScenes = Array[PackedScene]([ExtResource("2_1ball"), ExtResource("3_b3vbb"), ExtResource("4_n4lck")])
+BossScene = ExtResource("5_6rhjy")
 Player = NodePath("Player")
 HUD = NodePath("UILayer/HUD")
 FloorTransitionPanel = NodePath("UILayer/FloorTransitionPanel")
@@ -97,7 +97,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
-script = ExtResource("4_3dryh")
+script = ExtResource("6_d0mko")
 
 [node name="TopLeft" type="VBoxContainer" parent="UILayer/HUD"]
 custom_minimum_size = Vector2(300, 20)
@@ -233,10 +233,10 @@ theme_override_font_sizes/font_size = 12
 text = "Wave 1- 5 Enemies Remaining"
 horizontal_alignment = 1
 
-[node name="LevelUpPanel" parent="UILayer" instance=ExtResource("6_i6g32")]
+[node name="LevelUpPanel" parent="UILayer" instance=ExtResource("7_xi64p")]
 process_mode = 3
 
-[node name="FloorTransitionPanel" parent="UILayer" instance=ExtResource("6_ku1f2")]
+[node name="FloorTransitionPanel" parent="UILayer" instance=ExtResource("8_fjca2")]
 
 [node name="VictoryScreen" type="Control" parent="UILayer" node_paths=PackedStringArray("_timeLabel", "_enemiesLabel", "_levelLabel", "_floorsLabel")]
 process_mode = 3
@@ -247,7 +247,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("9_nqya7")
+script = ExtResource("9_526qx")
 _timeLabel = NodePath("CenterContainer/Panel/Content/Stats/TimeLabel")
 _enemiesLabel = NodePath("CenterContainer/Panel/Content/Stats/EnemiesLabel")
 _levelLabel = NodePath("CenterContainer/Panel/Content/Stats/LevelLabel")
@@ -321,7 +321,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("10_cuk5j")
+script = ExtResource("10_7fxft")
 _timeLabel = NodePath("CenterContainer/Panel/Content/Stats/TimeLabel")
 _enemiesLabel = NodePath("CenterContainer/Panel/Content/Stats/EnemiesLabel")
 _levelLabel = NodePath("CenterContainer/Panel/Content/Stats/LevelLabel")
@@ -385,16 +385,16 @@ custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
 text = "Continue to Results"
 
-[node name="StatAllocationPanel" parent="UILayer" instance=ExtResource("11_cuk5j")]
+[node name="StatAllocationPanel" parent="UILayer" instance=ExtResource("11_103gp")]
 visible = false
 
-[node name="ResultsScreen" parent="UILayer" instance=ExtResource("12_nqya7")]
+[node name="ResultsScreen" parent="UILayer" instance=ExtResource("12_ahhlw")]
 
 [node name="Player" type="CharacterBody2D" parent="." node_paths=PackedStringArray("LevelUpPanel", "StatAllocationPanel") groups=["player"]]
-script = ExtResource("3_wowpa")
+script = ExtResource("13_jfnko")
 CurrentClass = 1
-ProjectileScene = ExtResource("4_i6g32")
-MeleeAttackScene = ExtResource("7_o5yvi")
+ProjectileScene = ExtResource("14_xh1eq")
+MeleeAttackScene = ExtResource("15_vysty")
 LevelUpPanel = NodePath("../UILayer/LevelUpPanel")
 StatAllocationPanel = NodePath("../UILayer/StatAllocationPanel")
 
@@ -410,15 +410,15 @@ shape = SubResource("RectangleShape2D_4flbx")
 [node name="Camera2D" type="Camera2D" parent="Player"]
 
 [node name="SkillManager" type="Node" parent="Player"]
-script = ExtResource("5_i6g32")
-BasicAttackSkill = ExtResource("9_hps8g")
-PrimarySkill = ExtResource("10_e5gjp")
+script = ExtResource("16_1c77v")
+BasicAttackSkill = ExtResource("17_811ml")
+PrimarySkill = ExtResource("18_52qhq")
 metadata/_custom_type_script = "uid://bvjyaqpu6dell"
 
 [node name="StatsManager" type="Node" parent="Player"]
-script = ExtResource("9_h4fw4")
+script = ExtResource("19_sy2cx")
 metadata/_custom_type_script = "uid://b3km77lyp5ba3"
 
 [node name="UpgradeManager" type="Node" parent="Player"]
-script = ExtResource("10_ldgsr")
+script = ExtResource("20_n6kfg")
 metadata/_custom_type_script = "uid://cx5d7m8au6iit"

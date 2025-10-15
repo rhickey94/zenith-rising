@@ -11,8 +11,7 @@ public partial class MainMenu : Control
     private const float HoverAnimationDuration = 0.15f;
 
     // ===== EXPORT FIELDS =====
-    [Export] public string GameScenePath = "res://Scenes/Core/game.tscn";
-    [Export] public string HubScenePath = "res://Scenes/Core/hub.tscn"; // For Phase 2
+    [Export] public string HubScenePath = "res://Scenes/Core/hub.tscn";
 
     // ===== PRIVATE FIELDS - UI References =====
     private Button _startButton;
@@ -89,15 +88,15 @@ public partial class MainMenu : Control
         // Delete existing save for fresh start
         SaveManager.Instance?.DeleteSave();
 
-        GetTree().ChangeSceneToFile(GameScenePath);
+        GetTree().ChangeSceneToFile(HubScenePath);
     }
 
     private void OnContinuePressed()
     {
         GD.Print("Continuing saved game...");
 
-        // Load will happen in Game._Ready() via Player.Initialize()
-        GetTree().ChangeSceneToFile(GameScenePath);
+        // Load will happen in Hub._Ready() via Player.Initialize()
+        GetTree().ChangeSceneToFile(HubScenePath);
     }
 
     private void OnSettingsPressed()

@@ -114,6 +114,7 @@ public partial class Player : CharacterBody2D
     {
         if (SaveManager.Instance != null && SaveManager.Instance.SaveExists())
         {
+            // Existing save game - load it
             SaveData? saveData = SaveManager.Instance.LoadGame();
             if (saveData.HasValue)
             {
@@ -128,6 +129,12 @@ public partial class Player : CharacterBody2D
 
                 GD.Print("Save data loaded successfully!");
             }
+        }
+        else
+        {
+            // New game - initialize fresh stats
+            _statsManager?.Initialize();
+            GD.Print("Initialized fresh character stats");
         }
 
         EmitResourcesUpdate(0, 0, 0, 0);

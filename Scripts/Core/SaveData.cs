@@ -8,6 +8,7 @@ public struct SaveData
     // ===== VERSION & METADATA =====
     public int Version { get; set; }
     public string LastSaved { get; set; }
+    public bool IsInHub { get; set; }
 
     // ===== CHARACTER STATS (PERMANENT) =====
     public int Strength { get; set; }

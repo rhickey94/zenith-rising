@@ -393,15 +393,15 @@ public partial class StatsManager : Node
     {
         GD.Print("Player died!");
 
-        // Find Game node and notify it
-        var game = GetTree().Root.GetNode<Game>("Game");
-        if (game != null)
+        // Find Dungeon node and notify it
+        var dungeon = GetTree().Root.GetNode<Dungeon>("Dungeon");
+        if (dungeon != null)
         {
-            game.OnPlayerDeath();
+            dungeon.OnPlayerDeath();
         }
         else
         {
-            GD.PrintErr("Could not find Game node!");
+            GD.PrintErr("Could not find Dungeon node!");
             GetTree().ReloadCurrentScene(); // Fallback
         }
     }
