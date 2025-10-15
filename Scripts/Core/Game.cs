@@ -17,8 +17,9 @@ public partial class Game : Node
     [Export] public Player Player;
     [Export] public Hud HUD;
     [Export] public FloorTransitionPanel FloorTransitionPanel;
-    [Export] private Control _victoryScreen;
-    [Export] private Control _deathScreen;
+    [Export] private VictoryScreen _victoryScreen;
+    [Export] private DeathScreen _deathScreen;
+    [Export] private ResultsScreen _resultsScreen;
 
     [Export] public string MainMenuScenePath = "res://Scenes/UI/Menus/main_menu.tscn";
 
@@ -53,6 +54,7 @@ public partial class Game : Node
     private int _enemiesKilled = 0;
     private int _bossesKilled = 0;
     private bool _finalBossDefeated = false;
+    private int _lastCharacterXPAwarded = 0;
 
     public override void _Ready()
     {
@@ -67,6 +69,8 @@ public partial class Game : Node
         Player.Initialize();
         UpdateHUD();
         SetupFloorTransitionPanel();
+        SetupResultsScreen();
+        SetupVictoryDeathScreens();
     }
 
     public override void _PhysicsProcess(double delta)
@@ -98,17 +102,17 @@ public partial class Game : Node
     {
         // Calculate and award character XP BEFORE showing screen
         int characterXP = CalculateCharacterXP();
+        _lastCharacterXPAwarded = characterXP;
 
         var statsManager = Player?.GetNode<StatsManager>("StatsManager");
         if (statsManager != null)
         {
-            statsManager.AddCharacterExperience(characterXP);
-            GD.Print($"Awarded {characterXP} character XP!");
+            statsManager.AddCharacterExperience(_lastCharacterXPAwarded);
+            GD.Print($"Awarded {_lastCharacterXPAwarded} character XP!");
         }
 
-        var deathScreen = _deathScreen as DeathScreen;
         int playerLevel = Player?.GetNode<StatsManager>("StatsManager")?.PowerLevel ?? 1;
-        deathScreen?.ShowScreen(_totalGameTime, _enemiesKilled, playerLevel, _currentFloor);
+        _deathScreen?.ShowScreen(_totalGameTime, _enemiesKilled, playerLevel, _currentFloor);
     }
 
     private void UpdateWaveProgression()
@@ -258,18 +262,37 @@ public partial class Game : Node
     {
         // Calculate and award character XP BEFORE showing screen
         int characterXP = CalculateCharacterXP();
+        _lastCharacterXPAwarded = characterXP;
 
         var statsManager = Player?.GetNode<StatsManager>("StatsManager");
         if (statsManager != null)
         {
-            statsManager.AddCharacterExperience(characterXP);
-            GD.Print($"Awarded {characterXP} character XP!");
+            statsManager.AddCharacterExperience(_lastCharacterXPAwarded);
+            GD.Print($"Awarded {_lastCharacterXPAwarded} character XP!");
         }
-        var victoryScreen = _victoryScreen as VictoryScreen;
         var playerLevel = Player?.GetNode<StatsManager>("StatsManager")?.PowerLevel ?? 1;
 
-        victoryScreen?.ShowScreen(_totalGameTime, _enemiesKilled, playerLevel, _currentFloor);
+        _victoryScreen?.ShowScreen(_totalGameTime, _enemiesKilled, playerLevel, _currentFloor);
         GD.Print("Victory! Player has completed all floors.");
+    }
+
+    private void ShowResultsScreen()
+    {
+        var statsManager = Player?.GetNode<StatsManager>("StatsManager");
+        if (statsManager == null || _resultsScreen == null)
+        {
+            GD.PrintErr("Cannot show results screen - missing dependencies");
+            return;
+        }
+
+        _resultsScreen.ShowScreen(
+            _totalGameTime,
+            _enemiesKilled,
+            _floorsCleared,
+            _bossesKilled,
+            _lastCharacterXPAwarded,
+            statsManager
+        );
     }
 
     private void OnContinueToNextFloor()
@@ -353,6 +376,33 @@ public partial class Game : Node
         _totalGameTime = 0f;
     }
 
+    private void SetupResultsScreen()
+    {
+        _resultsScreen.AllocateStatsRequested += OnAllocateStatsRequested;
+        _resultsScreen.ReturnToMenuRequested += OnReturnToMenuFromResults;
+    }
+
+    private void SetupVictoryDeathScreens()
+    {
+        _victoryScreen.ContinueButtonPressed += ShowResultsScreen;
+        _deathScreen.ContinueButtonPressed += ShowResultsScreen;
+    }
+
+    private void OnAllocateStatsRequested()
+    {
+        // Open stat allocation panel
+        Player?.StatAllocationPanel?.ShowPanel(
+            Player.GetNode<StatsManager>("StatsManager"),
+            Player.GetNode<UpgradeManager>("UpgradeManager")
+        );
+    }
+
+    private void OnReturnToMenuFromResults()
+    {
+        // Return to main menu
+        GetTree().ChangeSceneToFile(MainMenuScenePath);
+    }
+
     private bool ValidateDependencies()
     {
         bool valid = true;
@@ -396,6 +446,12 @@ public partial class Game : Node
         if (_deathScreen == null)
         {
             GD.PrintErr("Game: DeathScreen not assigned!");
+            valid = false;
+        }
+
+        if (_resultsScreen == null)
+        {
+            GD.PrintErr("Game: ResultsScreen not assigned!");
             valid = false;
         }
 

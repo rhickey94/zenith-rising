@@ -10,6 +10,15 @@ public partial class VictoryScreen : Control
     [Export] private Label _levelLabel;
     [Export] private Label _floorsLabel;
     [Export] private string _menuScenePath = "res://Scenes/UI/Menus/main_menu.tscn";
+    [Signal] public delegate void ContinueButtonPressedEventHandler();
+
+    private Button _continueButton;
+
+    public override void _Ready()
+    {
+        _continueButton = GetNode<Button>("%VictoryContinueButton");
+        _continueButton.Pressed += OnContinueButtonPressed;
+    }
 
     public void ShowScreen(float timeSurvived, int enemiesKilled, int playerLevel, int floorsCompleted)
     {
@@ -29,9 +38,10 @@ public partial class VictoryScreen : Control
         return $"{minutes:D2}:{secs:D2}";
     }
 
-    private void OnMenuButtonPressed()
+    private void OnContinueButtonPressed()
     {
-        GetTree().Paused = false;
-        GetTree().ChangeSceneToFile(_menuScenePath);
+        Hide(); // Hide this screen
+        EmitSignal(SignalName.ContinueButtonPressed);
+        // Game.cs will handle showing ResultsScreen
     }
 }

@@ -1,0 +1,106 @@
+[gd_scene load_steps=2 format=3 uid="uid://c18x5hfiw6axv"]
+
+[ext_resource type="Script" uid="uid://b738cgu1wqgy3" path="res://Scripts/UI/Panels/ResultsScreen.cs" id="1_y1npu"]
+
+[node name="ResultsScreen" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_y1npu")
+
+[node name="Overlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.7254902)
+
+[node name="PanelContainer" type="PanelContainer" parent="Overlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -73.5
+offset_right = 20.0
+offset_bottom = 73.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Overlay/PanelContainer"]
+layout_mode = 2
+
+[node name="ResultsTitle" type="Label" parent="Overlay/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Run Complete"
+horizontal_alignment = 1
+
+[node name="RunStatContainer" type="VBoxContainer" parent="Overlay/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="FloorsLabel" type="Label" parent="Overlay/PanelContainer/VBoxContainer/RunStatContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BossesLabel" type="Label" parent="Overlay/PanelContainer/VBoxContainer/RunStatContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="TimeLabel" type="Label" parent="Overlay/PanelContainer/VBoxContainer/RunStatContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EnemiesLabel" type="Label" parent="Overlay/PanelContainer/VBoxContainer/RunStatContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="Overlay/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ProgressionContainer" type="VBoxContainer" parent="Overlay/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="XPEarnedLabel" type="Label" parent="Overlay/PanelContainer/VBoxContainer/ProgressionContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="CharacterLevelLabel" type="Label" parent="Overlay/PanelContainer/VBoxContainer/ProgressionContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="XPProgressBar" type="ProgressBar" parent="Overlay/PanelContainer/VBoxContainer/ProgressionContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="XPProgressLabel" type="Label" parent="Overlay/PanelContainer/VBoxContainer/ProgressionContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="LevelUpNotification" type="Label" parent="Overlay/PanelContainer/VBoxContainer/ProgressionContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ButtonContainer" type="HBoxContainer" parent="Overlay/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="AllocateStatsButton" type="Button" parent="Overlay/PanelContainer/VBoxContainer/ButtonContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "Allocate Stats"
+
+[node name="ReturnToMenuButton" type="Button" parent="Overlay/PanelContainer/VBoxContainer/ButtonContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "Return to Menu"
