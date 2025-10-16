@@ -135,7 +135,7 @@ public partial class Player : CharacterBody2D
         }
         else
         {
-            PlayIdleAnimation(direction);
+            PlayIdleAnimation(_lastDirection);
         }
 
         // Update skill cooldowns
