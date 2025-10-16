@@ -24,75 +24,178 @@
 
 ### 🔴 Critical (Phase 1-2)
 
-**Character Sprites** (Top Priority)
-- Player character (1 per class × 3 classes)
-- Animation states: Idle, walk, attack, death
-- Style: Top-down, 32x32 or 64x64
-- **Recommended:** Kenney's Top-Down Shooter Pack (FREE)
-  - Link: https://kenney.nl/assets/top-down-shooter
-  - 580+ assets including characters, weapons, objects
-  - CC0 licensed
+#### **Character Sprites** (Top Priority) ⭐⭐⭐⭐⭐
 
-**Enemy Sprites**
-- 3-5 enemy types minimum
-- Boss variants (larger, distinct)
-- **Recommended:** PenUsbMic's Sci-Fi Character Packs (FREE samples)
-  - Pack 10: https://penusbmic.itch.io/sci-fi-character-pack-10
-  - Pack 12: https://penusbmic.itch.io/sci-fi-character-pack-12
-  - 1 FREE robot per pack, paid versions $2.50 each
-  - Perfect metallic sci-fi aesthetic
+**PRIMARY RECOMMENDATION: Tatermand's Top-Down Sci-fi Shooter Characters 2.0**
+- Link: https://opengameart.org/content/top-down-sci-fi-shooter-characters-20
+- Cost: **100% FREE** (CC-BY-SA 3.0)
+- What: 9 professional character classes in powered armor
+- Style: Dark industrial sci-fi, exactly our aesthetic
+- Classes include:
+  - **Heavy** (perfect for Warrior/Breacher)
+  - **Sniper** (perfect for Ranger/Sharpshooter)
+  - **Engineer** (perfect for Mage/Conduit with recolor)
+  - Plus 6 more bonus classes
+- Format: PSD (layered, customizable) + PNG exports
+- Quality: **Legendary** - universally praised as "best on OpenGameArt"
+- **Why it's #1:** Free, professional quality, matches our theme perfectly, human soldiers
 
-**UI Elements**
-- Health bars, XP bars
-- Buttons (normal, hover, pressed states)
-- Panels and borders
-- Icons (skills, stats, resources)
-- **Recommended:** SunGraphica's FREE Sci-Fi UI
-  - Link: https://sungraphica.itch.io/free-sci-fi-ui
-  - Complete UI kit with PSD/PNG/Vector
-  - CC-BY license (credit required)
+**See detailed comparison:** [`../HUMAN-VS-ROBOT-SPRITES.md`](../HUMAN-VS-ROBOT-SPRITES.md)
 
-### 🟡 Important (Phase 2-3)
+**Alternative Option: PenUsbMic Robots**
+- If you prefer robots over humans
+- Pack 10: https://penusbmic.itch.io/sci-fi-character-pack-10
+- Cost: FREE for 1 robot, $7.50 for 3 class packs
+- Style: Metallic sci-fi robots
+- **See:** [`../CHARACTER-SPRITES-RESEARCH.md`](../CHARACTER-SPRITES-RESEARCH.md)
 
-**Weapon Sprites**
-- Swords, guns, staves
-- Visual distinction per class
-- **Recommended:** Kenney Top-Down Shooter (included in pack above)
+#### **Enemy Sprites**
 
-**Projectile Sprites**
-- Bullets, arrows, energy bolts
-- **Current Solution:** Use particle pack circles/stars
-- **Upgrade Option:** Kenney pack has dedicated projectiles
+**RECOMMENDED: Mix of sources**
 
-**Loot/Item Sprites**
-- Gear drops (weapon, armor, accessory icons)
-- Materials (energy cores, mod chips)
-- Gold coins
-- **Temporary:** Use colored squares with icons
-- **Upgrade:** Kenney Game Assets or custom commission
+1. **Tatermand's Mutant class** (from character pack above)
+   - Use for corrupted enemies
+   - FREE in same pack
 
-### 🟢 Nice-to-Have (Phase 3+)
+2. **PenUsbMic Pack 10 FREE robot** 
+   - Link: https://penusbmic.itch.io/sci-fi-character-pack-10
+   - Cost: FREE (1 robot)
+   - Use for robot enemies
 
-**Tileset - Metallic Sci-Fi**
-- Industrial metal floors/walls
-- Tech panels, machinery
-- **Recommended:** Atomic Realm Industrial Tileset
-  - Link: https://atomicrealm.itch.io/industrial-tileset
-  - FREE sample, full version $9.99
-  - Metallic sci-fi aesthetic (perfect match)
-  - Animated tiles available
+3. **Kenney Top-Down Shooter zombies**
+   - Link: https://kenney.nl/assets/top-down-shooter
+   - Cost: FREE (CC0)
+   - Use for basic enemies
 
-**Sound Effects**
-- Weapon fire, explosions, hits
-- UI clicks, level-up fanfare
-- Footsteps, ambient
-- **Recommended:** Kenney Audio Packs (FREE, CC0)
+#### **UI Elements**
 
-**Music**
-- Combat theme
-- Boss theme
-- Hub/menu music
-- **Recommended:** OpenGameArt or commission
+**SunGraphica's FREE Sci-Fi UI** ⭐⭐⭐⭐
+- Link: https://sungraphica.itch.io/free-sci-fi-ui
+- Cost: FREE (CC-BY, credit required)
+- What: Complete UI kit (PSD, PNG, Vector)
+- Includes: Health bars, panels, buttons, borders, icons
+- Why: Professional sci-fi UI, matches our aesthetic
+
+---
+
+## How to Use PSD Files
+
+### What is a PSD?
+
+**PSD = Photoshop Document**
+- Adobe Photoshop's native format
+- Contains **layers** (like transparent sheets stacked on top of each other)
+- Each layer = one part (body, arms, legs, weapon, effects)
+- You can show/hide, edit, or export individual layers
+
+**Think of it like:**
+```
+Layer 5: Weapon (top)
+Layer 4: Arms
+Layer 3: Body
+Layer 2: Legs
+Layer 1: Shadow (bottom)
+```
+
+All layers together = complete character sprite
+
+### Do I Need Photoshop?
+
+**No!** Free alternatives work perfectly:
+
+1. **GIMP** (FREE, recommended)
+   - Download: https://www.gimp.org/
+   - Opens PSD files
+   - Cross-platform (Windows, Mac, Linux)
+   - Full PSD support
+
+2. **Photopea** (FREE, online)
+   - Website: https://www.photopea.com/
+   - No download needed
+   - Works in browser
+   - Opens PSD directly
+
+3. **Krita** (FREE)
+   - Download: https://krita.org/
+   - Good PSD support
+   - More painting-focused
+
+**For Tatermand's sprites:** Use GIMP or Photopea
+
+### How to Export PSD to PNG for Godot
+
+#### Using Photopea (Easiest - No Install)
+
+1. **Go to:** https://www.photopea.com/
+2. **File → Open** → Select Tatermand's PSD
+3. **You'll see:** Layers panel on right (Body, Arms, Legs, etc.)
+4. **Select the character you want:**
+   - Hide layers you don't need (click eye icon)
+   - Show only the character you want (Heavy, Sniper, Engineer)
+5. **Export:**
+   - File → Export As → PNG
+   - Name it: `warrior_idle.png`
+6. **Repeat for each character class**
+
+#### Using GIMP (More Control)
+
+1. **Install GIMP** from https://www.gimp.org/
+2. **File → Open** → Select PSD
+3. **Layers panel shows all parts**
+4. **Hide/show layers** by clicking eye icons
+5. **Flatten when ready:**
+   - Image → Flatten Image (merges visible layers)
+6. **Export:**
+   - File → Export As → PNG
+   - Name: `warrior_idle.png`
+
+### Step-by-Step: Tatermand Pack to Godot
+
+**Step 1: Download Tatermand Pack** (5 min)
+1. Visit https://opengameart.org/content/top-down-sci-fi-shooter-characters-20
+2. Click "Download" (large PSD file ~20MB)
+3. Extract ZIP to `Downloads/Tatermand/`
+
+**Step 2: Open in Photopea** (2 min)
+1. Go to https://www.photopea.com/
+2. Drag PSD file into browser window
+3. Wait for it to load (10-20 seconds)
+
+**Step 3: Export Heavy Class (Warrior)** (5 min)
+1. In Layers panel, find "Heavy" group
+2. Hide all other character groups (click eye icons)
+3. Show only Heavy layers
+4. File → Export As → PNG
+5. Name: `heavy_idle.png`
+6. Save to `Assets/Sprites/Characters/Warrior/`
+
+**Step 4: Repeat for Sniper (Ranger)** (5 min)
+- Export as `sniper_idle.png`
+- Save to `Assets/Sprites/Characters/Ranger/`
+
+**Step 5: Repeat for Engineer (Mage)** (5 min)
+- Export as `engineer_idle.png`
+- Save to `Assets/Sprites/Characters/Mage/`
+
+**Step 6: Import to Godot** (5 min)
+1. Godot auto-imports PNGs
+2. Select sprite in FileSystem
+3. In Import tab: Filter = Nearest (for pixel art)
+4. Reimport
+
+**Total time: ~30 minutes to have all 3 class sprites ready**
+
+### What if the PSD is Too Complex?
+
+**Tatermand provides PNG exports too!**
+- Look for "flat" or "PNG" version in the download
+- These are pre-flattened, ready to use
+- Just import directly to Godot
+
+**Or use pre-made sprite sheets:**
+- Some PSDs have sprite sheet layers
+- Export the whole sheet
+- Use in Godot's AnimatedSprite2D
 
 ---
 
@@ -100,37 +203,43 @@
 
 ### Essential Downloads (Do These First)
 
-1. **Kenney Top-Down Shooter** ⭐⭐⭐⭐⭐
-   - Link: https://kenney.nl/assets/top-down-shooter
-   - Cost: FREE (CC0)
-   - What: 580 assets (characters, weapons, tiles, objects)
-   - Why: Covers 70% of sprite needs instantly
+1. **Tatermand Top-Down Sci-fi Shooter Characters 2.0** ⭐⭐⭐⭐⭐
+   - Link: https://opengameart.org/content/top-down-sci-fi-shooter-characters-20
+   - Cost: FREE (CC-BY-SA 3.0)
+   - What: 9 character classes, professional quality
+   - Why: Perfect match for our theme, legendary quality
 
-2. **PenUsbMic Sci-Fi Pack 10** ⭐⭐⭐⭐⭐
+2. **PenUsbMic Sci-Fi Pack 10** (for enemies) ⭐⭐⭐⭐⭐
    - Link: https://penusbmic.itch.io/sci-fi-character-pack-10
    - Cost: FREE (1 robot), $2.50 for full pack
-   - What: Animated robot enemies (perfect for our theme)
-   - Why: Metallic sci-fi robots = exactly our aesthetic
+   - What: Animated robot enemies
+   - Why: Perfect for enemy variety
 
 3. **SunGraphica FREE Sci-Fi UI** ⭐⭐⭐⭐
    - Link: https://sungraphica.itch.io/free-sci-fi-ui
    - Cost: FREE (CC-BY, credit required)
-   - What: Complete UI kit (PSD, PNG, Vector)
-   - Why: Professional sci-fi UI instantly
+   - What: Complete UI kit
+   - Why: Professional sci-fi UI
+
+4. **Kenney Top-Down Shooter** (backup/variety) ⭐⭐⭐⭐
+   - Link: https://kenney.nl/assets/top-down-shooter
+   - Cost: FREE (CC0)
+   - What: 580 assets (soldiers, zombies, props)
+   - Why: Backup sprites, enemy variety, props
 
 ### Secondary Recommendations
 
-4. **0x72 16x16 Industrial Tileset**
+5. **0x72 16x16 Industrial Tileset**
    - Link: https://0x72.itch.io/16x16-industrial-tileset
-   - Cost: FREE (no credit required)
-   - What: Dark industrial tileset + character + enemies
-   - Why: Good placeholder, includes enemies
+   - Cost: FREE
+   - What: Dark industrial tileset
+   - Why: Good placeholder
 
-5. **Atomic Realm Industrial Tileset** (Sample)
+6. **Atomic Realm Industrial Tileset** (Sample)
    - Link: https://atomicrealm.itch.io/industrial-tileset
    - Cost: FREE sample (full $9.99)
-   - What: Metallic tiles, animated options
-   - Why: Perfect aesthetic match for full game
+   - What: Metallic tiles, animated
+   - Why: Perfect aesthetic match
 
 ---
 
@@ -138,68 +247,79 @@
 
 ### Quick Start (This Week)
 
-**Phase 1 Minimum:**
-1. Download Kenney Top-Down Shooter
-2. Extract to `Assets/kenney_topdown_shooter/`
-3. Replace player square sprite with soldier sprite
-4. Replace enemy squares with zombie/robot sprites
-5. Test in game
+**Phase 1 Character Sprites:**
+1. Download Tatermand pack
+2. Open PSD in Photopea (or GIMP)
+3. Export Heavy, Sniper, Engineer as PNGs
+4. Import to `Assets/Sprites/Characters/`
+5. Replace placeholder squares in player.tscn
+6. Test in game
 
-**Phase 2 Additions:**
-6. Download PenUsbMic Pack 10 (free robot)
-7. Import robot as new enemy type
-8. Set up animations (idle, attack, death)
-9. Download SunGraphica UI pack
-10. Replace HUD elements with styled UI
+**Phase 1 Enemy Sprites:**
+7. Download PenUsbMic Pack 10 (free robot)
+8. Import robot PNG to `Assets/Sprites/Enemies/`
+9. Use Tatermand's Mutant class for another enemy
+10. Use Kenney zombies for basic enemies
+
+**Phase 1 UI:**
+11. Download SunGraphica UI pack
+12. Extract to `Assets/UI/`
+13. Replace HUD elements with styled panels
+14. Apply sci-fi button textures
 
 ### Asset Workflow
 
-**For Sprites:**
+**For PSD Sprites:**
+1. Open in Photopea or GIMP
+2. Export needed layers as PNG
+3. Save to `Assets/Sprites/[Category]/`
+4. Set Godot import: Filter = Nearest
+5. Create AnimatedSprite2D in scenes
+
+**For Ready-Made PNG:**
 1. Import to `Assets/Sprites/[Category]/`
-2. Set import settings: Pixel Art mode, No Filter
-3. Create scenes in `Scenes/[Category]/`
-4. Attach sprites to scene nodes
-5. Test in game
+2. Set import: Pixel Art mode, No Filter
+3. Attach to scene nodes
+4. Test in game
 
 **For UI:**
 1. Import to `Assets/UI/`
-2. Use StyleBoxFlat for buttons/panels
-3. Load textures for icons
+2. Use StyleBoxTexture for textured panels
+3. Load icons as Texture2D
 4. Follow visual-style-guide.md for colors
 
 ---
 
 ## Budget-Friendly Acquisition Strategy
 
-### $0 Budget (MVP)
+### $0 Budget (MVP) ← **RECOMMENDED TO START**
 Use only free assets:
-- Kenney packs (everything CC0)
-- PenUsbMic free samples
+- **Tatermand characters** (9 classes FREE)
+- PenUsbMic free samples (enemies)
 - SunGraphica free UI
-- 0x72 free tileset
-- **Result:** Functional game with decent art
+- Kenney packs (props, variety)
+- **Result:** Professional-looking game, $0 spent
 
-### $20 Budget (Polished MVP)
+### $10 Budget (Add Robot Variety)
+- Tatermand FREE
+- PenUsbMic full packs ($2.50 × 3 = $7.50)
+- Atomic Realm tileset sample (FREE) or full ($9.99)
+- **Result:** Maximum variety, professional quality
+
+### $20 Budget (Ultimate Free Assets + Premium Tools)
+- All free assets above
 - Kenney Game Assets All-in-1 ($19.95)
   - 60,000+ assets (2D + 3D + Audio)
-  - Lifetime access, all updates
+  - Lifetime access
   - Best value in game assets
-- **Result:** Professional-looking MVP
+- **Result:** Never need another asset pack
 
 ### $50-100 Budget (Near-Commercial Quality)
 - Kenney All-in-1 ($20)
-- PenUsbMic full character packs ($2.50 × 3-5 classes)
-- Atomic Realm Industrial Tileset ($10)
-- Commission custom UI theme ($50)
+- PenUsbMic character packs ($7.50)
+- Atomic Realm tileset ($10)
+- Custom UI commission ($50)
 - **Result:** Unique visual identity
-
-### $500+ Budget (Commercial Polish)
-- All above
-- Custom character sprites ($100-200 per character)
-- Custom weapon sprites ($50-100 set)
-- Professional UI design ($200-300)
-- Custom music ($500+)
-- **Result:** Fully custom art direction
 
 ---
 
@@ -209,7 +329,7 @@ Use only free assets:
 - Metallic sci-fi (Mass Effect / Dead Space inspired)
 - NOT neon Tron or bright cyberpunk
 - Industrial, worn, grounded
-- See [`visual-style-guide.md`](visual-style-guide.md) for details
+- Dark with cyan/orange accents
 
 **Color Palette:**
 - Primary: Steel Gray #2c3e50
@@ -218,10 +338,12 @@ Use only free assets:
 - Backgrounds: Deep Black #0a0a0a
 
 **Sprite Specifications:**
-- Resolution: 32x32 or 64x64 (consistent per asset type)
+- Resolution: 64x64 for characters (can scale Tatermand sprites to this)
 - Format: PNG with transparency
-- Style: Clean pixel art or low-poly 3D renders
+- Style: Detailed pixel art
 - Animation: 4-8 frames per action
+
+**Tatermand sprites are larger (~100px) but scale beautifully to 64x64 in Godot**
 
 ---
 
@@ -229,18 +351,18 @@ Use only free assets:
 
 **Phase 1 (Current):**
 - ✅ Particles (have Kenney pack)
-- 🔴 Character sprites (use Kenney top-down)
-- 🔴 Enemy sprites (use PenUsbMic + Kenney)
-- 🟡 Basic UI (use SunGraphica)
+- 🔴 Character sprites (**USE TATERMAND - download now!**)
+- 🔴 Enemy sprites (Tatermand Mutant + PenUsbMic robot + Kenney zombies)
+- 🟡 Basic UI (SunGraphica)
 
 **Phase 2:**
-- 🟡 Weapon sprites
-- 🟡 Loot icons
+- 🟡 Weapon sprites (Tatermand pack includes some)
+- 🟡 Loot icons (can reuse from packs)
 - 🟡 Polished UI
-- 🟢 Sound effects
+- 🟢 Sound effects (Kenney audio)
 
 **Phase 3:**
-- 🟢 Sci-fi tileset
+- 🟢 Sci-fi tileset (Atomic Realm)
 - 🟢 More enemy variety
 - 🟢 Music tracks
 
@@ -253,10 +375,17 @@ Use only free assets:
 
 ## License Compliance
 
-**CC0 (Public Domain) - Kenney, 0x72:**
+**CC0 (Public Domain) - Kenney:**
 - ✅ Use commercially
 - ✅ Modify freely
-- ✅ No attribution required (but appreciated)
+- ✅ No attribution required
+
+**CC-BY-SA 3.0 - Tatermand:**
+- ✅ Use commercially
+- ✅ Modify freely
+- ⚠️ **Must credit "Tatermand"** in game
+- ⚠️ Share-alike (derivative sprite edits use same license)
+- Example credit: "Character sprites by Tatermand (CC-BY-SA 3.0)"
 
 **CC-BY - SunGraphica:**
 - ✅ Use commercially
@@ -265,24 +394,59 @@ Use only free assets:
 
 **PenUsbMic Assets:**
 - ✅ Use commercially
-- ✅ Credit "PenUsbMic" if desired (not required)
+- ✅ Credit "PenUsbMic" optional (appreciated)
 - ⚠️ Don't resell asset packs themselves
 
 ---
 
 ## Next Steps
 
+**Right Now (30 minutes):**
+1. **Download Tatermand pack** (5 min)
+2. **Open in Photopea** (2 min) - https://www.photopea.com/
+3. **Export Heavy, Sniper, Engineer** (15 min)
+4. **Import to Godot** (5 min)
+5. **Test with one character** (3 min)
+
 **This Week:**
-1. Download Kenney Top-Down Shooter
-2. Download PenUsbMic Pack 10 (free)
-3. Download SunGraphica UI Pack
-4. Import to project
-5. Replace placeholder sprites
+6. Download PenUsbMic Pack 10 (free robot)
+7. Download SunGraphica UI pack
+8. Replace all placeholder sprites
+9. Test complete visual overhaul
 
 **Related Documentation:**
-- Visual style: [`visual-style-guide.md`](visual-style-guide.md)
+- Human vs Robot comparison: [`../HUMAN-VS-ROBOT-SPRITES.md`](../HUMAN-VS-ROBOT-SPRITES.md)
+- Visual style guide: [`visual-style-guide.md`](visual-style-guide.md)
 - Current status: [`../../CLAUDE.md`](../../CLAUDE.md)
 
 ---
 
-*Keep this updated as we acquire new assets.*
+## Quick Reference: PSD to Godot Workflow
+
+```
+1. Download Tatermand PSD
+   ↓
+2. Open in Photopea (photopea.com)
+   ↓
+3. Hide unwanted layers (click eye icons)
+   ↓
+4. Show only character you want (Heavy/Sniper/Engineer)
+   ↓
+5. File → Export As → PNG
+   ↓
+6. Save to Assets/Sprites/Characters/[Class]/
+   ↓
+7. Godot auto-imports
+   ↓
+8. Set Filter: Nearest
+   ↓
+9. Use in AnimatedSprite2D
+   ↓
+10. Done!
+```
+
+**Total time:** 30 minutes for all 3 classes
+
+---
+
+*Updated with Tatermand as primary recommendation + PSD workflow guide*
