@@ -7,6 +7,16 @@ using SpaceTower.Scripts.Core;
 
 namespace SpaceTower.Scripts.PlayerScripts;
 
+public enum PlayerState
+{
+    Idle,
+    Running,
+    BasicAttacking,
+    CastingSkill,
+    Hurt,
+    Dead
+}
+
 public partial class Player : CharacterBody2D
 {
     // ===== EXPORT FIELDS - Config =====
@@ -31,6 +41,10 @@ public partial class Player : CharacterBody2D
     private SkillManager _skillManager;
     private StatsManager _statsManager;
     private UpgradeManager _upgradeManager;
+    private Sprite2D _sprite;
+    private AnimationPlayer _animationPlayer;
+    private Vector2 _lastDirection = Vector2.Down;
+    private PlayerState _currentState;
 
     // ===== LIFECYCLE METHODS =====
     public override void _Ready()
@@ -64,6 +78,22 @@ public partial class Player : CharacterBody2D
         if (_upgradeManager == null)
         {
             GD.PrintErr("Player: UpgradeManager component not found!");
+        }
+
+        _sprite = GetNode<Sprite2D>("Sprite2D");
+        if (_sprite == null)
+        {
+            GD.PrintErr("Player: AnimatedSprite2D not found!");
+        }
+
+        _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+        if (_animationPlayer == null)
+        {
+            GD.PrintErr("Player: AnimationPlayer not found!");
+        }
+        else
+        {
+            _animationPlayer.AnimationFinished += OnAnimationFinished;
         }
 
         // Connect to LevelUpPanel
@@ -100,7 +130,12 @@ public partial class Player : CharacterBody2D
 
         if (direction != Vector2.Zero)
         {
-            Rotation = direction.Angle();
+            _lastDirection = direction;
+            PlayWalkAnimation(direction);
+        }
+        else
+        {
+            PlayIdleAnimation(direction);
         }
 
         // Update skill cooldowns
@@ -189,4 +224,77 @@ public partial class Player : CharacterBody2D
     {
         EmitSignal(SignalName.WaveInfoChanged, waveNumber, enemiesRemaining);
     }
+
+    // ===== PRIVATE HELPERS - Animation =====
+
+    private void PlayWalkAnimation(Vector2 direction)
+    {
+        if (_animationPlayer == null)
+        {
+            return;
+        }
+
+        string animName = GetDirectionalAnimationName("walk", direction);
+
+        if (_animationPlayer.CurrentAnimation != animName)
+        {
+            _animationPlayer.Play(animName);
+        }
+    }
+
+    private void PlayIdleAnimation(Vector2 direction)
+    {
+        if (_animationPlayer == null)
+        {
+            return;
+        }
+
+        string animName = GetDirectionalAnimationName("idle", direction);
+
+        if (_animationPlayer.CurrentAnimation != animName)
+        {
+            _animationPlayer.Play(animName);
+        }
+    }
+
+    private string GetDirectionalAnimationName(string baseAnimation, Vector2 direction)
+    {
+        string directionSuffix;
+
+        if (Mathf.Abs(direction.X) > Mathf.Abs(direction.Y))
+        {
+            directionSuffix = direction.X > 0 ? "right" : "left";
+        }
+        else
+        {
+            directionSuffix = direction.Y > 0 ? "down" : "up";
+        }
+
+        return $"{baseAnimation}_{directionSuffix}";
+    }
+    private bool CanTransitionTo(PlayerState newState)
+    {
+        if (_currentState == PlayerState.Dead)
+        {
+            return false;
+        }
+
+        if (newState == PlayerState.Hurt || newState == PlayerState.Dead)
+        {
+            return true;
+        }
+
+        return _currentState switch
+        {
+            PlayerState.Idle => true,
+            PlayerState.Running => true,
+            PlayerState.BasicAttacking => newState == PlayerState.Idle || newState == PlayerState.Running,
+            PlayerState.CastingSkill => newState == PlayerState.Idle || newState == PlayerState.Running,
+            PlayerState.Hurt => newState == PlayerState.Idle || newState == PlayerState.Running,
+            _ => false
+        };
+    }
+
+    private void OnAnimationFinished(StringName animName) { }
+
 }
