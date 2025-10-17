@@ -24,7 +24,6 @@ BalanceType = 1
 CastBehavior = 1
 DamageSource = 0
 BaseDamage = 40.0
-Cooldown = 8.0
 Radius = 150.0
 CastTime = 0.8
 StrengthScaling = 1.2

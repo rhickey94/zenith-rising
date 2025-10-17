@@ -1,5 +1,13 @@
 # Sequential Development Plan
 
+> **📌 MVP SCOPE:** Phases 1-3 + 3.5 = Core gameplay loop validated
+>
+> **📝 POST-MVP:** Phases 4-7 = Expansion content and retention features
+>
+> For current implementation status, see [`../../CLAUDE.md`](../../CLAUDE.md)
+
+---
+
 ## Development Philosophy
 
 **Core Principle:** Build in phases where **each phase proves a hypothesis** before investing in the next.

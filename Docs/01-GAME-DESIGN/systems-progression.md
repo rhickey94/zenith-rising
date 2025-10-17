@@ -13,7 +13,7 @@ Zenith Rising uses a **stat-based power system** where everything scales from 5 
 
 ---
 
-## Character Stats System
+## Character Stats System ✅ MVP - IMPLEMENTED
 
 ### The 5 Core Stats
 
@@ -149,7 +149,7 @@ Every character has 5 base stats that define their combat capabilities:
 
 ---
 
-## Equipment System
+## Equipment System 📝 Phase 4 - PLANNED
 
 ### Gear Slots
 
@@ -290,7 +290,9 @@ Add enchantments with refined components.
 
 ---
 
-## Material Economy (Simplified)
+## Material Economy (Simplified) 📝 Phase 5 - PLANNED
+
+> ⚠️ **MATERIAL COUNT:** ONE material type (Energy Cores) for MVP. Future phases may add Modification Chips.
 
 ### Design Philosophy
 
@@ -383,7 +385,7 @@ Add enchantments with refined components.
 
 ---
 
-## Idle Systems
+## Idle Systems 📝 Phase 5 - PLANNED
 
 ### Design Constraints
 

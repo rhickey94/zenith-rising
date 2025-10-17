@@ -86,25 +86,28 @@ Before each run, **equip 3 active skills** from your unlocked pool:
 **Example Warrior Loadout:**
 
 ```
-Q: Whirlwind (spin attack, AOE damage)
-E: Iron Skin (damage reduction buff)
-R: Berserker Rage (massive damage boost)
+Q: Crowd Suppression (ground slam, AOE knockback + slow)
+E: Fortify (deploy energy shield, block damage)
+R: Combat Stim (attack/move speed + damage boost)
+Ultimate: Last Stand (cannot die for 10s, massive damage)
 ```
 
 **Example Mage Loadout:**
 
 ```
-Q: Arc Lightning (chain lightning)
-E: Void Rift (damage zone + healing)
-R: Singularity (gravity well + implosion)
+Q: Arc Lightning (chain lightning, multi-target)
+E: Void Rift (damage zone + healing + slow)
+R: Architect's Blessing (cooldown reduction + chains + shields)
+Ultimate: Singularity (gravity well + implosion)
 ```
 
 **Example Ranger Loadout:**
 
 ```
-Q: Flashbang (blind + damage boost)
-E: Tactical Roll (dash + decoy)
-R: Auto-Turret (summon turret)
+Q: Tactical Grenade (AOE damage + mark targets for bonus damage)
+E: Evasive Roll (dash + invuln + holographic decoy)
+R: Overwatch (precision mode, +100% crit chance)
+Ultimate: Killzone (deploy turret + Aria gains attack speed)
 ```
 
 ### Skill Unlocking
@@ -303,30 +306,34 @@ Temporary stat increases
 
 **Warrior - Tank Build:**
 
-- Q: Shockwave (crowd control)
-- E: Iron Skin (damage reduction)
-- R: Last Stand (survive death)
+- Q: Crowd Suppression (knockback + slow)
+- E: Fortify (energy shield, block damage)
+- R: Combat Stim (attack speed + survivability)
+- Ultimate: Last Stand (invulnerability + damage)
 - Upgrades: +Max HP, +Regen, Lifesteal on hit
 
-**Warrior - Berserker Build:**
+**Warrior - Aggressive Build:**
 
-- Q: Whirlwind (AOE damage)
-- E: Combat Stim (attack speed)
-- R: Berserker Rage (damage boost)
+- Q: Crowd Suppression (crowd control)
+- E: Combat Stim (damage + attack speed)
+- R: Fortify (sustain for extended fights)
+- Ultimate: Last Stand (clutch moments)
 - Upgrades: +Attack Speed, +Damage, Crit chance
 
 **Mage - Chain Lightning Build:**
 
-- Q: Arc Lightning
-- E: Void Rift (sustain)
-- R: Architect's Blessing (cooldown reduction)
+- Q: Arc Lightning (multi-target chain)
+- E: Void Rift (sustain + slow)
+- R: Architect's Blessing (cooldown reduction + chains)
+- Ultimate: Singularity (massive AOE)
 - Upgrades: +Chain targets, −Cooldowns, Chain damage
 
-**Ranger - Sniper Build:**
+**Ranger - Precision Build:**
 
-- Q: Charged Shot
-- E: Tactical Roll (positioning)
-- R: Deadeye (crit boost)
+- Q: Tactical Grenade (mark targets for bonus damage)
+- E: Evasive Roll (positioning + decoy)
+- R: Overwatch (precision mode, +100% crit chance)
+- Ultimate: Killzone (turret + attack speed)
 - Upgrades: +Crit damage, Pierce, Slow enemies
 
 ---
@@ -452,21 +459,26 @@ Boss:
 
 ## Related Documentation
 
-**For detailed class designs:**
+**For detailed skill specifications (SOURCE OF TRUTH):**
 
-- See [`../03-CONTENT-DESIGN/class-abilities.md`](../03-CONTENT-DESIGN/class-abilities.md)
+- [`../03-CONTENT-DESIGN/class-abilities.md`](../03-CONTENT-DESIGN/class-abilities.md) - Complete skill designs for all 3 classes with exact values, mechanics, and upgrade paths
+
+**For technical implementation (CURRENT APPROACH):**
+
+- [`../02-IMPLEMENTATION/skill-standardization.md`](../02-IMPLEMENTATION/skill-standardization.md) - Animation-driven hitbox pattern (Phase 3.5)
+- [`../02-IMPLEMENTATION/skill-system-architecture.md`](../02-IMPLEMENTATION/skill-system-architecture.md) - Historical reference (type-based executor pattern)
 
 **For upgrade pool:**
 
-- See [`../03-CONTENT-DESIGN/upgrade-pool.md`](../03-CONTENT-DESIGN/upgrade-pool.md)
+- [`../03-CONTENT-DESIGN/upgrade-pool.md`](../03-CONTENT-DESIGN/upgrade-pool.md) - All upgrade definitions (~140 total for full vision, 8 implemented for MVP)
 
-**For technical implementation:**
+**For balance tuning:**
 
-- See [`../02-IMPLEMENTATION/skill-system-architecture.md`](../02-IMPLEMENTATION/skill-system-architecture.md)
+- [`../02-IMPLEMENTATION/balance-systems-architecture.md`](../02-IMPLEMENTATION/balance-systems-architecture.md) - Centralized config system for inspector-based tuning
 
-**For current status:**
+**For current implementation status:**
 
-- See [`CLAUDE.md`](../../CLAUDE.md)
+- [`../../CLAUDE.md`](../../CLAUDE.md) - Updated daily with session progress
 
 ---
 

@@ -13,7 +13,8 @@ SpaceTower/
 │
 ├── Scenes/
 │   ├── Core/
-│   │   └── game.tscn                # Main game loop
+│   │   ├── hub.tscn                 # Safe zone with dungeon portal
+│   │   └── dungeon.tscn             # Combat zone (wave/floor system)
 │   ├── Player/
 │   │   └── player.tscn              # Player character
 │   ├── Enemies/
@@ -28,14 +29,25 @@ SpaceTower/
 │   │   ├── whirlwind_effect.tscn
 │   │   └── melee_attack.tscn
 │   └── UI/
-│       ├── hud.tscn
-│       ├── level_up_panel.tscn
-│       └── main_menu.tscn
+│       ├── Menus/
+│       │   ├── main_menu.tscn
+│       │   └── floor_transition_panel.tscn
+│       ├── Panels/
+│       │   ├── level_up_panel.tscn
+│       │   ├── stat_allocation_panel.tscn
+│       │   ├── victory_screen.tscn
+│       │   ├── death_screen.tscn
+│       │   └── results_screen.tscn
+│       └── hud.tscn
 │
 ├── Scripts/
 │   ├── Core/
-│   │   ├── Game.cs                  # Main game controller
-│   │   └── CombatSystem.cs          # Damage calculations
+│   │   ├── Hub.cs                   # Hub world management
+│   │   ├── Dungeon.cs               # Combat/spawning controller
+│   │   ├── DungeonPortal.cs         # Hub → Dungeon interaction
+│   │   ├── CombatSystem.cs          # Damage calculations
+│   │   ├── SaveManager.cs           # JSON save/load system
+│   │   └── SaveData.cs              # Data structures
 │   ├── PlayerScripts/
 │   │   ├── Player.cs
 │   │   └── Components/
@@ -63,17 +75,29 @@ SpaceTower/
 │   │   └── Base/
 │   │       └── Enemy.cs
 │   └── UI/
-│       ├── Hud.cs
-│       ├── LevelUpPanel.cs
-│       └── MainMenu.cs
+│       ├── Panels/
+│       │   ├── LevelUpPanel.cs
+│       │   ├── StatAllocationPanel.cs
+│       │   ├── FloorTransitionPanel.cs
+│       │   ├── VictoryScreen.cs
+│       │   ├── DeathScreen.cs
+│       │   └── ResultsScreen.cs
+│       ├── HUD/
+│       │   └── Hud.cs
+│       └── Menus/
+│           └── MainMenu.cs
 │
 ├── Resources/
-│   ├── Skills/
-│   │   ├── Mage/
-│   │   │   └── Fireball.tres
-│   │   └── Warrior/
-│   │       └── Whirlwind.tres
-│   └── Upgrades/ (TODO)
+│   ├── Balance/
+│   │   ├── balance_config.tres
+│   │   └── skill_balance_database.tres
+│   └── Skills/
+│       ├── Mage/
+│       │   ├── Fireball.tres
+│       │   └── MageBasicAttack.tres
+│       └── Warrior/
+│           ├── Whirlwind.tres
+│           └── WarriorBasicAttack.tres
 │
 └── Docs/                            # Documentation (see 00-START-HERE.md)
 ```

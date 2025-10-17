@@ -4,5 +4,4 @@
 
 [node name="enemy" instance=ExtResource("1_ts1ew")]
 modulate = Color(0.5953107, 0.31248838, 3.85046e-07, 1)
-Speed = 300.0
 MaxHealth = 50.0

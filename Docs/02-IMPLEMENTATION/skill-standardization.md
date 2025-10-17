@@ -1,6 +1,16 @@
-# Skill Implementation Standardization
+# Skill Implementation Standardization (✅ CURRENT IMPLEMENTATION)
 
-> **⚠️ IMPORTANT:** Before implementing this standardization (Phase B), you MUST complete **Phase A: Balance Systems Foundation** first. See [balance-systems-architecture.md](balance-systems-architecture.md) for details.
+> **✅ ACTIVE APPROACH:** This document describes the **animation-driven hitbox pattern** currently being implemented in Phase 3.5.
+>
+> **Related Documentation:**
+> - [`skill-system-architecture.md`](skill-system-architecture.md) - Historical reference (type-based executor pattern)
+> - [`../03-CONTENT-DESIGN/class-abilities.md`](../03-CONTENT-DESIGN/class-abilities.md) - Detailed skill specifications (source of truth for mechanics)
+> - [`balance-systems-architecture.md`](balance-systems-architecture.md) - How skill balance values are stored and loaded
+> - [`../../CLAUDE.md`](../../CLAUDE.md) - Current implementation status
+
+---
+
+> **⚠️ PREREQUISITE:** Before implementing this standardization (Phase B), you MUST complete **Phase A: Balance Systems Foundation** first. See [balance-systems-architecture.md](balance-systems-architecture.md) for details.
 >
 > Phase A creates the BalanceConfig and SkillBalanceDatabase that this standardization depends on. Skills will load their balance parameters (damage, cooldown, range, etc.) from the database, not from exported fields on .tres files.
 

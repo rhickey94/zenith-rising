@@ -1,5 +1,13 @@
-Class Skills: Narrative-Integrated Abilities
-Let me design skills that feel mechanically distinct while reflecting each character's personality and story role.
+# Class Skills: Narrative-Integrated Abilities (✅ SOURCE OF TRUTH)
+
+> **📌 AUTHORITATIVE REFERENCE:** This document contains the complete, detailed skill specifications for all three classes. All other skill documentation should reference this file for specific mechanics and values.
+>
+> **Related Documentation:**
+> - [`../01-GAME-DESIGN/combat-skills.md`](../01-GAME-DESIGN/combat-skills.md) - High-level combat philosophy and design
+> - [`../02-IMPLEMENTATION/skill-standardization.md`](../02-IMPLEMENTATION/skill-standardization.md) - Technical implementation patterns
+> - [`../../CLAUDE.md`](../../CLAUDE.md) - Current implementation status (2 of 18 skills working)
+
+This document designs skills that feel mechanically distinct while reflecting each character's personality and story role.
 
 Marcus Kane - The Breacher (Melee Fighter)
 Core Identity

@@ -725,15 +725,12 @@ float damageMult = (1 + currentWave * 0.05f) * (1 + currentFloor * 0.5f);
 
 ### Character Stat System (Implemented - Phase 2)
 
-```
-STR (Strength): +3% Physical Dmg, +10 HP per point
-INT (Intelligence): +3% Magical Dmg, +2% CDR per point
-AGI (Agility): +2% Attack Speed, +1% Crit Chance per point (cap 50%)
-VIT (Vitality): +25 HP, +0.5 HP/sec regen per point
-FOR (Fortune): +2% Crit Damage, +1% Drop Rate per point
-```
+**5 Core Stats:** STR, INT, AGI, VIT, FOR
 
-**Progression:**
+For complete stat formulas and progression details, see [`Docs/01-GAME-DESIGN/systems-progression.md`](Docs/01-GAME-DESIGN/systems-progression.md#the-5-core-stats)
+
+**Quick Reference:**
+- Starting stats: 0/0/0/0/0 + 15 points to distribute
 - Character Level: Permanent, awards 1 stat point per level
 - Character XP: Earned from dungeon runs (50 base + per floor/boss)
 - Power Level: Per-run progression, resets to 1 after death/victory

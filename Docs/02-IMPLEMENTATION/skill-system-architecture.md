@@ -1,4 +1,15 @@
-# 🎮 Skill System Architecture Guide
+# 🎮 Skill System Architecture Guide (⚠️ HISTORICAL REFERENCE)
+
+> **⚠️ IMPORTANT:** This document describes the **original type-based executor pattern** approach.
+>
+> **CURRENT APPROACH:** See [`skill-standardization.md`](skill-standardization.md) for the **animation-driven hitbox pattern** currently being implemented (Phase 3.5).
+>
+> This documentation is preserved for:
+> - Understanding architectural evolution
+> - Reference for potential future executor patterns
+> - Historical context for why current approach was chosen
+
+---
 
 ## Overview
 

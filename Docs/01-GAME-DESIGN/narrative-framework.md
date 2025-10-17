@@ -1,7 +1,22 @@
-Expanding the Hybrid Narrative: Multi-Zone & Class Integration
-Excellent questions! Let's build a narrative framework that supports unlimited expansion while keeping the core story intact.
+# Narrative Framework (📝 FUTURE VISION - Post-MVP Expansion)
 
-The Multi-Zone Narrative Framework
+> ⚠️ **SCOPE NOTICE**
+>
+> This document describes the **full narrative vision** for a multi-zone game with extensive character arcs and branching storylines.
+>
+> **MVP SCOPE (Phases 1-3):** Single dungeon (Zenith Station, 5 floors), minimal story, focus on proving combat is fun.
+>
+> **FULL VISION (Phase 7+):** 6 zones, deep character arcs, choice-driven endings.
+>
+> See [`design-overview.md`](design-overview.md) for MVP philosophy and [`../../CLAUDE.md`](../../CLAUDE.md) for current implementation status.
+
+---
+
+## Expanding the Hybrid Narrative: Multi-Zone & Class Integration
+
+This framework supports unlimited expansion while keeping the core story intact.
+
+## The Multi-Zone Narrative Framework
 Core Concept: The Spire Network
 The Revelation (After Floor 5):
 The Zenith Station Spire isn't unique—it's part of a network of Architect monitoring stations scattered across the galaxy. Each Spire was placed near emerging civilizations to observe and test them. When you reach the summit of Zenith, the Architect reveals this truth:

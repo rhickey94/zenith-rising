@@ -79,7 +79,7 @@ Check: **[`04-VISUAL-AUDIO/visual-style-guide.md`](04-VISUAL-AUDIO/visual-style-
 
 **Phase 3.5 (B-F): Remaining Warrior Skills**
 - 2 skills working (Basic Attack, Whirlwind)
-- 3 skills remaining: Crowd Suppression, Combat Stim, Breaching Charge
+- 4 skills remaining: Crowd Suppression, Fortify, Combat Stim, Last Stand
 - Combat polish: animation timing, hitbox tuning, visual effects
 
 ### 📝 Not Started

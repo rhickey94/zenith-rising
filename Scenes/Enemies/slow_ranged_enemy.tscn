@@ -10,4 +10,7 @@ script = ExtResource("2_0djtb")
 ProjectileScene = ExtResource("3_yeubo")
 AttackRange = 300.0
 PreferredDistance = 250.0
+Speed = 25.0
+Damage = 5.0
+AttackCooldown = 2.0
 ExperienceReward = 20

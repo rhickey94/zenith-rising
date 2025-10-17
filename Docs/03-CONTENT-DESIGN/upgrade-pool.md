@@ -1,5 +1,14 @@
-Complete Skill Designs & Upgrade Pool
-Let me design all the skills for each class and create a comprehensive upgrade pool.
+# Complete Skill Designs & Upgrade Pool (📝 FUTURE VISION - 140+ Upgrades)
+
+> ⚠️ **SCOPE NOTICE**
+>
+> This document describes the **complete upgrade ecosystem** planned for the full game (~140 unique upgrades).
+>
+> **MVP SCOPE (Phases 1-3):** 8 basic upgrades implemented (see `../../CLAUDE.md` for current status).
+>
+> **FULL VISION (Phase 6+):** All universal + class-specific upgrades, full synergy system.
+>
+> This document plans the full upgrade pool for future expansion and content updates.
 
 MARCUS KANE - THE BREACHER (Melee)
 Basic Attack (Left Click) - "Fusion Cutter"
