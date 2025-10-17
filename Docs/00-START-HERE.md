@@ -40,35 +40,55 @@ Check: **[`04-VISUAL-AUDIO/visual-style-guide.md`](04-VISUAL-AUDIO/visual-style-
 
 ## 📊 Current Project Status
 
-**Phase:** Phase 1 (Proving Combat) - ~60% to MVP
+**Phase:** Phase 3.5 (Warrior Combat) - Sub-Phase A (Balance Systems Foundation)
 
-**🎉 MAJOR MILESTONE: Phase 1 Hypothesis PROVEN 🎉**
+**🎉 PHASES 1, 2, & 3 COMPLETE! 🎉**
 
-Combat is fun and engaging through multiple playtests. The core loop works.
+- **Phase 1 (Combat):** Proven fun through playtesting ✅
+- **Phase 2 (Progression):** Character stats, save/load working ✅  
+- **Phase 3 (Hub World):** Scene flow and player initialization working ✅
+- **Phase 3.5 (Warrior):** Animation foundation complete, balance systems in progress ⏳
 
-### ✅ Actually Working
+### ✅ Currently Working
 
-- Player movement and combat
-- 3 enemy types with distinct behaviors
-- Power XP/Power Level system (1-20) with 8 working Power Upgrades
-- Skill system (Whirlwind, Fireball, basic attacks)
-- Wave/floor progression system
-- Boss spawning
-- Stats and upgrade systems
+**Core Systems:**
+- Complete combat loop (Main Menu → Hub → Dungeon → Hub)
+- 3 skills (Whirlwind, Fireball, Basic attacks)
+- 8 power upgrades with proper stacking
+- 3 enemy types + boss spawning
+- Character stat system (STR/INT/AGI/VIT/FOR) with stat allocation
+- Save/load system (JSON-based, persists between sessions)
+- Hub world with dungeon portal interaction
+- Victory/Death screens with full stats display
+
+**Animation System (Warrior):**
+- Custom FSM + AnimationPlayer pattern
+- Locomotion animations (walk/idle, 4 directions)
+- Combat animations (attack, whirlwind)
+- PlayerState transitions validated
 
 ### ⏳ In Progress
 
-- Floor transition UI
-- Victory screen
-- HUD integration with Game.cs
+**Phase 3.5-A: Balance Systems Foundation (CURRENT PRIORITY)**
+- BalanceConfig system (game-wide parameters)
+- SkillBalanceDatabase (skill-specific parameters)
+- GameBalance singleton (global access autoload)
+- StatsManager/UpgradeManager/Dungeon refactor to use config
+- **Goal:** Centralize all balance tuning BEFORE implementing 18 skills
+- **Investment:** 4-6 hours now saves 10+ hours during warrior implementation
 
 ### 📝 Not Started
 
-- Character stat system (STR/VIT/AGI/RES/FOR)
-- Gear/equipment system
-- Materials or idle systems
-- Save/load system
-- Hub system
+**Phase 3.5 (B-F):**
+- Skill system standardization (CastBehavior/DamageSource enums)
+- Player hitbox infrastructure (melee/AOE collision)
+- Remaining 5 warrior skills implementation
+
+**Phase 4+:**
+- Gear/equipment drops and inventory
+- Idle systems (materials, workshop)
+- Additional classes (Ranger, Mage)
+- Multiple dungeons
 
 **For detailed status:** See [`CLAUDE.md`](../CLAUDE.md) in project root (updated daily)
 

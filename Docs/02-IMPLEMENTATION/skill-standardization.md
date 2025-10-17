@@ -1,5 +1,9 @@
 # Skill Implementation Standardization
 
+> **⚠️ IMPORTANT:** Before implementing this standardization (Phase B), you MUST complete **Phase A: Balance Systems Foundation** first. See [balance-systems-architecture.md](balance-systems-architecture.md) for details.
+>
+> Phase A creates the BalanceConfig and SkillBalanceDatabase that this standardization depends on. Skills will load their balance parameters (damage, cooldown, range, etc.) from the database, not from exported fields on .tres files.
+
 ## Problem Statement
 
 Before implementing all 18 planned skills across 3 classes, we need a consistent, plug-and-play approach that:
@@ -258,6 +262,8 @@ Input → SkillManager.UseSkill()
 ---
 
 ## Skill Data Extensions
+
+> **Note:** These enums are added in Phase B. The SkillId and Initialize() pattern are added in Phase A (Balance Systems).
 
 Add two new properties to base **Skill.cs**:
 
@@ -530,24 +536,56 @@ New patterns emerge by combining existing axes or extending enums:
 
 ## Implementation Order Recommendation
 
-### Phase A: Foundation (Do First)
+> **UPDATED:** Phase names have been adjusted to reflect the Balance Systems implementation priority.
+
+### Phase A: Balance Systems Foundation (Do First - 4-6 hours)
+**Status:** ⏳ CURRENT PRIORITY
+
+**This phase MUST be completed before Phase B.** See [balance-systems-architecture.md](balance-systems-architecture.md) for full implementation guide.
+
+1. Create BalanceConfig system (game-wide parameters)
+2. Create SkillBalanceDatabase system (skill-specific parameters)
+3. Refactor StatsManager to use BalanceConfig
+4. Refactor UpgradeManager to use BalanceConfig
+5. Add Initialize() pattern to Skill.cs that loads from database
+6. Update existing skills to use database
+
+**Why this comes first:** Skills in Phases C-F will immediately load from the database. Creating skills with exported values that need refactoring later wastes time.
+
+### Phase B: Skill System Standardization (After Phase A - 2-3 hours)
+**Status:** 📝 NEXT
+
 1. Add CastBehavior and DamageSource enums to Skill.cs
 2. Update SkillManager.UseSkill() to route based on CastBehavior
 3. Add hitbox control methods to Player.cs
 4. Create hitbox nodes in player.tscn
 
-### Phase B: Prove Pattern (Validate Approach)
+### Phase C: Prove Pattern (Validate Approach - 1-2 hours)
 1. Implement Fusion Cutter (Melee Pattern) - prove PlayerHitbox works
 2. Implement Whirlwind (Instant AOE Pattern) - prove animation-driven AOE works
 3. Test both extensively - ensure damage timing, animation flow correct
 
-### Phase C: Complete Warrior (Build Out)
+### Phase D: Whirlwind (AOE Pattern - 1-2 hours)
+1. Implement Whirlwind using Instant AOE Pattern
+2. Skill loads balance from database (damage, radius, duration)
+3. Refactor WhirlwindEffect → WhirlwindVisual (remove collision)
+4. Test animation-driven AOE hitbox
+5. Tune values in skill_balance_database.tres
+
+### Phase E: Complete Warrior (Build Out - 3-4 hours)
 1. Breaching Charge (Cast-Spawn Pattern)
 2. Crowd Suppression (reuse Instant AOE Pattern)
 3. Combat Stim (Instant-Buff Pattern)
 4. Fortify and Last Stand later (Phase 4+)
 
-### Phase D: Ranger & Mage
+### Phase F: Polish (1-2 hours)
+1. Tune all warrior skills in inspector
+2. Visual effects polish
+3. Animation timing adjustments
+
+---
+
+## Post-Warrior: Ranger & Mage (Phase 4+)
 1. Use established patterns from matrix
 2. Most are Instant + EffectCollision (existing system works)
 3. Only Psionic Wave needs new animation (Melee Pattern)

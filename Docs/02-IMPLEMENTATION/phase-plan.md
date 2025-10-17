@@ -18,7 +18,8 @@
 |-------|-----------|----------|--------|
 | Phase 1 | Combat is fun | 2 weeks | ✅ **PROVEN** |
 | Phase 2 | Progression hooks players | 2 weeks | ✅ **COMPLETE** |
-| Phase 3 | Hub enables meta-progression | 1 week | ⏳ **IN PROGRESS** |
+| Phase 3 | Hub enables meta-progression | 1 week | ✅ **COMPLETE** |
+| **Phase 3.5** | **Warrior combat validates animation/skill systems** | **2 weeks** | **⏳ IN PROGRESS** |
 | Phase 4 | Gear & loot add variety | 2 weeks | 📝 Next |
 | Phase 5 | Idle adds value | 2 weeks | 📝 Planned |
 | Phase 6 | Depth increases retention | 2 weeks | 📝 Planned |
@@ -159,9 +160,9 @@
 
 **Focus:** Complete ONE class (Warrior) fully to validate animation and skill standardization systems
 
-**Status:** ⏳ **IN PROGRESS** - Animation phases 1-4 complete, skill standardization planned
+**Status:** ⏳ **IN PROGRESS** - Balance systems foundation prioritized before skill implementation
 
-**Why this phase:** Before building 18 skills across 3 classes, validate systems with 5 warrior skills end-to-end.
+**Why this phase:** Before building 18 skills across 3 classes, establish centralized balance infrastructure and validate systems with 5 warrior skills end-to-end.
 
 ### Architecture Completed ✅
 
@@ -179,39 +180,152 @@
 - ✅ Hybrid hitbox approach designed (PlayerHitbox for melee/AOE, EffectCollision for projectiles)
 - ✅ Documentation created ([skill-standardization.md](skill-standardization.md), [animation-architecture.md](animation-architecture.md))
 
-### Implementation Phases (A-E)
+---
 
-**Phase A: Skill System Standardization** (2-3 hours) 📝 NEXT
+### Implementation Phases (A-F)
+
+**Phase A: Balance Systems Foundation** (4-6 hours) ⏳ **CURRENT PRIORITY**
+
+**Why this phase comes first:**
+Setting up centralized balance systems BEFORE implementing remaining skills prevents:
+- Hardcoded magic numbers scattered across 18 skill files
+- Manual recompilation for every balance tweak
+- Inconsistent formulas between similar skills
+- Difficulty comparing and tuning related values
+
+**Investment pays off:**
+- 4-6 hours setup → saves 10+ hours during skill implementation/tuning
+- Makes Phases B-F dramatically faster
+- Enables rapid iteration during playtesting
+- Creates sustainable architecture for future content
+
+**Tasks:**
+
+1. **Create BalanceConfig System** (2 hours)
+   - Create `Scripts/Core/BalanceConfig.cs` with nested config classes:
+     - PlayerStatsConfig (base health, speed, damage)
+     - CharacterProgressionConfig (stat scaling formulas)
+     - CombatSystemConfig (crit damage, damage types)
+     - EnemyConfig (scaling, aggro, spawn rates)
+     - UpgradeSystemConfig (upgrade values per stack)
+   - Create `Scripts/Core/GameBalance.cs` singleton for global access
+   - Create `Resources/Balance/balance_config.tres` resource
+   - Wire up GameBalance as autoload in Project Settings
+   - Assign balance_config.tres to GameBalance.Config export
+
+2. **Create SkillBalanceDatabase** (2 hours)
+   - Create `Scripts/Skills/Balance/SkillBalanceType.cs` enum
+   - Create `Scripts/Skills/Balance/SkillBalanceEntry.cs` data structure
+   - Create `Scripts/Skills/Balance/SkillBalanceDatabase.cs` container
+   - Create `Resources/Balance/skill_balance_database.tres` resource
+   - Wire up to GameBalance.SkillDatabase export
+   - Add entries for existing skills (Whirlwind, Fireball, WarriorBasicAttack)
+
+3. **Refactor Existing Systems** (1-2 hours)
+   - **StatsManager.cs**: Replace constants with BalanceConfig reads
+     - STR_DAMAGE_PER_POINT → Config.CharacterProgression.StrengthDamagePerPoint
+     - VIT_HEALTH_PER_POINT → Config.CharacterProgression.VitalityHealthPerPoint
+     - etc. for all stat scaling
+   - **UpgradeManager.cs**: Replace hardcoded upgrade values with Config reads
+     - DamageBoostPerStack, AttackSpeedPerStack, etc.
+   - **Dungeon.cs**: Replace enemy spawn/scaling values with Config reads
+   - **Enemy.cs**: Replace aggro/leash ranges with Config reads
+
+4. **Update Skill Loading Pattern** (1 hour)
+   - Add `skill.Initialize()` method that loads from SkillBalanceDatabase
+   - Update Skill.cs base class with runtime properties (not exports)
+   - Only SkillId remains as export - all other values load from database
+   - Update SkillManager to call skill.Initialize() before first use
+   - Simplify skill .tres files (only SkillId + visual references)
+
+**Testing & Validation:**
+- Verify StatsManager reads player stats from config correctly
+- Change a balance value in inspector, run game, confirm change takes effect
+- Verify skills load damage/cooldown from database
+- All existing skills (Whirlwind, Fireball) still work correctly
+
+**Documentation:**
+- Create `Docs/02-IMPLEMENTATION/balance-systems-architecture.md`
+- Update this file with "Phase A Complete" when done
+
+**Success Criteria:**
+- ✅ GameBalance singleton accessible globally
+- ✅ balance_config.tres holds all game-wide tuning values
+- ✅ skill_balance_database.tres holds all skill-specific values
+- ✅ StatsManager/UpgradeManager/Dungeon read from config (no constants)
+- ✅ Skills load from database (no exported damage/cooldown values)
+- ✅ Can tune balance in inspector without recompiling code
+
+---
+
+**Phase B: Skill System Standardization** (2-3 hours) 📝 NEXT AFTER PHASE A
+
+**Tasks:**
 - Add CastBehavior and DamageSource enums to Skill.cs
 - Update SkillManager.UseSkill() to route based on CastBehavior
 - Add hitbox infrastructure to Player.cs (EnableMeleeHitbox, EnableAOEHitbox, etc.)
 - Create BasicAttackHitbox and WhirlwindHitbox Area2D nodes in player.tscn
 - Wire collision signals to Player.cs handlers
+- Update Player state machine to handle CastingSkill state
 
-**Phase B: Fusion Cutter (Basic Attack)** (1-2 hours) 📝 PLANNED
-- Configure WarriorBasicAttack.tres (CastBehavior: AnimationDriven, DamageSource: PlayerHitbox)
-- Add Call Method tracks to warrior_attack_down/up/left/right animations
-- Implement OnMeleeHitboxBodyEntered() to apply damage
-- Test: left-click → animation plays → damage applied
+**Why after Phase A:** 
+Skills will load balance from database, so database must exist first.
 
-**Phase C: Whirlwind** (1-2 hours) 📝 PLANNED
-- Configure Whirlwind.tres (CastBehavior: AnimationDriven, DamageSource: PlayerHitbox)
-- Refactor WhirlwindEffect.cs → WhirlwindVisual.cs (remove collision, keep VFX)
+---
+
+**Phase C: Fusion Cutter (Basic Attack)** (1-2 hours) 📝 PLANNED
+- Prove Melee Pattern works end-to-end
+- Configure WarriorBasicAttack.tres (load from database)
+- Add Call Method tracks to warrior_attack animations
+- Implement OnMeleeHitboxBodyEntered() damage application
+- Test: left-click → animation → hitbox → damage → kill tracking
+- Tune damage/range in skill_balance_database.tres until it feels good
+
+**Why after Phases A+B:** 
+Database must exist (Phase A), hitbox infrastructure must exist (Phase B).
+
+---
+
+**Phase D: Whirlwind** (1-2 hours) 📝 PLANNED
+- Prove Instant AOE Pattern works end-to-end
+- Configure Whirlwind.tres (load from database)
+- Refactor WhirlwindEffect.cs → WhirlwindVisual.cs (remove collision logic)
 - Add Call Method tracks to warrior_whirlwind animation
-- Implement OnAOEHitboxBodyEntered() to apply damage
-- Test: Q key → spin animation → AOE damage
+- Implement OnAOEHitboxBodyEntered() damage application
+- Test: Q key → animation → AOE hitbox → damage → kill tracking
+- Tune radius/damage/duration in skill_balance_database.tres
 
-**Phase D: Remaining Warrior Skills** (3-4 hours) 📝 PLANNED
-- Leap Slam (E) - AnimationDriven + PlayerHitbox (dash + AOE pattern)
-- Battle Cry (R) - Instant + None (buff pattern)
-- Shield Bash (passive) - AnimationDriven + PlayerHitbox (melee pattern)
+**Why after Phase C:** 
+Validates second hitbox pattern (AOE vs Melee).
 
-**Phase E: Testing & Polish** (1-2 hours) 📝 PLANNED
-- Test all 5 warrior skills in combat
-- Adjust animation timings and hitbox sizes
+---
+
+**Phase E: Remaining Warrior Skills** (3-4 hours) 📝 PLANNED
+- **Crowd Suppression** (Q alternative) - reuse Instant AOE pattern
+- **Combat Stim** (R) - prove Buff pattern works
+- **Breaching Charge** (E) - prove Cast-Spawn pattern works (dash + collision)
+- Each skill gets database entry for easy tuning
+- Each skill follows pattern from skill-standardization.md
+- Validate all 6 patterns work end-to-end
+
+---
+
+**Phase F: Testing & Polish** (1-2 hours) 📝 PLANNED
+- Playtest all 5 warrior skills in full run
+- Adjust timings in AnimationPlayer
+- Tune damage/cooldown/radius in skill_balance_database.tres
+- Add visual effects polish
 - Verify skill mastery tracking
 - Validate upgrade interactions
 - Bug fixing
+
+---
+
+### Estimated Duration
+**Total: 12-19 hours** (2-3 work sessions)
+
+**Phase A (Balance): 4-6 hours**
+**Phases B-F (Skills): 8-13 hours**
 
 ### Success Criteria
 - All 5 warrior skills functional and feeling good
@@ -219,11 +333,9 @@
 - Instant skills work without animation locks
 - Hybrid hitbox approach validated (no rework needed for other classes)
 - Skill standardization patterns proven extensible
+- **Balance systems enable rapid iteration** (critical for success)
 
-### Estimated Duration
-**Total: 8-13 hours** (1-2 work sessions)
-
-**Deferred to Post-Warrior:**
+### Deferred to Post-Warrior
 - Ranger class (5 skills)
 - Mage class (8 skills)
 - Additional enemy types
@@ -240,7 +352,7 @@
 1. **Basic Gear Drops**
    - 3 slots: Weapon, Armor, Accessory
    - 3 rarities: Common, Rare, Epic
-   - Flat stat bonuses
+   - Flat stat bonuses (read from BalanceConfig)
    - Drops from bosses (100%) and enemies (5-10%)
 
 2. **Inventory UI**
@@ -360,6 +472,10 @@
 ---
 
 ## Current Focus
+
+**Phase 3.5 - Phase A (Balance Systems Foundation)**
+
+Implementing centralized balance infrastructure before scaling to 18 skills. This 4-6 hour investment creates sustainable architecture and dramatically accelerates future skill implementation.
 
 **See [`../../CLAUDE.md`](../../CLAUDE.md) for current session progress and next tasks.**
 

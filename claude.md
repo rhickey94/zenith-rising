@@ -51,7 +51,7 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 
 ## Current Status: Be Honest
 
-**Phase:** Animation & Skill System (Warrior Focus) - ⏳ **IN PROGRESS**
+**Phase:** Balance Systems Foundation (Phase 3.5-A) - ⏳ **IN PROGRESS**
 
 **🎉 PHASES 1, 2, & 3 COMPLETE! 🎉**
 
@@ -114,7 +114,15 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 **Skill Standardization:**
 - ✅ 6 patterns designed (Melee, AOE, Projectile, Cast-Spawn, Buff, Zone)
 - ✅ All 18 skills mapped to implementation patterns
-- 📝 NOT yet implemented (planned for Phase A)
+- 📝 NOT yet implemented (planned for Phase B)
+
+**Balance Systems (Phase 3.5-A - CURRENT PRIORITY):**
+- 📝 BalanceConfig system - creating centralized game-wide balance parameters
+- 📝 SkillBalanceDatabase - creating skill-specific content balance database
+- 📝 GameBalance singleton - global access autoload
+- 📝 StatsManager refactor - eliminate hardcoded constants
+- 📝 UpgradeManager refactor - read values from config
+- **Why prioritized:** 4-6 hour investment prevents scattered magic numbers, enables rapid tuning
 
 ### 📝 Not Started (Phase 4+)
 
@@ -128,36 +136,114 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 ## Current Phase Focus
 
 **Phase 3.5: Warrior Combat Implementation** ⏳ **IN PROGRESS**
+**Sub-Phase A: Balance Systems Foundation** ⏳ **CURRENT PRIORITY**
 
-**Current goals (Phase A-E):**
+### Phase A: Balance Systems Foundation (4-6 hours)
 
-**Phase A:** Skill System Standardization 📝 NEXT
+**Why This Phase Comes First:**
+Before implementing 5 warrior skills (and eventually 18 total skills), we need centralized balance infrastructure. This prevents:
+- Hardcoded magic numbers scattered across skill files
+- Manual recompilation for every balance tweak  
+- Inconsistent formulas between similar skills
+- Difficulty comparing and tuning related values
+
+**Investment Pays Off:**
+- 4-6 hours setup → saves 10+ hours during Phases B-F
+- Enables rapid iteration during playtesting
+- Creates sustainable architecture for 18+ skills
+
+**Current Tasks (Step-by-Step Guide):**
+
+**STEP 1: Create BalanceConfig System (2 hours)**
+1. Create `Scripts/Core/BalanceConfig.cs` with nested config classes:
+   - PlayerStatsConfig (BaseMaxHealth, BaseSpeed, BaseDamage)
+   - CharacterProgressionConfig (stat scaling formulas)
+   - CombatSystemConfig (crit damage, damage type multipliers)
+   - EnemyConfig (scaling formulas, aggro ranges, spawn rates)
+   - UpgradeSystemConfig (upgrade values per stack)
+2. Create `Scripts/Core/GameBalance.cs` singleton autoload
+3. Create folder `Resources/Balance/`
+4. Create resource `Resources/Balance/balance_config.tres`
+5. Add GameBalance to Project Settings → Autoload
+6. Assign balance_config.tres to GameBalance.Config export in editor
+
+**STEP 2: Create SkillBalanceDatabase (2 hours)**
+1. Create `Scripts/Skills/Balance/` folder
+2. Create `SkillBalanceType.cs` enum (Projectile, InstantAOE, Melee, etc.)
+3. Create `SkillBalanceEntry.cs` data structure (all skill parameters)
+4. Create `SkillBalanceDatabase.cs` container with GetSkillBalance() lookup
+5. Create resource `Resources/Balance/skill_balance_database.tres`
+6. Assign to GameBalance.SkillDatabase export in editor
+7. Add entries for existing skills:
+   - warrior_basic_attack
+   - whirlwind  
+   - fireball
+
+**STEP 3: Refactor Existing Systems (1-2 hours)**
+1. **StatsManager.cs**: Replace ALL constants with Config reads:
+   - STR_DAMAGE_PER_POINT → GameBalance.Instance.Config.CharacterProgression.StrengthDamagePerPoint
+   - VIT_HEALTH_PER_POINT → GameBalance.Instance.Config.CharacterProgression.VitalityHealthPerPoint
+   - (Do this for ALL stat scaling constants)
+2. **UpgradeManager.cs**: Replace hardcoded upgrade values:
+   - DamageBoostPerStack → GameBalance.Instance.Config.UpgradeSystem.DamageBoostPerStack
+   - (Do this for ALL upgrade types)
+3. **Dungeon.cs**: Replace enemy spawn/scaling hardcoded values
+4. **Enemy.cs**: Replace aggro/leash range constants
+
+**STEP 4: Update Skill Loading Pattern (1 hour)**  
+1. Add `Initialize()` method to Skill.cs that loads from database
+2. Change Skill.cs to use runtime properties (not exports) for balance values
+3. Only SkillId remains as export on skill resources
+4. Update SkillManager to call skill.Initialize() before first use
+5. Simplify existing .tres files (WarriorBasicAttack, Whirlwind, Fireball)
+
+**Testing & Validation:**
+- Run game, verify player stats still work correctly
+- Change BaseMaxHealth in balance_config.tres, verify change takes effect
+- Verify Whirlwind/Fireball load damage from database
+- No errors in console
+
+**Success Criteria for Phase A:**
+- ✅ GameBalance singleton accessible via GameBalance.Instance
+- ✅ balance_config.tres holds all game-wide tuning values
+- ✅ skill_balance_database.tres holds all skill-specific values
+- ✅ StatsManager has ZERO hardcoded constants (all read from config)
+- ✅ UpgradeManager reads from config
+- ✅ Skills load damage/cooldown from database
+- ✅ Can tune balance in Godot inspector without recompiling
+
+**Documentation:**
+- Create `Docs/02-IMPLEMENTATION/balance-systems-architecture.md` when complete
+- Update CLAUDE.md Session Progress Log
+- Mark Phase A as ✅ COMPLETE in this section
+
+---
+
+### Phases B-F: Skill Implementation (AFTER Phase A)
+
+**Phase B: Skill System Standardization** (2-3 hours) 📝 NEXT
 - Add CastBehavior and DamageSource enums to Skill.cs
-- Update SkillManager to route based on CastBehavior
-- Add hitbox infrastructure to Player.cs
-- Create hitbox nodes in player.tscn
+- Update SkillManager.UseSkill() to route based on CastBehavior  
+- Add hitbox control methods to Player.cs
+- Create hitbox Area2D nodes in player.tscn
 
-**Phase B:** Fusion Cutter (Basic Attack) 📝 PLANNED
+**Phase C: Fusion Cutter** (1-2 hours) 📝 PLANNED
 - Prove Melee Pattern works
-- Configure WarriorBasicAttack.tres
-- Add Call Method tracks to attack animations
-- Test: left-click → animation → damage
+- Skill loads from database
+- Animation-driven hitbox damage
 
-**Phase C:** Whirlwind 📝 PLANNED
+**Phase D: Whirlwind** (1-2 hours) 📝 PLANNED  
 - Prove Instant AOE Pattern works
-- Configure Whirlwind.tres
 - Refactor WhirlwindEffect → WhirlwindVisual
-- Test: Q key → spin → AOE damage
+- AOE hitbox damage
 
-**Phase D:** Remaining Warrior Skills 📝 PLANNED
-- Crowd Suppression (reuse AOE pattern)
-- Combat Stim (Buff pattern)
-- Breaching Charge (Cast-Spawn pattern)
+**Phase E: Remaining Warrior Skills** (3-4 hours) 📝 PLANNED
+- Crowd Suppression, Combat Stim, Breaching Charge
+- Each loads from database
 
-**Phase E:** Polish 📝 PLANNED
-- Adjust animation timings
-- Add visual effects
-- Tune hitbox sizes
+**Phase F: Polish** (1-2 hours) 📝 PLANNED
+- Tune all values in inspector
+- Visual effects polish
 
 **Architecture completed:**
 - ✅ Custom FSM + AnimationPlayer pattern chosen
@@ -173,6 +259,15 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 ---
 
 **After Warrior Complete: Return to Phase 4 (Gear & Loot)**
+
+**Implementation Strategy:**
+Phase A (Balance Systems) is prioritized BEFORE Phase B (Skill Standardization) because:
+1. Skills in Phases C-F will immediately use the database for their parameters
+2. Prevents creating skills with hardcoded values that need refactoring later  
+3. StatsManager refactor validates the pattern before applying to skills
+4. Creates inspector-based workflow that accelerates all remaining warrior work
+
+**The 4-6 hour investment in Phase A saves 10+ hours in Phases B-F.**
 
 **See [`Docs/02-IMPLEMENTATION/phase-plan.md`](Docs/02-IMPLEMENTATION/phase-plan.md) for full phase details.**
 
