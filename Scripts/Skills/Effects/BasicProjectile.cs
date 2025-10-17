@@ -8,7 +8,6 @@ namespace ZenithRising.Scripts.Skills.Effects;
 public partial class BasicProjectile : CollisionSkillEffect
 {
     [Export] public float Speed = 600.0f;
-    [Export] public float BaseDamage = 25.0f;
     [Export] public float Lifetime = 3.0f;
 
     private int _pierceCount = 0;
@@ -19,8 +18,8 @@ public partial class BasicProjectile : CollisionSkillEffect
     {
         base.Initialize(skill, caster, direction);
 
-        BaseDamage = skill.Damage;
-        _totalDamage = BaseDamage;
+        float damageToUse = skill.ProjectileDamage > 0 ? skill.ProjectileDamage : skill.BaseDamage;
+        _totalDamage = damageToUse;
 
         // Apply upgrade bonuses
         _maxPierce = _statsManager.ProjectilePierceCount;

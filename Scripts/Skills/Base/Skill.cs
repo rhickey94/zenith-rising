@@ -29,18 +29,14 @@ public partial class Skill : Resource
     public float BaseDamage { get; private set; }
     public float Range { get; private set; }
     public float Radius { get; private set; }
+    public int ProjectileCount { get; private set; }
     public float ProjectileSpeed { get; private set; }
+    public float ProjectileDamage { get; private set; }
+    public float ProjectileSpreadAngle { get; private set; }
     public int PierceCount { get; private set; }
     public SkillBalanceType BalanceType { get; private set; }
     public CastBehavior CastBehavior { get; private set; }
     public DamageSource DamageSource { get; private set; }
-
-    public float Damage
-    {
-        get => BaseDamage;
-        set => BaseDamage = value;
-    }
-
 
     private bool _initialized = false;
 
@@ -68,18 +64,22 @@ public partial class Skill : Resource
 
         // Load balance values
         SkillName = entry.SkillName;
-        Cooldown = entry.Cooldown;
         DamageType = entry.DamageType;
+        CastBehavior = entry.CastBehavior;
+        DamageSource = entry.DamageSource;
+        BalanceType = entry.BalanceType;
+
+        Cooldown = entry.Cooldown;
         BaseDamage = entry.BaseDamage;
         Range = entry.Range;
         Radius = entry.Radius;
-        ProjectileSpeed = entry.ProjectileSpeed;
-        PierceCount = entry.PierceCount;
-        BalanceType = entry.BalanceType;
-        Damage = entry.BaseDamage;
 
-        CastBehavior = entry.CastBehavior;
-        DamageSource = entry.DamageSource;
+        PierceCount = entry.PierceCount;
+
+        ProjectileSpeed = entry.ProjectileSpeed;
+        ProjectileCount = entry.ProjectileCount;
+        ProjectileDamage = entry.ProjectileDamage;
+        ProjectileSpreadAngle = entry.ProjectileSpreadAngle;
 
         _initialized = true;
         GD.Print($"Skill '{SkillName}' ({SkillId}) initialized from database");

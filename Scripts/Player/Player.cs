@@ -6,6 +6,7 @@ using ZenithRising.Scripts.UI.Panels;
 using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.Enemies.Base;
 using ZenithRising.Scripts.Skills.Base;
+using ZenithRising.Scripts.Skills.Effects;
 
 namespace ZenithRising.Scripts.PlayerScripts;
 
@@ -274,6 +275,42 @@ public partial class Player : CharacterBody2D
         return true;
     }
 
+    public void SpawnWaveProjectiles()
+    {
+        if (_currentCastingSkill == null)
+        {
+            GD.PrintErr("SpawnEnergyWaveProjectiles: No casting skill set!");
+            return;
+        }
+
+        if (_currentCastingSkill.ProjectileCount <= 0)
+        {
+            return; // Not a projectile-spawning skill
+        }
+
+        if (ProjectileScene == null)
+        {
+            GD.PrintErr("SpawnEnergyWaveProjectiles: ProjectileScene not assigned!");
+            return;
+        }
+
+        // Spawn position: slightly in front of player
+        Vector2 spawnOffset = _lastDirection * 40f;
+        Vector2 spawnPos = GlobalPosition + spawnOffset;
+
+        // Base angle from player's facing direction
+        float baseAngle = Mathf.Atan2(_lastDirection.Y, _lastDirection.X);
+
+        int projectileCount = _currentCastingSkill.ProjectileCount;
+        float spreadAngle = _currentCastingSkill.ProjectileSpreadAngle;
+
+        // Spawn each projectile in cone
+        for (int i = 0; i < projectileCount; i++)
+        {
+            SpawnSingleProjectile(spawnPos, baseAngle, i, projectileCount, spreadAngle);
+        }
+    }
+
     // ===== PRIVATE HELPERS - Event Handlers =====
     private void OnLeveledUp()
     {
@@ -341,6 +378,33 @@ public partial class Player : CharacterBody2D
         if (_animationPlayer.CurrentAnimation != animName)
         {
             _animationPlayer.Play(animName);
+        }
+    }
+
+    private void SpawnSingleProjectile(Vector2 spawnPos, float baseAngle, int index, int totalCount, float spreadAngle)
+    {
+        // Calculate angle offset for this projectile
+        float angleOffset = 0f;
+
+        if (totalCount > 1)
+        {
+            // Spread evenly: 3 projectiles = -25°, 0°, +25°
+            float step = (spreadAngle * 2) / (totalCount - 1);
+            angleOffset = -spreadAngle + (step * index);
+        }
+
+        float finalAngle = baseAngle + Mathf.DegToRad(angleOffset);
+        Vector2 direction = new Vector2(Mathf.Cos(finalAngle), Mathf.Sin(finalAngle));
+
+        // Spawn projectile
+        var projectile = ProjectileScene.Instantiate<Node2D>();
+        GetTree().Root.AddChild(projectile);
+        projectile.GlobalPosition = spawnPos;
+
+        // Initialize with skill data
+        if (projectile is SkillEffect effect)
+        {
+            effect.Initialize(_currentCastingSkill, this, direction);
         }
     }
 
