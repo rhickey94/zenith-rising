@@ -25,10 +25,16 @@ public partial class SkillBalanceEntry : Resource
     [Export] public float Width { get; set; } = 0f; // For melee arcs
 
     [ExportGroup("Projectile Properties")]
-    [Export] public float ExplosionDamage { get; set; } = 0f;
     [Export] public float ProjectileSpeed { get; set; } = 0f;
     [Export] public int PierceCount { get; set; } = 0;
     [Export] public float ProjectileLifetime { get; set; } = 5f;
+    [Export] public int ProjectileCount { get; set; } = 0;
+    [Export] public float ProjectileDamage { get; set; } = 0f;
+    [Export] public float ProjectileSpreadAngle { get; set; } = 0f;
+
+    [ExportGroup("Explosion Properties")]
+    [Export] public float ExplosionDamage { get; set; } = 0f;
+    [Export] public float ExplosionRadius { get; set; } = 0f;
 
     [ExportGroup("Timing")]
     [Export] public float CastTime { get; set; } = 0f; // Animation duration
