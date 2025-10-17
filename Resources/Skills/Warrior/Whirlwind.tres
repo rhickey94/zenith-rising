@@ -1,12 +1,11 @@
-[gd_resource type="Resource" script_class="InstantAOESkill" load_steps=3 format=3 uid="uid://5g8accyxr8hh"]
+[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://5g8accyxr8hh"]
 
-[ext_resource type="PackedScene" uid="uid://blpyt6xpu1lhh" path="res://Scenes/SkillEffects/whirlwind_effect.tscn" id="1_72mrr"]
-[ext_resource type="Script" uid="uid://dlqhwikuotfew" path="res://Scripts/Skills/Data/InstantAOESkill.cs" id="2_72mrr"]
+[ext_resource type="Script" uid="uid://dff1q4v5i7rpk" path="res://Scripts/Skills/Base/Skill.cs" id="1_mt7j2"]
 
 [resource]
-script = ExtResource("2_72mrr")
+script = ExtResource("1_mt7j2")
+SkillId = "warrior_whirlwind"
 SkillName = "Whirlwind"
-Description = "Deals damage in an area around the player"
+Description = "Spin around dealing damage to all enemies within the radius."
 Slot = 2
-SkillEffectScene = ExtResource("1_72mrr")
 metadata/_custom_type_script = "uid://dff1q4v5i7rpk"

@@ -5,6 +5,7 @@ using ZenithRising.Scripts.PlayerScripts.Components;
 using ZenithRising.Scripts.UI.Panels;
 using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.Enemies.Base;
+using ZenithRising.Scripts.Skills.Base;
 
 namespace ZenithRising.Scripts.PlayerScripts;
 
@@ -46,9 +47,10 @@ public partial class Player : CharacterBody2D
     private AnimationPlayer _animationPlayer;
     private Vector2 _lastDirection = Vector2.Down;
     private PlayerState _currentState = PlayerState.Idle;
-    private Area2D _basicAttackHitbox;
-    private Area2D _whirlwindHitbox;
-    private readonly HashSet<Enemy> _whirlwindHitEnemies = [];
+    private Area2D _meleeHitbox;
+    private Area2D _aoeHitbox;
+    private readonly HashSet<Enemy> _hitEnemiesThisCast = [];
+    private Skill _currentCastingSkill;
 
     // ===== LIFECYCLE METHODS =====
     public override void _Ready()
@@ -98,6 +100,27 @@ public partial class Player : CharacterBody2D
         else
         {
             _animationPlayer.AnimationFinished += OnAnimationFinished;
+        }
+
+        // Get hitbox nodes
+        _meleeHitbox = GetNode<Area2D>("MeleeHitbox");
+        if (_meleeHitbox == null)
+        {
+            GD.PrintErr("Player: MeleeHitbox not found!");
+        }
+        else
+        {
+            _meleeHitbox.BodyEntered += OnMeleeHitboxBodyEntered;
+        }
+
+        _aoeHitbox = GetNode<Area2D>("AOEHitbox");
+        if (_aoeHitbox == null)
+        {
+            GD.PrintErr("Player: AOEHitbox not found!");
+        }
+        else
+        {
+            _aoeHitbox.BodyEntered += OnAOEHitboxBodyEntered;
         }
 
         // Connect to LevelUpPanel
@@ -223,13 +246,16 @@ public partial class Player : CharacterBody2D
 
         ChangeState(PlayerState.BasicAttacking);
 
+        // Store the basic attack skill for hitbox damage calculation
+        _currentCastingSkill = _skillManager?.BasicAttackSkill;  // ✅ ADD THIS LINE
+
         string attackAnim = GetDirectionalAnimationName("warrior_attack", _lastDirection);
         _animationPlayer.Play(attackAnim);
 
         return true;
     }
 
-    public bool TryCastSkill(string skillName)
+    public bool TryCastSkill(Skill skill)
     {
         if (!CanTransitionTo(PlayerState.CastingSkill))
         {
@@ -238,12 +264,14 @@ public partial class Player : CharacterBody2D
 
         ChangeState(PlayerState.CastingSkill);
 
-        // For now, we'll handle specific skill animations
-        if (skillName == "Whirlwind")
-        {
-            _animationPlayer.Play("warrior_whirlwind");
-        }
+        // Store skill for hitbox damage calculation
+        _currentCastingSkill = skill;
 
+        // Determine animation name based on skill
+        string animName = GetSkillAnimationName(skill);
+        _animationPlayer.Play(animName);
+
+        GD.Print($"Playing skill animation: {animName}");
         return true;
     }
 
@@ -332,6 +360,24 @@ public partial class Player : CharacterBody2D
 
         return $"{baseAnimation}_{directionSuffix}";
     }
+
+    private string GetSkillAnimationName(Skill skill)
+    {
+        // For now, handle known skills
+        // Later this can be data-driven via skill.AnimationName property
+        if (skill.SkillId == "warrior_basic_attack")
+        {
+            return GetDirectionalAnimationName("warrior_attack", _lastDirection);
+        }
+        else if (skill.SkillId == "warrior_whirlwind")
+        {
+            return "warrior_whirlwind";
+        }
+
+        GD.PrintErr($"No animation mapped for skill: {skill.SkillId}");
+        return "idle_down"; // Fallback
+    }
+
     private bool CanTransitionTo(PlayerState newState)
     {
         if (_currentState == PlayerState.Dead)
@@ -388,4 +434,109 @@ public partial class Player : CharacterBody2D
         }
     }
 
+    // ===== HITBOX SYSTEM =====
+
+    public void EnableMeleeHitbox()
+    {
+        if (_meleeHitbox == null)
+        {
+            return;
+        }
+
+        _hitEnemiesThisCast.Clear();
+        _meleeHitbox.Monitoring = true;
+        GD.Print("Melee hitbox enabled");
+    }
+
+    public void DisableMeleeHitbox()
+    {
+        if (_meleeHitbox == null)
+        {
+            return;
+        }
+
+        _meleeHitbox.Monitoring = false;
+        GD.Print("Melee hitbox disabled");
+    }
+
+    public void EnableAOEHitbox()
+    {
+        if (_aoeHitbox == null)
+        {
+            return;
+        }
+
+        _hitEnemiesThisCast.Clear();
+        _aoeHitbox.Monitoring = true;
+        GD.Print("AOE hitbox enabled");
+    }
+
+    public void DisableAOEHitbox()
+    {
+        if (_aoeHitbox == null)
+        {
+            return;
+        }
+
+        _aoeHitbox.Monitoring = false;
+        GD.Print("AOE hitbox disabled");
+    }
+
+    private void OnMeleeHitboxBodyEntered(Node2D body)
+    {
+        if (body is not Enemy enemy)
+        {
+            return;
+        }
+
+        if (_hitEnemiesThisCast.Contains(enemy))
+        {
+            return;
+        }
+
+        _hitEnemiesThisCast.Add(enemy);
+        ApplyHitboxDamage(enemy);
+    }
+
+    private void OnAOEHitboxBodyEntered(Node2D body)
+    {
+        if (body is not Enemy enemy)
+        {
+            return;
+        }
+
+        if (_hitEnemiesThisCast.Contains(enemy))
+        {
+            return;
+        }
+
+        _hitEnemiesThisCast.Add(enemy);
+        ApplyHitboxDamage(enemy);
+    }
+
+    private void ApplyHitboxDamage(Enemy enemy)
+    {
+        if (_currentCastingSkill == null || _statsManager == null)
+        {
+            GD.PrintErr("ApplyHitboxDamage called but no active skill or stats!");
+            return;
+        }
+
+        float baseDamage = _currentCastingSkill.BaseDamage;
+        float damage = CombatSystem.CalculateDamage(
+            baseDamage,
+            _statsManager,
+            _currentCastingSkill.DamageType
+        );
+
+        float healthBefore = enemy.Health;
+        enemy.TakeDamage(damage);
+        GD.Print($"{_currentCastingSkill.SkillName} hit {enemy.Name} for {damage} damage");
+
+        // Track kill if enemy died
+        if (healthBefore > 0 && enemy.Health <= 0)
+        {
+            _currentCastingSkill.RecordKill();
+        }
+    }
 }

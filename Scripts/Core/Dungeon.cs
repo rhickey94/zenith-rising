@@ -1,6 +1,5 @@
-using System.Collections.Generic;
 using Godot;
-using SpaceTower.Scripts.Core;
+using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.Enemies.Base;
 using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.PlayerScripts.Components;
@@ -67,6 +66,11 @@ public partial class Dungeon : Node
 
     public override void _PhysicsProcess(double delta)
     {
+        if (GameBalance.Instance == null || GameBalance.Instance.Config == null)
+        {
+            return; // GameBalance not ready yet, skip this frame
+        }
+
         _floorTimeElapsed += (float)delta;
         _timeSinceLastSpawn += (float)delta;
         _totalGameTime += (float)delta;

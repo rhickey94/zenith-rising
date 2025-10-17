@@ -1,15 +1,23 @@
 using Godot;
-using ZenithRising.Scripts.Core;
+using ZenithRising.Scripts.Core.Config;
 using ZenithRising.Scripts.Skills.Balance;
 
-namespace SpaceTower.Scripts.Core;
+namespace ZenithRising.Scripts.Core;
 
 public partial class GameBalance : Node
 {
     public static GameBalance Instance { get; private set; }
 
-    [Export] public BalanceConfig Config { get; set; }
+    // Individual .tres files (assigned in Godot editor)
+    [Export] public PlayerStatsConfig PlayerStatsResource { get; set; }
+    [Export] public CharacterProgressionConfig CharacterProgressionResource { get; set; }
+    [Export] public CombatSystemConfig CombatSystemResource { get; set; }
+    [Export] public EnemyConfig EnemyResource { get; set; }
+    [Export] public UpgradeSystemConfig UpgradeSystemResource { get; set; }
     [Export] public SkillBalanceDatabase SkillDatabase { get; set; }
+
+    // Wrapper populated in _Ready()
+    public BalanceConfig Config { get; private set; }
 
     public override void _Ready()
     {
@@ -22,10 +30,39 @@ public partial class GameBalance : Node
 
         Instance = this;
 
-        if (Config == null)
+        if (PlayerStatsResource == null)
         {
-            GD.PrintErr("GameBalance: BalanceConfig not assigned!");
+            GD.PrintErr("GameBalance: PlayerStats not assigned!");
         }
+
+        if (CharacterProgressionResource == null)
+        {
+            GD.PrintErr("GameBalance: CharacterProgression not assigned!");
+        }
+
+        if (CombatSystemResource == null)
+        {
+            GD.PrintErr("GameBalance: CombatSystem not assigned!");
+        }
+
+        if (EnemyResource == null)
+        {
+            GD.PrintErr("GameBalance: Enemy not assigned!");
+        }
+
+        if (UpgradeSystemResource == null)
+        {
+            GD.PrintErr("GameBalance: UpgradeSystem not assigned!");
+        }
+
+        Config = new()
+        {
+            PlayerStats = PlayerStatsResource,
+            CharacterProgression = CharacterProgressionResource,
+            CombatSystem = CombatSystemResource,
+            Enemy = EnemyResource,
+            UpgradeSystem = UpgradeSystemResource
+        };
 
         if (SkillDatabase == null)
         {
@@ -33,5 +70,6 @@ public partial class GameBalance : Node
         }
 
         GD.Print("GameBalance initialized successfully");
+        GD.Print($"Loading {PlayerStatsResource.GetType().Name} with BaseMaxHealth: {PlayerStatsResource.BaseMaxHealth}");
     }
 }

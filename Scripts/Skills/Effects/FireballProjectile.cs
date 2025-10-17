@@ -1,9 +1,7 @@
 using Godot;
-using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.Enemies.Base;
 using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.Skills.Base;
-using ZenithRising.Scripts.Skills.Data;
 
 namespace ZenithRising.Scripts.Skills.Effects;
 
@@ -25,8 +23,9 @@ public partial class FireballProjectile : CollisionSkillEffect
     {
         base.Initialize(sourceSkill, caster, direction);
 
+        // Read from base Skill properties (loaded from database)
         _directDamage = sourceSkill.BaseDamage;
-        _explosionDamage = sourceSkill.BaseDamage;
+        _explosionDamage = sourceSkill.BaseDamage * 2f; // 2x base for explosion
         _explosionRadius = sourceSkill.Radius;
         _startPosition = caster.GlobalPosition;
 

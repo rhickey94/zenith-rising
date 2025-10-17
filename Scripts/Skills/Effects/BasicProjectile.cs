@@ -1,10 +1,7 @@
 using Godot;
-using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.Enemies.Base;
 using ZenithRising.Scripts.PlayerScripts;
-using ZenithRising.Scripts.PlayerScripts.Components;
 using ZenithRising.Scripts.Skills.Base;
-using ZenithRising.Scripts.Skills.Data;
 
 namespace ZenithRising.Scripts.Skills.Effects;
 
@@ -18,17 +15,11 @@ public partial class BasicProjectile : CollisionSkillEffect
     private int _maxPierce = 0;
     private float _totalDamage;
 
-    public override void Initialize(Skill sourceSkill, Player caster, Vector2 direction)
+    public override void Initialize(Skill skill, Player caster, Vector2 direction)
     {
-        base.Initialize(sourceSkill, caster, direction);
+        base.Initialize(skill, caster, direction);
 
-        if (sourceSkill is not ProjectileSkill skill)
-        {
-            GD.PrintErr("BasicProjectile: sourceSkill is not ProjectileSkill!");
-            return;
-        }
-
-        BaseDamage = skill.DirectDamage;
+        BaseDamage = skill.Damage;
         _totalDamage = BaseDamage;
 
         // Apply upgrade bonuses

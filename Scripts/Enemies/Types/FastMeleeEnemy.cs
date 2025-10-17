@@ -1,4 +1,3 @@
-using Godot;
 using ZenithRising.Scripts.Enemies.Base;
 
 namespace ZenithRising.Scripts.Enemies.Types;

@@ -1,10 +1,18 @@
-[gd_scene load_steps=4 format=3 uid="uid://dv1ynugy6f8o3"]
+[gd_scene load_steps=8 format=3 uid="uid://dv1ynugy6f8o3"]
 
-[ext_resource type="Script" uid="uid://svfekvyvdeh5" path="res://Scripts/Core/GameBalance.cs" id="1_15wvk"]
-[ext_resource type="Resource" uid="uid://dybjpuv1hw2hw" path="res://Resources/Balance/balance_config.tres" id="2_fspwh"]
-[ext_resource type="Resource" uid="uid://dbooxibogc7fp" path="res://Resources/Balance/skill_balance_database.tres" id="3_fspwh"]
+[ext_resource type="Script" uid="uid://svfekvyvdeh5" path="res://Scripts/Core/GameBalance.cs" id="1_t4n6p"]
+[ext_resource type="Resource" uid="uid://c322dv1nge0w" path="res://Resources/Balance/player_stats_config.tres" id="2_bwqjs"]
+[ext_resource type="Resource" uid="uid://bltpkgd1fv3yy" path="res://Resources/Balance/character_progression_config.tres" id="3_x3wlo"]
+[ext_resource type="Resource" uid="uid://dn8yh5sx178q1" path="res://Resources/Balance/combat_system_config.tres" id="4_w1mex"]
+[ext_resource type="Resource" uid="uid://1ejw50nqgj63" path="res://Resources/Balance/enemy_config.tres" id="5_gdctl"]
+[ext_resource type="Resource" uid="uid://dqbcrgh1lurfp" path="res://Resources/Balance/upgrade_system_config.tres" id="6_1vxrx"]
+[ext_resource type="Resource" uid="uid://dbooxibogc7fp" path="res://Resources/Balance/skill_balance_database.tres" id="7_4vc0j"]
 
 [node name="Node" type="Node"]
-script = ExtResource("1_15wvk")
-Config = ExtResource("2_fspwh")
-SkillDatabase = ExtResource("3_fspwh")
+script = ExtResource("1_t4n6p")
+PlayerStatsResource = ExtResource("2_bwqjs")
+CharacterProgressionResource = ExtResource("3_x3wlo")
+CombatSystemResource = ExtResource("4_w1mex")
+EnemyResource = ExtResource("5_gdctl")
+UpgradeSystemResource = ExtResource("6_1vxrx")
+SkillDatabase = ExtResource("7_4vc0j")

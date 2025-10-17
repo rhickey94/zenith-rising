@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="MeleeAttackSkill" load_steps=3 format=3 uid="uid://dfssvafd8e1nw"]
+[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://dfssvafd8e1nw"]
 
-[ext_resource type="PackedScene" uid="uid://du4yo1vulblyh" path="res://Scenes/SkillEffects/melee_attack.tscn" id="1_ejf0k"]
-[ext_resource type="Script" uid="uid://7fwrg4413bt3" path="res://Scripts/Skills/Data/MeleeAttackSkill.cs" id="2_ejf0k"]
+[ext_resource type="Script" uid="uid://dff1q4v5i7rpk" path="res://Scripts/Skills/Base/Skill.cs" id="1_sbfav"]
 
 [resource]
-script = ExtResource("2_ejf0k")
+script = ExtResource("1_sbfav")
+SkillId = "warrior_basic_attack"
 SkillName = "Fusion Cutter"
-Description = "Basic melee attack"
-SkillEffectScene = ExtResource("1_ejf0k")
+Description = "Swings a melee weapon to do minor damage."

@@ -51,13 +51,14 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 
 ## Current Status: Be Honest
 
-**Phase:** Balance Systems Foundation (Phase 3.5-A) - ⏳ **IN PROGRESS**
+**Phase:** Warrior Skill Implementation (Phase 3.5-B+) - ⏳ **IN PROGRESS**
 
-**🎉 PHASES 1, 2, & 3 COMPLETE! 🎉**
+**🎉 PHASES 1, 2, 3, & 3.5-A COMPLETE! 🎉**
 
 **Phase 1 - Combat:** Proven fun and engaging through multiple playtests
 **Phase 2 - Progression:** Character stats, save/load, stat allocation working
 **Phase 3 - Hub World:** Scene flow and player initialization working
+**Phase 3.5-A - Balance Systems:** Centralized config infrastructure complete
 
 ### ✅ Actually Working
 
@@ -104,25 +105,28 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 - **Combat animations** - warrior_attack_[dir], warrior_whirlwind created
 - **Phases 1-4 complete** - Foundation, locomotion, FSM, combat animations
 
+**Balance Systems (Phase 3.5-A):**
+- **GameBalance singleton** - Autoload with centralized config access
+- **5 config Resources** - Player stats, progression, combat, enemies, upgrades (separate files)
+- **Inspector-based tuning** - Edit balance values without recompilation
+- **Hybrid architecture** - Individual .tres files + C# wrapper for clean access
+- **Lazy initialization** - Null guards prevent timing issues during startup
+- **Warrior combat working** - Basic attack and Whirlwind deal damage via hitboxes
+- **SkillBalanceDatabase** - Centralized skill parameter storage
+
 ### ⏳ In Progress
 
-**Animation System (Warrior):**
-- ✅ Phases 1-4: Sprite2D, locomotion, FSM, combat animations
-- ⏳ Phase 5: Combat hitboxes (BasicAttackHitbox, WhirlwindHitbox)
-- 📝 Phases 6-7: Skill integration, testing
+**Warrior Skills Implementation:**
+- ✅ Basic Attack (Fusion Cutter) - Functional with hitbox damage
+- ✅ Whirlwind - Functional with AOE hitbox damage
+- 📝 Crowd Suppression - Planned (AOE Pattern)
+- 📝 Combat Stim - Planned (Buff Pattern)
+- 📝 Breaching Charge - Planned (Cast-Spawn Pattern)
 
-**Skill Standardization:**
-- ✅ 6 patterns designed (Melee, AOE, Projectile, Cast-Spawn, Buff, Zone)
-- ✅ All 18 skills mapped to implementation patterns
-- 📝 NOT yet implemented (planned for Phase B)
-
-**Balance Systems (Phase 3.5-A - CURRENT PRIORITY):**
-- 📝 BalanceConfig system - creating centralized game-wide balance parameters
-- 📝 SkillBalanceDatabase - creating skill-specific content balance database
-- 📝 GameBalance singleton - global access autoload
-- 📝 StatsManager refactor - eliminate hardcoded constants
-- 📝 UpgradeManager refactor - read values from config
-- **Why prioritized:** 4-6 hour investment prevents scattered magic numbers, enables rapid tuning
+**Combat Polish:**
+- 📝 Animation timing refinement
+- 📝 Hitbox frame tuning for better feel
+- 📝 Visual effects for attacks
 
 ### 📝 Not Started (Phase 4+)
 
@@ -408,6 +412,124 @@ After completing Phase 3 (Hub World), began work on warrior character animations
 - Create hitbox nodes in player.tscn
 - Update SkillManager.UseSkill() to route based on CastBehavior
 
+### Session 11 - Balance Systems Foundation (Phase 3.5-A) COMPLETE! 🎯
+
+**Context:**
+After Session 10 planning work, began implementation of centralized balance systems infrastructure. Session focused on creating Godot-friendly Resource architecture and fixing initialization timing issues.
+
+**Completed:**
+
+**Balance System Architecture (Phase 3.5-A):**
+- ✅ Created 5 separate config Resource classes in `Scripts/Core/Config/`:
+  - PlayerStatsConfig.cs (BaseMaxHealth, BaseSpeed, BaseFireRate, BaseMeleeRate, BasePickupRadius)
+  - CharacterProgressionConfig.cs (stat scaling formulas, XP curves)
+  - CombatSystemConfig.cs (crit multipliers, damage caps)
+  - EnemyConfig.cs (spawn rates, scaling formulas, wave/floor system)
+  - UpgradeSystemConfig.cs (upgrade values per stack)
+- ✅ Created BalanceConfig.cs wrapper class (plain C#, not a Resource)
+- ✅ Modified GameBalance.cs to use hybrid approach:
+  - Exports individual .tres resources (PlayerStatsResource, etc.)
+  - Assembles BalanceConfig wrapper in _Ready() for clean code access
+  - Added validation for all Resource properties before creating Config
+- ✅ Created 5 .tres resource files in `Resources/Balance/`:
+  - player_stats_config.tres
+  - character_progression_config.tres
+  - combat_system_config.tres
+  - enemy_config.tres
+  - upgrade_system_config.tres
+- ✅ Updated game_balance.tscn to reference all 5 individual .tres files
+- ✅ Fixed project.godot autoload to point to game_balance.tscn (not .cs file)
+
+**Initialization Timing Fixes:**
+- ✅ Added null guards to prevent NullReferenceException during startup:
+  - StatsManager.cs: Field initializers use default values, config loads in _Ready()
+  - UpgradeManager.cs: Added lazy initialization with InitializeUpgradeList() method
+  - Dungeon.cs: Added null check in _PhysicsProcess() to skip frame if GameBalance not ready
+  - StatAllocationPanel.cs: Added null guards to all formatting methods
+- ✅ Fixed Godot Resource initialization order issues (autoload vs scene nodes)
+
+**Combat System Integration:**
+- ✅ Warrior basic attack (Fusion Cutter) now functional with hitbox damage
+- ✅ Whirlwind AOE attack working
+- ✅ Animation-driven combat with Call Method tracks for hitboxes
+- ✅ Fixed animation loop mode (animations now finish properly)
+- ✅ Player state machine returns to locomotion after attacks
+- ✅ Damage calculation working through centralized CombatSystem.cs
+
+**Skill System Updates:**
+- ✅ SkillManager routes skills by CastBehavior (Instant vs AnimationDriven)
+- ✅ Player.TryBasicAttack() sets _currentCastingSkill for hitbox damage calculation
+- ✅ Skill.Initialize() loads balance data from SkillBalanceDatabase
+- ✅ Skills use runtime properties loaded from database (not hardcoded exports)
+
+**Challenges Solved:**
+
+1. **Nested Resources Problem:**
+   - **Issue:** Godot's C# system struggles with Resources nested in .tres files
+   - **Root Cause:** Multiple [GlobalClass] attributes in one file, corrupted sub-resource references
+   - **Solution:** Split config classes into separate files, use hybrid architecture (individual .tres + wrapper)
+
+2. **GameBalance Initialization Timing:**
+   - **Issue:** Scene nodes' _Ready() sometimes called before autoload _Ready()
+   - **Root Cause:** Godot initialization order not guaranteed for autoload exports
+   - **Solution:** Lazy initialization pattern with null guards in all consuming systems
+
+3. **Animation Looping Infinitely:**
+   - **Issue:** Attack animations looped forever, player stuck in attack state
+   - **Root Cause:** Animation loop_mode = 1, AnimationFinished never fired
+   - **Solution:** Changed loop_mode to 0 (no loop) in Godot editor
+
+4. **No Damage Being Dealt:**
+   - **Issue:** Attacks played but enemies took no damage
+   - **Root Cause:** Hitboxes never enabled (no Call Method tracks in animations)
+   - **Solution:** Added Call Method tracks to animations for EnableMeleeHitbox/DisableMeleeHitbox
+
+**Architecture Insights:**
+
+- **Godot Resource Best Practices:**
+  - Each [GlobalClass] Resource should be in its own file
+  - Avoid deep nesting of Resources in .tres files
+  - Use plain C# classes as wrappers for code convenience
+  - Individual .tres files are easier to edit and maintain
+
+- **Autoload Initialization:**
+  - Autoloads initialize in order defined in project.godot
+  - Scene nodes may _Ready() before autoload _Ready() completes
+  - Always add null guards when accessing autoload exports
+  - Lazy initialization pattern handles timing uncertainty
+
+**Testing Results:**
+- ✅ Game loads without errors
+- ✅ Player moves normally in hub and dungeon
+- ✅ Basic attacks (left click) deal damage and finish properly
+- ✅ Whirlwind (right click) deals AOE damage
+- ✅ Player returns to locomotion state after attacks
+- ✅ Balance values can be edited in Godot inspector without recompiling
+- ✅ All GameBalance.Instance.Config references work correctly
+
+**Achievements:**
+
+- 🎉 **Phase 3.5-A COMPLETE!** Balance Systems Foundation fully implemented
+- 🎯 **Centralized balance infrastructure** ready for rapid iteration
+- 🏗️ **Architecture validated** through Godot C# Resource system challenges
+- ⚔️ **Warrior combat functional** with animation-driven hitbox damage
+- 📊 **Inspector-based workflow** enables tuning without recompilation
+
+**Lessons Learned:**
+
+- Godot's Resource system requires careful architecture for C# classes
+- Split complex nested structures into flat individual files for Godot
+- Hybrid approach (individual exports + wrapper) balances editor and code convenience
+- Sequential thinking tool invaluable for tracing initialization order bugs
+- Taking time to build infrastructure properly pays off for rapid iteration
+
+**Next Session:**
+
+- Polish animation timing and hitbox frames for better combat feel
+- Implement remaining warrior skills (Crowd Suppression, Combat Stim, Breaching Charge)
+- Test balance values by tweaking in inspector during playtesting
+- Consider adding visual effects for attacks
+
 ### Session 8 - Victory & Death Screens - PHASE 1 COMPLETE! 🎉
 
 **Completed:**
@@ -658,5 +780,5 @@ FOR (Fortune): +2% Crit Damage, +1% Drop Rate per point
 
 ---
 
-_Last updated: Session 10 - Animation architecture & skill standardization_
-_🎉 PHASES 1, 2, & 3 COMPLETE - Warrior animations in progress! 🎉_
+_Last updated: Session 11 - Balance Systems Foundation complete_
+_🎉 PHASES 1, 2, 3, & 3.5-A COMPLETE - Balance systems live, warrior combat functional! 🎉_

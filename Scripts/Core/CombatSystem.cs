@@ -1,5 +1,4 @@
 using Godot;
-using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.PlayerScripts.Components;
 
 namespace ZenithRising.Scripts.Core;

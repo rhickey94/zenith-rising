@@ -106,17 +106,26 @@ public partial class SkillManager : Node
             return;
         }
 
+        // Initialize skill from database if not already done
         skill.Initialize();
 
-        GD.Print($"Using {skill.SkillName}!");
+        GD.Print($"Using {skill.SkillName}! (CastBehavior: {skill.CastBehavior}, DamageSource: {skill.DamageSource})");
 
-        // Execute skill effect
-
-        skill.Execute(_player);
-
-        // Start cooldown
-
-        cooldownRemaining = skill.Cooldown;
+        // Route based on CastBehavior
+        if (skill.CastBehavior == CastBehavior.AnimationDriven)
+        {
+            // Request player to play animation
+            if (_player.TryCastSkill(skill))
+            {
+                cooldownRemaining = skill.Cooldown;
+            }
+        }
+        else // CastBehavior.Instant
+        {
+            // Execute immediately via existing executor system
+            skill.Execute(_player);
+            cooldownRemaining = skill.Cooldown;
+        }
     }
 
     private void ValidateSkill(Skill skill, SkillSlot expectedSlot)

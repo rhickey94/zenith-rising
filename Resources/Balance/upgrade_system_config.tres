@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="UpgradeSystemConfig" load_steps=2 format=3 uid="uid://dqbcrgh1lurfp"]
+
+[ext_resource type="Script" uid="uid://b2mmfdnfg5eka" path="res://Scripts/Core/Config/UpgradeSystemConfig.cs" id="1_sl36l"]
+
+[resource]
+script = ExtResource("1_sl36l")
+metadata/_custom_type_script = "uid://b2mmfdnfg5eka"

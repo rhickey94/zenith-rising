@@ -1,5 +1,4 @@
 using Godot;
-using System;
 
 namespace ZenithRising.Scripts.UI.Panels;
 

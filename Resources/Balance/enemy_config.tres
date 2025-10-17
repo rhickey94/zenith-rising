@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="EnemyConfig" load_steps=2 format=3 uid="uid://1ejw50nqgj63"]
+
+[ext_resource type="Script" uid="uid://b2y67if3h625h" path="res://Scripts/Core/Config/EnemyConfig.cs" id="1_s46j8"]
+
+[resource]
+script = ExtResource("1_s46j8")
+metadata/_custom_type_script = "uid://b2y67if3h625h"

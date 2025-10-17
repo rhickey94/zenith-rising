@@ -1,5 +1,5 @@
 using Godot;
-using SpaceTower.Scripts.Core;
+using ZenithRising.Scripts.Core;
 using System.Collections.Generic;
 using ZenithRising.Scripts.PlayerScripts.Components;
 
@@ -105,6 +105,11 @@ public partial class StatAllocationPanel : Control
 
     private string FormatStrengthBonus(StatsManager stats)
     {
+        if (GameBalance.Instance == null || GameBalance.Instance.Config == null)
+        {
+            return "Loading...";
+        }
+
         float physDmg = (stats.PhysicalDamageMultiplier - 1.0f) * 100f;
         float hp = stats.Strength * GameBalance.Instance.Config.CharacterProgression.StrengthHealthPerPoint;
         return $"Physical Dmg +{physDmg:F0}%, HP +{hp:F0}";
@@ -118,6 +123,11 @@ public partial class StatAllocationPanel : Control
 
     private string FormatAgilityBonus(StatsManager stats)
     {
+        if (GameBalance.Instance == null || GameBalance.Instance.Config == null)
+        {
+            return "Loading...";
+        }
+
         float atkSpd = stats.Agility * GameBalance.Instance.Config.CharacterProgression.AgilityAttackSpeedPerPoint * 100f;
         float crit = Mathf.Min(stats.Agility * GameBalance.Instance.Config.CharacterProgression.AgilityCritPerPoint, 0.5f) * 100f;
         return $"Attack Speed +{atkSpd:F0}%, Crit +{crit:F0}%";
@@ -125,6 +135,11 @@ public partial class StatAllocationPanel : Control
 
     private string FormatVitalityBonus(StatsManager stats)
     {
+        if (GameBalance.Instance == null || GameBalance.Instance.Config == null)
+        {
+            return "Loading...";
+        }
+
         float hp = stats.Vitality * GameBalance.Instance.Config.CharacterProgression.VitalityHealthPerPoint;
         float regen = stats.Vitality * GameBalance.Instance.Config.CharacterProgression.VitalityRegenPerPoint;
         return $"HP +{hp:F0}, Regen +{regen:F1}/sec";
@@ -132,6 +147,11 @@ public partial class StatAllocationPanel : Control
 
     private string FormatFortuneBonus(StatsManager stats)
     {
+        if (GameBalance.Instance == null || GameBalance.Instance.Config == null)
+        {
+            return "Loading...";
+        }
+
         float critDmg = (stats.CritDamageMultiplier - 1.5f) * 100f;
         float dropRate = stats.Fortune * GameBalance.Instance.Config.CharacterProgression.FortuneDropRatePerPoint * 100f;
         return $"Crit Dmg +{critDmg:F0}%, Drop Rate +{dropRate:F0}%";

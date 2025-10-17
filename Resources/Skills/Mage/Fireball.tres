@@ -1,15 +1,13 @@
-[gd_resource type="Resource" script_class="ProjectileSkill" load_steps=3 format=3 uid="uid://ck7w68lb1penv"]
+[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://ck7w68lb1penv"]
 
-[ext_resource type="PackedScene" uid="uid://b107rbmwnfdg" path="res://Scenes/SkillEffects/fireball_projectile.tscn" id="1_dich7"]
-[ext_resource type="Script" uid="uid://dd080vxgkhmnp" path="res://Scripts/Skills/Data/ProjectileSkill.cs" id="2_dich7"]
+[ext_resource type="Script" uid="uid://dff1q4v5i7rpk" path="res://Scripts/Skills/Base/Skill.cs" id="1_nrwkw"]
 
 [resource]
-script = ExtResource("2_dich7")
+script = ExtResource("1_nrwkw")
+SkillId = "mage_fireball"
 SkillName = "Fireball"
-Description = "Hurls a ball of fire that explodes at the target"
-Cooldown = 1.0
+Description = "Throws a ball of fire that explodes at the target."
 DamageType = 1
 AllowedClass = 1
 Slot = 2
-SkillEffectScene = ExtResource("1_dich7")
 metadata/_custom_type_script = "uid://dff1q4v5i7rpk"

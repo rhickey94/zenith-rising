@@ -1,6 +1,5 @@
 using System;
 using Godot;
-using SpaceTower.Scripts.Core;
 using ZenithRising.Scripts.Core;
 
 namespace ZenithRising.Scripts.PlayerScripts.Components;
@@ -39,10 +38,10 @@ public partial class StatsManager : Node
     private int _fortune = 0;
 
     // ===== EXPORT PROPERTIES - Base Stats =====
-    [Export] public float BaseMaxHealth { get; set; } = GameBalance.Instance.Config.PlayerStats.BaseMaxHealth;
-    [Export] public float BaseSpeed { get; set; } = GameBalance.Instance.Config.PlayerStats.BaseSpeed;
-    [Export] public float BaseFireRate { get; set; } = GameBalance.Instance.Config.PlayerStats.BaseFireRate;
-    [Export] public float BaseMeleeRate { get; set; } = GameBalance.Instance.Config.PlayerStats.BaseMeleeRate;
+    [Export] public float BaseMaxHealth { get; set; } = 100f;
+    [Export] public float BaseSpeed { get; set; } = 300f;
+    [Export] public float BaseFireRate { get; set; } = 0.2f;
+    [Export] public float BaseMeleeRate { get; set; }
 
     // ===== EXPORT PROPERTIES - Character Progression =====
     [ExportGroup("Character Progression")]
@@ -92,6 +91,37 @@ public partial class StatsManager : Node
         if (_player == null)
         {
             GD.PrintErr("StatsManager: Could not find Player parent!");
+        }
+
+        // Initialize base stats from config (allows inspector overrides if non-zero)
+        if (GameBalance.Instance != null && GameBalance.Instance.Config != null)
+        {
+            var config = GameBalance.Instance.Config.PlayerStats;
+
+            // Only override if not set in inspector (check against defaults)
+            if (BaseMaxHealth == 100.0f)
+            {
+                BaseMaxHealth = config.BaseMaxHealth;
+            }
+
+            if (BaseSpeed == 300.0f)
+            {
+                BaseSpeed = config.BaseSpeed;
+            }
+
+            if (BaseFireRate == 0.2f)
+            {
+                BaseFireRate = config.BaseFireRate;
+            }
+
+            if (BaseMeleeRate == 0.5f)
+            {
+                BaseMeleeRate = config.BaseMeleeRate;
+            }
+        }
+        else
+        {
+            GD.PrintErr("StatsManager: GameBalance not initialized! Using default values.");
         }
 
         CurrentMaxHealth = BaseMaxHealth;

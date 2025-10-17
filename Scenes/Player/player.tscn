@@ -13,23 +13,6 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
 size = Vector2(50, 62)
 
-[sub_resource type="Animation" id="Animation_0u5uq"]
-resource_name = "walk_down"
-length = 0.9
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:region_rect")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [Rect2(0, 640, 64, 64), Rect2(64, 640, 64, 64), Rect2(128, 640, 64, 64), Rect2(192, 640, 64, 64), Rect2(256, 640, 64, 64), Rect2(320, 640, 64, 64), Rect2(384, 640, 64, 64), Rect2(448, 640, 64, 64), Rect2(512, 640, 64, 64)]
-}
-
 [sub_resource type="Animation" id="Animation_jlvik"]
 length = 0.001
 tracks/0/type = "value"
@@ -45,8 +28,72 @@ tracks/0/keys = {
 "values": [Rect2(0, 640, 64, 64)]
 }
 
-[sub_resource type="Animation" id="Animation_gk6dx"]
-resource_name = "walk_up"
+[sub_resource type="Animation" id="Animation_oikmp"]
+resource_name = "idle_down"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-1.4901161e-08),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Rect2(0, 640, 64, 64)]
+}
+
+[sub_resource type="Animation" id="Animation_7g0yx"]
+resource_name = "idle_left"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Rect2(0, 576, 64, 64)]
+}
+
+[sub_resource type="Animation" id="Animation_dey5f"]
+resource_name = "idle_right"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Rect2(0, 704, 64, 64)]
+}
+
+[sub_resource type="Animation" id="Animation_06tpx"]
+resource_name = "idle_up"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Rect2(0, 512, 64, 64)]
+}
+
+[sub_resource type="Animation" id="Animation_0u5uq"]
+resource_name = "walk_down"
 length = 0.9
 loop_mode = 1
 tracks/0/type = "value"
@@ -56,10 +103,10 @@ tracks/0/path = NodePath("Sprite2D:region_rect")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(-5.9604645e-08, 0.099999964, 0.19999993, 0.29999995, 0.39999998, 0.49999988, 0.6, 0.6999999, 0.79999995),
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [Rect2(0, 512, 64, 64), Rect2(64, 512, 64, 64), Rect2(128, 512, 64, 64), Rect2(192, 512, 64, 64), Rect2(256, 512, 64, 64), Rect2(320, 512, 64, 64), Rect2(384, 512, 64, 64), Rect2(448, 512, 64, 64), Rect2(512, 512, 64, 64)]
+"values": [Rect2(0, 640, 64, 64), Rect2(64, 640, 64, 64), Rect2(128, 640, 64, 64), Rect2(192, 640, 64, 64), Rect2(256, 640, 64, 64), Rect2(320, 640, 64, 64), Rect2(384, 640, 64, 64), Rect2(448, 640, 64, 64), Rect2(512, 640, 64, 64)]
 }
 
 [sub_resource type="Animation" id="Animation_jhyir"]
@@ -96,9 +143,10 @@ tracks/0/keys = {
 "values": [Rect2(0, 704, 64, 64), Rect2(64, 704, 64, 64), Rect2(128, 704, 64, 64), Rect2(192, 704, 64, 64), Rect2(256, 704, 64, 64), Rect2(320, 704, 64, 64), Rect2(384, 704, 64, 64), Rect2(448, 704, 64, 64), Rect2(512, 704, 64, 64)]
 }
 
-[sub_resource type="Animation" id="Animation_oikmp"]
-resource_name = "idle_down"
-length = 0.1
+[sub_resource type="Animation" id="Animation_gk6dx"]
+resource_name = "walk_up"
+length = 0.9
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -106,64 +154,15 @@ tracks/0/path = NodePath("Sprite2D:region_rect")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(-1.4901161e-08),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Rect2(0, 640, 64, 64)]
-}
-
-[sub_resource type="Animation" id="Animation_06tpx"]
-resource_name = "idle_up"
-length = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:region_rect")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Rect2(0, 512, 64, 64)]
-}
-
-[sub_resource type="Animation" id="Animation_7g0yx"]
-resource_name = "idle_left"
-length = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:region_rect")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Rect2(0, 576, 64, 64)]
-}
-
-[sub_resource type="Animation" id="Animation_dey5f"]
-resource_name = "idle_right"
-length = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:region_rect")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Rect2(0, 704, 64, 64)]
+"times": PackedFloat32Array(-5.9604645e-08, 0.099999964, 0.19999993, 0.29999995, 0.39999998, 0.49999988, 0.6, 0.6999999, 0.79999995),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Rect2(0, 512, 64, 64), Rect2(64, 512, 64, 64), Rect2(128, 512, 64, 64), Rect2(192, 512, 64, 64), Rect2(256, 512, 64, 64), Rect2(320, 512, 64, 64), Rect2(384, 512, 64, 64), Rect2(448, 512, 64, 64), Rect2(512, 512, 64, 64)]
 }
 
 [sub_resource type="Animation" id="Animation_r5xpd"]
 resource_name = "warrior_attack_down"
 length = 0.6
-loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -176,28 +175,27 @@ tracks/0/keys = {
 "update": 1,
 "values": [Rect2(0, 3712, 128, 128), Rect2(128, 3712, 128, 128), Rect2(256, 3712, 128, 128), Rect2(384, 3712, 128, 128), Rect2(512, 3712, 128, 128), Rect2(640, 3712, 128, 128)]
 }
-
-[sub_resource type="Animation" id="Animation_ks1b7"]
-resource_name = "warrior_attack_up"
-length = 0.6
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:region_rect")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(-5.9604645e-08, 0.099999964, 0.19999993, 0.29999995, 0.39999998, 0.49999988),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [Rect2(0, 3456, 128, 128), Rect2(128, 3456, 128, 128), Rect2(256, 3456, 128, 128), Rect2(384, 3456, 128, 128), Rect2(512, 3456, 128, 128), Rect2(640, 3456, 128, 128)]
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.16666667, 0.33333334),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"EnableMeleeHitbox"
+}, {
+"args": [],
+"method": &"DisableMeleeHitbox"
+}]
 }
 
 [sub_resource type="Animation" id="Animation_hnuln"]
 resource_name = "warrior_attack_left"
 length = 0.6
-loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -210,11 +208,27 @@ tracks/0/keys = {
 "update": 1,
 "values": [Rect2(0, 3584, 128, 128), Rect2(128, 3584, 128, 128), Rect2(256, 3584, 128, 128), Rect2(384, 3584, 128, 128), Rect2(512, 3584, 128, 128), Rect2(640, 3584, 128, 128)]
 }
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.15, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"EnableMeleeHitbox"
+}, {
+"args": [],
+"method": &"DisableMeleeHitbox"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_aqm4k"]
 resource_name = "warrior_attack_right"
 length = 0.6
-loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -227,11 +241,60 @@ tracks/0/keys = {
 "update": 1,
 "values": [Rect2(0, 3840, 128, 128), Rect2(128, 3840, 128, 128), Rect2(256, 3840, 128, 128), Rect2(384, 3840, 128, 128), Rect2(512, 3840, 128, 128), Rect2(640, 3840, 128, 128)]
 }
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.15, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"EnableMeleeHitbox"
+}, {
+"args": [],
+"method": &"DisableMeleeHitbox"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_ks1b7"]
+resource_name = "warrior_attack_up"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-5.9604645e-08, 0.099999964, 0.19999993, 0.29999995, 0.39999998, 0.49999988),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Rect2(0, 3456, 128, 128), Rect2(128, 3456, 128, 128), Rect2(256, 3456, 128, 128), Rect2(384, 3456, 128, 128), Rect2(512, 3456, 128, 128), Rect2(640, 3456, 128, 128)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.15, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"EnableMeleeHitbox"
+}, {
+"args": [],
+"method": &"DisableMeleeHitbox"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_rcvs5"]
 resource_name = "warrior_whirlwind"
 length = 1.2
-loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -243,6 +306,23 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 1,
 "values": [Rect2(128, 3712, 128, 128), Rect2(256, 3712, 128, 128), Rect2(384, 3712, 128, 128), Rect2(512, 3712, 128, 128), Rect2(640, 3712, 128, 128), Rect2(640, 3840, 128, 128), Rect2(640, 3456, 128, 128), Rect2(640, 3584, 128, 128), Rect2(640, 3712, 128, 128), Rect2(640, 3840, 128, 128), Rect2(640, 3456, 128, 128), Rect2(640, 3584, 128, 128)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.1, 1.15),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"EnableAOEHitbox"
+}, {
+"args": [],
+"method": &"DisableAOEHitbox"
+}]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_r5xpd"]
@@ -277,7 +357,7 @@ MeleeAttackScene = ExtResource("3_gk6dx")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_0u5uq")
 region_enabled = true
-region_rect = Rect2(128, 3712, 128, 128)
+region_rect = Rect2(0, 3456, 128, 128)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false

@@ -1,21 +1,14 @@
 using Godot;
 using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.Skills.Base;
-using ZenithRising.Scripts.Skills.Data;
 using ZenithRising.Scripts.Skills.Effects;
 
 namespace ZenithRising.Scripts.Skills.Executors;
 
 public class InstantAOESkillExecutor : ISkillExecutor
 {
-    public void ExecuteSkill(Player player, Skill baseSkill)
+    public void ExecuteSkill(Player player, Skill skill)
     {
-        if (baseSkill is not InstantAOESkill skill)
-        {
-            GD.PrintErr("InstantAOESkillExecutor: Skill is not of type InstantAOESkill!");
-            return;
-        }
-
         if (skill.SkillEffectScene == null)
         {
             GD.PrintErr("InstantAOESkillExecutor: SkillEffectScene not set!");

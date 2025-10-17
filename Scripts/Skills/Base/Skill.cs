@@ -1,5 +1,5 @@
 using Godot;
-using SpaceTower.Scripts.Core;
+using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.Skills.Balance;
@@ -138,13 +138,18 @@ public partial class Skill : Resource
 
     private ISkillExecutor CreateExecutor()
     {
-        // Type-based factory - automatically matches skill to executor based on data type
-
-        return this switch
+        // Only used for EffectCollision damage source
+        if (DamageSource != DamageSource.EffectCollision)
         {
-            Data.ProjectileSkill => new ProjectileSkillExecutor(),
-            Data.InstantAOESkill => new InstantAOESkillExecutor(),
-            Data.MeleeAttackSkill => new MeleeSkillExecutor(),
+            return null; // PlayerHitbox and None don't use executors
+        }
+
+        // Route by BalanceType for effect-based skills
+        return BalanceType switch
+        {
+            SkillBalanceType.Projectile => new ProjectileSkillExecutor(),
+            SkillBalanceType.PersistentZone => null, // Future implementation
+            SkillBalanceType.CastSpawn => null, // Future implementation
             _ => null
         };
     }

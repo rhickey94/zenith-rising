@@ -1,21 +1,14 @@
 using Godot;
 using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.Skills.Base;
-using ZenithRising.Scripts.Skills.Data;
 using ZenithRising.Scripts.Skills.Effects;
 
 namespace ZenithRising.Scripts.Skills.Executors;
 
 public class ProjectileSkillExecutor : ISkillExecutor
 {
-    public void ExecuteSkill(Player player, Skill baseSkill)
+    public void ExecuteSkill(Player player, Skill skill)
     {
-        if (baseSkill is not ProjectileSkill skill)
-        {
-            GD.PrintErr("ProjectileSkillExecutor: Skill is not of type ProjectileSkill!");
-            return;
-        }
-
         if (skill.SkillEffectScene == null)
         {
             GD.PrintErr("ProjectileSkillExecutor: SkillEffectScene not set!");

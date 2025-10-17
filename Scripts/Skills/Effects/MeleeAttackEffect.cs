@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using Godot;
-using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.Enemies.Base;
 using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.Skills.Base;
-using ZenithRising.Scripts.Skills.Data;
 
 namespace ZenithRising.Scripts.Skills.Effects;
 

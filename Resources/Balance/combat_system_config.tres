@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="CombatSystemConfig" load_steps=2 format=3 uid="uid://dn8yh5sx178q1"]
+
+[ext_resource type="Script" uid="uid://bvd7p0q7pek3e" path="res://Scripts/Core/Config/CombatSystemConfig.cs" id="1_hhg63"]
+
+[resource]
+script = ExtResource("1_hhg63")
+metadata/_custom_type_script = "uid://bvd7p0q7pek3e"

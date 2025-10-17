@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://6a6ovxmbcjd1"]
+[gd_scene load_steps=19 format=3 uid="uid://6a6ovxmbcjd1"]
 
 [ext_resource type="Script" uid="uid://ije0l625j2w0" path="res://Scripts/Core/Dungeon.cs" id="1_nxi3e"]
 [ext_resource type="PackedScene" uid="uid://cmd26cuctvrk3" path="res://Scenes/Enemies/fast_melee_enemy.tscn" id="2_1ball"]
@@ -12,14 +12,7 @@
 [ext_resource type="Script" uid="uid://dbeaf5ogp1y77" path="res://Scripts/UI/Panels/DeathScreen.cs" id="10_7fxft"]
 [ext_resource type="PackedScene" uid="uid://cggfbynyfbjc" path="res://Scenes/UI/Panels/stat_allocation_panel.tscn" id="11_103gp"]
 [ext_resource type="PackedScene" uid="uid://c18x5hfiw6axv" path="res://Scenes/UI/Panels/results_screen.tscn" id="12_ahhlw"]
-[ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="13_jfnko"]
-[ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/SkillEffects/projectile.tscn" id="14_xh1eq"]
-[ext_resource type="PackedScene" uid="uid://du4yo1vulblyh" path="res://Scenes/SkillEffects/melee_attack.tscn" id="15_vysty"]
-[ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="16_1c77v"]
-[ext_resource type="Resource" uid="uid://y2i2lfbhh0ty" path="res://Resources/Skills/Mage/MageBasicAttack.tres" id="17_811ml"]
-[ext_resource type="Resource" uid="uid://ck7w68lb1penv" path="res://Resources/Skills/Mage/Fireball.tres" id="18_52qhq"]
-[ext_resource type="Script" uid="uid://b3km77lyp5ba3" path="res://Scripts/Player/Components/StatsManager.cs" id="19_sy2cx"]
-[ext_resource type="Script" uid="uid://cx5d7m8au6iit" path="res://Scripts/Player/Components/UpgradeManager.cs" id="20_n6kfg"]
+[ext_resource type="PackedScene" uid="uid://jb1p3bafbe1" path="res://Scenes/Player/player.tscn" id="13_ufyag"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3gfia"]
 bg_color = Color(0.16470589, 0.16470589, 0.16470589, 1)
@@ -68,12 +61,6 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_sh265"]
-size = Vector2(50, 50)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
-size = Vector2(50, 50)
 
 [node name="Dungeon" type="Node" node_paths=PackedStringArray("Player", "HUD", "FloorTransitionPanel", "_victoryScreen", "_deathScreen", "_resultsScreen")]
 script = ExtResource("1_nxi3e")
@@ -390,35 +377,6 @@ visible = false
 
 [node name="ResultsScreen" parent="UILayer" instance=ExtResource("12_ahhlw")]
 
-[node name="Player" type="CharacterBody2D" parent="." node_paths=PackedStringArray("LevelUpPanel", "StatAllocationPanel") groups=["player"]]
-script = ExtResource("13_jfnko")
-CurrentClass = 1
-ProjectileScene = ExtResource("14_xh1eq")
-MeleeAttackScene = ExtResource("15_vysty")
+[node name="Player" parent="." node_paths=PackedStringArray("LevelUpPanel", "StatAllocationPanel") instance=ExtResource("13_ufyag")]
 LevelUpPanel = NodePath("../UILayer/LevelUpPanel")
 StatAllocationPanel = NodePath("../UILayer/StatAllocationPanel")
-
-[node name="Sprite2D" type="Sprite2D" parent="Player"]
-modulate = Color(0.8070632, 0.64180166, 0.89619935, 1)
-position = Vector2(3, -1)
-texture = SubResource("PlaceholderTexture2D_sh265")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
-position = Vector2(2, 0)
-shape = SubResource("RectangleShape2D_4flbx")
-
-[node name="Camera2D" type="Camera2D" parent="Player"]
-
-[node name="SkillManager" type="Node" parent="Player"]
-script = ExtResource("16_1c77v")
-BasicAttackSkill = ExtResource("17_811ml")
-PrimarySkill = ExtResource("18_52qhq")
-metadata/_custom_type_script = "uid://bvjyaqpu6dell"
-
-[node name="StatsManager" type="Node" parent="Player"]
-script = ExtResource("19_sy2cx")
-metadata/_custom_type_script = "uid://b3km77lyp5ba3"
-
-[node name="UpgradeManager" type="Node" parent="Player"]
-script = ExtResource("20_n6kfg")
-metadata/_custom_type_script = "uid://cx5d7m8au6iit"

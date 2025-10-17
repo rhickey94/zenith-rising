@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="CharacterProgressionConfig" load_steps=2 format=3 uid="uid://bltpkgd1fv3yy"]
+
+[ext_resource type="Script" uid="uid://clfc52i8jbydf" path="res://Scripts/Core/Config/CharacterProgressionConfig.cs" id="1_i0qyu"]
+
+[resource]
+script = ExtResource("1_i0qyu")
+metadata/_custom_type_script = "uid://clfc52i8jbydf"
