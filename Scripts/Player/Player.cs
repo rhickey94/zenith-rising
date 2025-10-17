@@ -44,7 +44,7 @@ public partial class Player : CharacterBody2D
     private Sprite2D _sprite;
     private AnimationPlayer _animationPlayer;
     private Vector2 _lastDirection = Vector2.Down;
-    private PlayerState _currentState;
+    private PlayerState _currentState = PlayerState.Idle;
 
     // ===== LIFECYCLE METHODS =====
     public override void _Ready()
@@ -116,31 +116,54 @@ public partial class Player : CharacterBody2D
 
     public override void _PhysicsProcess(double delta)
     {
-        Vector2 direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
+        Vector2 direction = Vector2.Zero;
 
-        // Read speed from StatsManager
+        // Only allow movement input in locomotion states
+        if (_currentState == PlayerState.Idle || _currentState == PlayerState.Running)
+        {
+            direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
+        }
+        else if (_currentState == PlayerState.CastingSkill)
+        {
+            // Block movement during skill cast
+            direction = Vector2.Zero;
+        }
+        else if (_currentState == PlayerState.BasicAttacking)
+        {
+            // Allow movement during basic attack for responsiveness
+            direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
+        }
+
         if (_statsManager != null)
         {
             Velocity = direction * _statsManager.CurrentSpeed;
         }
-        else
+
+        // Update locomotion animations only in locomotion states
+        if (_currentState == PlayerState.Idle || _currentState == PlayerState.Running)
         {
-            Velocity = direction * 100; // Default speed if StatsManager missing
+            if (direction != Vector2.Zero)
+            {
+                _lastDirection = direction;
+                PlayWalkAnimation(direction);
+
+                if (_currentState != PlayerState.Running)
+                {
+                    ChangeState(PlayerState.Running);
+                }
+            }
+            else
+            {
+                PlayIdleAnimation(_lastDirection);
+
+                if (_currentState != PlayerState.Idle)
+                {
+                    ChangeState(PlayerState.Idle);
+                }
+            }
         }
 
-        if (direction != Vector2.Zero)
-        {
-            _lastDirection = direction;
-            PlayWalkAnimation(direction);
-        }
-        else
-        {
-            PlayIdleAnimation(_lastDirection);
-        }
-
-        // Update skill cooldowns
         _skillManager?.Update((float)delta);
-
         MoveAndSlide();
     }
 
@@ -185,6 +208,39 @@ public partial class Player : CharacterBody2D
     public void AddExperience(int amount)
     {
         _statsManager?.AddPowerExperience(amount);
+    }
+
+    public bool TryBasicAttack()
+    {
+        if (!CanTransitionTo(PlayerState.BasicAttacking))
+        {
+            return false;
+        }
+
+        ChangeState(PlayerState.BasicAttacking);
+
+        string attackAnim = GetDirectionalAnimationName("warrior_attack", _lastDirection);
+        _animationPlayer.Play(attackAnim);
+
+        return true;
+    }
+
+    public bool TryCastSkill(string skillName)
+    {
+        if (!CanTransitionTo(PlayerState.CastingSkill))
+        {
+            return false;
+        }
+
+        ChangeState(PlayerState.CastingSkill);
+
+        // For now, we'll handle specific skill animations
+        if (skillName == "Whirlwind")
+        {
+            _animationPlayer.Play("warrior_whirlwind");
+        }
+
+        return true;
     }
 
     // ===== PRIVATE HELPERS - Event Handlers =====
@@ -295,6 +351,37 @@ public partial class Player : CharacterBody2D
         };
     }
 
-    private void OnAnimationFinished(StringName animName) { }
+    private void ChangeState(PlayerState newState)
+    {
+        if (!CanTransitionTo(newState))
+        {
+            GD.Print($"Cannot transition from {_currentState} to {newState}");
+            return;
+        }
+
+        GD.Print($"State: {_currentState} → {newState}");
+        _currentState = newState;
+    }
+
+    private void OnAnimationFinished(StringName animName)
+    {
+        string anim = animName.ToString();
+
+        // Return to locomotion state after attacks/skills
+        if (anim.StartsWith("warrior_attack") || anim.StartsWith("warrior_whirlwind"))
+        {
+            // Check if player is moving to determine next state
+            Vector2 direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
+
+            if (direction != Vector2.Zero)
+            {
+                ChangeState(PlayerState.Running);
+            }
+            else
+            {
+                ChangeState(PlayerState.Idle);
+            }
+        }
+    }
 
 }

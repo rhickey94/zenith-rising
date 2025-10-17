@@ -1,13 +1,14 @@
-[gd_scene load_steps=20 format=3 uid="uid://jb1p3bafbe1"]
+[gd_scene load_steps=26 format=3 uid="uid://jb1p3bafbe1"]
 
 [ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="1_a3d8c"]
 [ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_xpcdj"]
 [ext_resource type="Texture2D" uid="uid://c71rfpwxsxsap" path="res://Assets/Sprites/Characters/warrior.png" id="2_0u5uq"]
 [ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/SkillEffects/projectile.tscn" id="2_jlvik"]
-[ext_resource type="Resource" uid="uid://y2i2lfbhh0ty" path="res://Resources/Skills/Mage/MageBasicAttack.tres" id="3_dd0ac"]
-[ext_resource type="Resource" uid="uid://ck7w68lb1penv" path="res://Resources/Skills/Mage/Fireball.tres" id="3_htcer"]
+[ext_resource type="PackedScene" uid="uid://du4yo1vulblyh" path="res://Scenes/SkillEffects/melee_attack.tscn" id="3_gk6dx"]
 [ext_resource type="Script" uid="uid://b3km77lyp5ba3" path="res://Scripts/Player/Components/StatsManager.cs" id="4_mtuoh"]
 [ext_resource type="Script" uid="uid://cx5d7m8au6iit" path="res://Scripts/Player/Components/UpgradeManager.cs" id="5_htcer"]
+[ext_resource type="Resource" uid="uid://dfssvafd8e1nw" path="res://Resources/Skills/Warrior/WarriorBasicAttack.tres" id="6_gk6dx"]
+[ext_resource type="Resource" uid="uid://5g8accyxr8hh" path="res://Resources/Skills/Warrior/Whirlwind.tres" id="7_jhyir"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
 size = Vector2(50, 62)
@@ -159,6 +160,91 @@ tracks/0/keys = {
 "values": [Rect2(0, 704, 64, 64)]
 }
 
+[sub_resource type="Animation" id="Animation_r5xpd"]
+resource_name = "warrior_attack_down"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-5.9604645e-08, 0.099999964, 0.19999993, 0.29999995, 0.39999998, 0.49999988),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Rect2(0, 3712, 128, 128), Rect2(128, 3712, 128, 128), Rect2(256, 3712, 128, 128), Rect2(384, 3712, 128, 128), Rect2(512, 3712, 128, 128), Rect2(640, 3712, 128, 128)]
+}
+
+[sub_resource type="Animation" id="Animation_ks1b7"]
+resource_name = "warrior_attack_up"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-5.9604645e-08, 0.099999964, 0.19999993, 0.29999995, 0.39999998, 0.49999988),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Rect2(0, 3456, 128, 128), Rect2(128, 3456, 128, 128), Rect2(256, 3456, 128, 128), Rect2(384, 3456, 128, 128), Rect2(512, 3456, 128, 128), Rect2(640, 3456, 128, 128)]
+}
+
+[sub_resource type="Animation" id="Animation_hnuln"]
+resource_name = "warrior_attack_left"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-5.9604645e-08, 0.099999964, 0.19999993, 0.29999995, 0.39999998, 0.49999988),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Rect2(0, 3584, 128, 128), Rect2(128, 3584, 128, 128), Rect2(256, 3584, 128, 128), Rect2(384, 3584, 128, 128), Rect2(512, 3584, 128, 128), Rect2(640, 3584, 128, 128)]
+}
+
+[sub_resource type="Animation" id="Animation_aqm4k"]
+resource_name = "warrior_attack_right"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-5.9604645e-08, 0.099999964, 0.19999993, 0.29999995, 0.39999998, 0.49999988),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Rect2(0, 3840, 128, 128), Rect2(128, 3840, 128, 128), Rect2(256, 3840, 128, 128), Rect2(384, 3840, 128, 128), Rect2(512, 3840, 128, 128), Rect2(640, 3840, 128, 128)]
+}
+
+[sub_resource type="Animation" id="Animation_rcvs5"]
+resource_name = "warrior_whirlwind"
+length = 1.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(6.7055225e-08, 0.1, 0.20000002, 0.30000004, 0.39999995, 0.50000006, 0.6, 0.7000001, 0.8, 0.90000004, 1, 1.1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Rect2(128, 3712, 128, 128), Rect2(256, 3712, 128, 128), Rect2(384, 3712, 128, 128), Rect2(512, 3712, 128, 128), Rect2(640, 3712, 128, 128), Rect2(640, 3840, 128, 128), Rect2(640, 3456, 128, 128), Rect2(640, 3584, 128, 128), Rect2(640, 3712, 128, 128), Rect2(640, 3840, 128, 128), Rect2(640, 3456, 128, 128), Rect2(640, 3584, 128, 128)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_r5xpd"]
 _data = {
 &"RESET": SubResource("Animation_jlvik"),
@@ -169,18 +255,23 @@ _data = {
 &"walk_down": SubResource("Animation_0u5uq"),
 &"walk_left": SubResource("Animation_jhyir"),
 &"walk_right": SubResource("Animation_74mp2"),
-&"walk_up": SubResource("Animation_gk6dx")
+&"walk_up": SubResource("Animation_gk6dx"),
+&"warrior_attack_down": SubResource("Animation_r5xpd"),
+&"warrior_attack_left": SubResource("Animation_hnuln"),
+&"warrior_attack_right": SubResource("Animation_aqm4k"),
+&"warrior_attack_up": SubResource("Animation_ks1b7"),
+&"warrior_whirlwind": SubResource("Animation_rcvs5")
 }
 
 [node name="Player" type="CharacterBody2D" groups=["player"]]
 script = ExtResource("1_xpcdj")
-CurrentClass = 1
 ProjectileScene = ExtResource("2_jlvik")
+MeleeAttackScene = ExtResource("3_gk6dx")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_0u5uq")
 region_enabled = true
-region_rect = Rect2(0, 704, 64, 64)
+region_rect = Rect2(128, 3712, 128, 128)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
@@ -191,8 +282,8 @@ shape = SubResource("RectangleShape2D_4flbx")
 
 [node name="SkillManager" type="Node" parent="."]
 script = ExtResource("1_a3d8c")
-BasicAttackSkill = ExtResource("3_dd0ac")
-PrimarySkill = ExtResource("3_htcer")
+BasicAttackSkill = ExtResource("6_gk6dx")
+PrimarySkill = ExtResource("7_jhyir")
 metadata/_custom_type_script = "uid://bvjyaqpu6dell"
 
 [node name="StatsManager" type="Node" parent="."]
