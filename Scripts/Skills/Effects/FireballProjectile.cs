@@ -25,15 +25,9 @@ public partial class FireballProjectile : CollisionSkillEffect
     {
         base.Initialize(sourceSkill, caster, direction);
 
-        if (sourceSkill is not ProjectileSkill skill)
-        {
-            GD.PrintErr("FireballProjectile: sourceSkill is not ProjectileSkill!");
-            return;
-        }
-
-        _directDamage = skill.DirectDamage;
-        _explosionDamage = skill.ExplosionDamage;
-        _explosionRadius = skill.ExplosionRadius;
+        _directDamage = sourceSkill.BaseDamage;
+        _explosionDamage = sourceSkill.BaseDamage;
+        _explosionRadius = sourceSkill.Radius;
         _startPosition = caster.GlobalPosition;
 
         Rotation = direction.Angle();

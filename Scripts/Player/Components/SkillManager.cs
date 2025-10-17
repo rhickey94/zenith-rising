@@ -106,6 +106,8 @@ public partial class SkillManager : Node
             return;
         }
 
+        skill.Initialize();
+
         GD.Print($"Using {skill.SkillName}!");
 
         // Execute skill effect

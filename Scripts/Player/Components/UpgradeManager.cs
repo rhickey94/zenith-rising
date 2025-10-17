@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using SpaceTower.Scripts.Core;
 using ZenithRising.Scripts.Progression.Upgrades;
 
 namespace ZenithRising.Scripts.PlayerScripts.Components;
@@ -11,17 +12,7 @@ public partial class UpgradeManager : Node
     private readonly Dictionary<UpgradeType, float> _activeUpgrades = [];
 
     // Available upgrades pool
-    private readonly List<Upgrade> _availableUpgrades =
-    [
-        new Upgrade { UpgradeName = "Damage Boost", Description = "+15% Damage", Type = UpgradeType.DamagePercent, Value = 0.15f },
-        new Upgrade { UpgradeName = "Attack Speed", Description = "+20% Fire Rate", Type = UpgradeType.AttackSpeed, Value = 0.20f },
-        new Upgrade { UpgradeName = "Swift Feet", Description = "+15% Movement Speed", Type = UpgradeType.MovementSpeed, Value = 0.15f },
-        new Upgrade { UpgradeName = "Vitality", Description = "+50 Max Health", Type = UpgradeType.MaxHealth, Value = 50f },
-        new Upgrade { UpgradeName = "Magnet", Description = "+30 Pickup Radius", Type = UpgradeType.PickupRadius, Value = 30f },
-        new Upgrade { UpgradeName = "Piercing Shots", Description = "Projectiles Pierce +1", Type = UpgradeType.ProjectilePierce, Value = 1f },
-        new Upgrade { UpgradeName = "Critical Hit", Description = "+10% Crit Chance", Type = UpgradeType.CritChance, Value = 0.10f },
-        new Upgrade { UpgradeName = "Regeneration", Description = "+2 HP/sec", Type = UpgradeType.HealthRegen, Value = 2f }
-    ];
+    private readonly List<Upgrade> _availableUpgrades = [];
 
     private Player _player;
     private StatsManager _statsManager;
@@ -39,6 +30,21 @@ public partial class UpgradeManager : Node
         {
             GD.PrintErr("UpgradeManager: Could not find StatsManager on Player!");
         }
+
+        // Build upgrade list from config
+        var config = GameBalance.Instance.Config.UpgradeSystem;
+        _availableUpgrades.Clear();
+        _availableUpgrades.AddRange(
+        [
+        new Upgrade { UpgradeName = "Damage Boost", Description = $"+{config.DamageBoostPerStack * 100}% Damage", Type = UpgradeType.DamagePercent, Value = config.DamageBoostPerStack },
+        new Upgrade { UpgradeName = "Attack Speed", Description = $"+{config.AttackSpeedPerStack * 100}% Fire Rate", Type = UpgradeType.AttackSpeed, Value = config.AttackSpeedPerStack },
+        new Upgrade { UpgradeName = "Swift Feet", Description = $"+{config.MovementSpeedPerStack * 100}% Movement Speed", Type = UpgradeType.MovementSpeed, Value = config.MovementSpeedPerStack },
+        new Upgrade { UpgradeName = "Vitality", Description = $"+{config.MaxHealthPerStack} Max Health", Type = UpgradeType.MaxHealth, Value = config.MaxHealthPerStack },
+        new Upgrade { UpgradeName = "Magnet", Description = $"+{config.PickupRadiusPerStack} Pickup Radius", Type = UpgradeType.PickupRadius, Value = config.PickupRadiusPerStack },
+        new Upgrade { UpgradeName = "Piercing Shots", Description = $"Projectiles Pierce +{config.ProjectilePiercePerStack}", Type = UpgradeType.ProjectilePierce, Value = config.ProjectilePiercePerStack },
+        new Upgrade { UpgradeName = "Critical Hit", Description = $"+{config.CritChancePerStack * 100}% Crit Chance", Type = UpgradeType.CritChance, Value = config.CritChancePerStack },
+        new Upgrade { UpgradeName = "Regeneration", Description = $"+{config.HealthRegenPerStack} HP/sec", Type = UpgradeType.HealthRegen, Value = config.HealthRegenPerStack }
+    ]);
     }
 
     public void ApplyUpgrade(Upgrade upgrade)
@@ -83,7 +89,7 @@ public partial class UpgradeManager : Node
         float movementSpeedBonus = GetUpgradeValue(UpgradeType.MovementSpeed);
         float attackSpeedBonus = GetUpgradeValue(UpgradeType.AttackSpeed);
         float maxHealthBonus = GetUpgradeValue(UpgradeType.MaxHealth);
-        float baseSpeedBonus = 10f * _statsManager.PowerLevel; // Level up bonus (+10 speed per level)
+        float baseSpeedBonus = GameBalance.Instance.Config.UpgradeSystem.BaseSpeedPerLevel * _statsManager.PowerLevel; // Level up bonus (+10 speed per level)
 
         float damagePercentBonus = GetUpgradeValue(UpgradeType.DamagePercent);
         float critChanceBonus = GetUpgradeValue(UpgradeType.CritChance);

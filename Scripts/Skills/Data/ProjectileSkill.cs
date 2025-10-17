@@ -1,9 +1,11 @@
+using System;
 using Godot;
 using ZenithRising.Scripts.Skills.Base;
 
 namespace ZenithRising.Scripts.Skills.Data;
 
 [GlobalClass]
+[Obsolete]
 public partial class ProjectileSkill : Skill
 {
     [Export] public float DirectDamage { get; set; } = 50f;

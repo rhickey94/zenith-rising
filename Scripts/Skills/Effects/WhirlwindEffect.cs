@@ -19,15 +19,8 @@ public partial class WhirlwindEffect : SkillEffect
     {
         base.Initialize(sourceSkill, caster, direction);
 
-        var skill = sourceSkill as InstantAOESkill;
-        if (skill == null)
-        {
-            GD.PrintErr("WhirlwindEffect: sourceSkill is not InstantAOESkill!");
-            return;
-        }
-
-        _damage = skill.Damage;
-        _radius = skill.Radius;
+        _damage = sourceSkill.Damage;
+        _radius = sourceSkill.Radius;
 
         // Apply mastery bonuses
         ApplyMasteryBonuses();

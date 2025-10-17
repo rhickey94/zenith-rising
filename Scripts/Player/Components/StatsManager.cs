@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using SpaceTower.Scripts.Core;
 using ZenithRising.Scripts.Core;
 
 namespace ZenithRising.Scripts.PlayerScripts.Components;
@@ -29,18 +30,6 @@ public enum StatType
 [GlobalClass]
 public partial class StatsManager : Node
 {
-    // ===== CONSTANTS - Stat Formulas =====
-    public const float STR_DAMAGE_PER_POINT = 0.03f;
-    public const float STR_HEALTH_PER_POINT = 10f;
-    public const float INT_DAMAGE_PER_POINT = 0.03f;
-    public const float INT_CDR_PER_POINT = 0.02f;
-    public const float AGI_ATTACK_SPEED_PER_POINT = 0.02f;
-    public const float AGI_CRIT_PER_POINT = 0.01f;
-    public const float VIT_HEALTH_PER_POINT = 25f;
-    public const float VIT_REGEN_PER_POINT = 0.5f;
-    public const float FOR_CRIT_DMG_PER_POINT = 0.02f;
-    public const float FOR_DROP_RATE_PER_POINT = 0.01f; // Drop rate bonus (not implemented yet)
-
     // ===== PRIVATE BACKING FIELDS =====
     private Player _player;
     private int _strength = 0;
@@ -50,10 +39,10 @@ public partial class StatsManager : Node
     private int _fortune = 0;
 
     // ===== EXPORT PROPERTIES - Base Stats =====
-    [Export] public float BaseMaxHealth { get; set; } = 100.0f;
-    [Export] public float BaseSpeed { get; set; } = 300.0f;
-    [Export] public float BaseFireRate { get; set; } = 0.2f;
-    [Export] public float BaseMeleeRate { get; set; } = 0.5f;
+    [Export] public float BaseMaxHealth { get; set; } = GameBalance.Instance.Config.PlayerStats.BaseMaxHealth;
+    [Export] public float BaseSpeed { get; set; } = GameBalance.Instance.Config.PlayerStats.BaseSpeed;
+    [Export] public float BaseFireRate { get; set; } = GameBalance.Instance.Config.PlayerStats.BaseFireRate;
+    [Export] public float BaseMeleeRate { get; set; } = GameBalance.Instance.Config.PlayerStats.BaseMeleeRate;
 
     // ===== EXPORT PROPERTIES - Character Progression =====
     [ExportGroup("Character Progression")]
@@ -200,32 +189,33 @@ public partial class StatsManager : Node
     {
         // Calculate health percentage BEFORE changing MaxHealth
         float healthPercentage = CurrentMaxHealth > 0 ? CurrentHealth / CurrentMaxHealth : 1f;
+        var config = GameBalance.Instance.Config.CharacterProgression;
 
         // Apply upgrade bonuses to base values
         CurrentSpeed = (BaseSpeed + modifiers.BaseSpeedBonus) * (1 + modifiers.MovementSpeedBonus);
 
         // Attack speed: AGI bonus + upgrade bonuses
-        float agiSpeedBonus = Agility * AGI_ATTACK_SPEED_PER_POINT;
+        float agiSpeedBonus = Agility * config.AgilityAttackSpeedPerPoint;
         float totalAttackSpeedBonus = modifiers.AttackSpeedBonus + agiSpeedBonus;
         CurrentFireRate = BaseFireRate * (1 - totalAttackSpeedBonus);
         CurrentMeleeRate = BaseMeleeRate * (1 - totalAttackSpeedBonus);
 
         // Max Health: Base + Run level + Upgrades + Character stats (VIT + STR)
-        float characterHealthBonus = (Vitality * VIT_HEALTH_PER_POINT) + (Strength * STR_HEALTH_PER_POINT);
+        float characterHealthBonus = (Vitality * config.VitalityHealthPerPoint) + (Strength * config.StrengthHealthPerPoint);
         CurrentMaxHealth = BaseMaxHealth + CalculateRunLevelHealthBonus() + modifiers.MaxHealthBonus + characterHealthBonus;
 
         // Damage: Upgrades + Character stats (STR/INT)
         DamageMultiplier = 1.0f + modifiers.DamagePercentBonus;
-        PhysicalDamageMultiplier = 1.0f + (Strength * STR_DAMAGE_PER_POINT);
-        MagicalDamageMultiplier = 1.0f + (Intelligence * INT_DAMAGE_PER_POINT);
+        PhysicalDamageMultiplier = 1.0f + (Strength * config.StrengthDamagePerPoint);
+        MagicalDamageMultiplier = 1.0f + (Intelligence * config.IntelligenceDamagePerPoint);
 
         // Crit: Upgrades + Character stats (AGI + FOR)
-        float characterCritChance = Mathf.Min(Agility * AGI_CRIT_PER_POINT, 0.5f); // Cap at 50%
+        float characterCritChance = Mathf.Min(Agility * config.AgilityCritPerPoint, 0.5f); // Cap at 50%
         CritChance = Mathf.Clamp(modifiers.CritChanceBonus + characterCritChance, 0f, 1f);
-        CritDamageMultiplier = 1.5f + (Fortune * FOR_CRIT_DMG_PER_POINT); // Base 150% + FOR bonus
+        CritDamageMultiplier = 1.5f + (Fortune * config.FortuneCritDamagePerPoint); // Base 150% + FOR bonus
 
         // Regen: Upgrades + Character stats (VIT)
-        float characterRegen = Vitality * VIT_REGEN_PER_POINT;
+        float characterRegen = Vitality * config.VitalityRegenPerPoint;
         HealthRegenPerSecond = modifiers.HealthRegenBonus + characterRegen;
 
         PickupRadius = 80f + modifiers.PickupRadiusBonus;
@@ -288,7 +278,7 @@ public partial class StatsManager : Node
 
     public float GetCooldownReduction()
     {
-        return (1.0f - (1.0f / (1.0f + Intelligence * INT_CDR_PER_POINT))) * 100f;
+        return (1.0f - (1.0f / (1.0f + Intelligence * GameBalance.Instance.Config.CharacterProgression.IntelligenceCDRPerPoint))) * 100f;
     }
 
     // ===== PUBLIC API - Save/Load =====
@@ -355,29 +345,25 @@ public partial class StatsManager : Node
     // ===== PRIVATE HELPERS - Calculations =====
     private int CalculateCharacterXPForNextLevel()
     {
-        // Exponential curve: each level requires ~10% more XP than previous
-        // Level 1→2: 500 XP
-        // Level 10→11: ~1,300 XP
-        // Level 50→51: ~58,000 XP
-        // Level 100: Total ~13.8 million XP (balanced for long-term play)
-        return (int)(500 * Mathf.Pow(1.1f, CharacterLevel - 1));
+        var config = GameBalance.Instance.Config.CharacterProgression;
+        return (int)(config.CharacterXPBase * Mathf.Pow(config.CharacterXPGrowth, CharacterLevel - 1));
     }
 
     private float CalculateRunLevelHealthBonus()
     {
-        // +20 HP per level (Level 1 = 0 bonus, Level 2 = 20, Level 3 = 40, etc.)
-        return 20f * (PowerLevel - 1);
+        return GameBalance.Instance.Config.CharacterProgression.PowerLevelHealthBonus * (PowerLevel - 1);
     }
 
     // ===== PRIVATE HELPERS - Progression =====
     private void PowerLevelUp()
     {
+        var config = GameBalance.Instance.Config.CharacterProgression;
         PowerExperience -= PowerExperienceToNextLevel;
         PowerLevel++;
         PowerExperienceToNextLevel = (int)(PowerExperienceToNextLevel * 1.5);
 
         // Recalculate MaxHealth with new run level (UpgradeManager will call RecalculateStats, but update now for heal)
-        float characterHealthBonus = (Vitality * VIT_HEALTH_PER_POINT) + (Strength * STR_HEALTH_PER_POINT);
+        float characterHealthBonus = (Vitality * config.VitalityHealthPerPoint) + (Strength * config.StrengthHealthPerPoint);
         CurrentMaxHealth = BaseMaxHealth + CalculateRunLevelHealthBonus() + characterHealthBonus;
         CurrentHealth = CurrentMaxHealth;  // Full heal on level up
 

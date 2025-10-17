@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Godot;
+using SpaceTower.Scripts.Core;
 using ZenithRising.Scripts.Enemies.Base;
 using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.PlayerScripts.Components;
@@ -10,16 +11,6 @@ namespace ZenithRising.Scripts.Core;
 
 public partial class Dungeon : Node
 {
-    // ===== CONSTANTS =====
-    private const float WaveDuration = 30f;
-    private const int WavesPerFloor = 10;
-    private const int MaxFloors = 5;
-    private const float InitialSpawnInterval = 2.0f;
-    private const float FinalSpawnInterval = 0.8f;
-    private const float HealthPerWave = 0.10f;
-    private const float DamagePerWave = 0.05f;
-    private const float StatsPerFloor = 0.50f;
-
     // ===== EXPORT FIELDS - Scenes =====
     [Export] public PackedScene[] EnemyScenes;
     [Export] public PackedScene BossScene;
@@ -79,12 +70,13 @@ public partial class Dungeon : Node
         _floorTimeElapsed += (float)delta;
         _timeSinceLastSpawn += (float)delta;
         _totalGameTime += (float)delta;
+        var config = GameBalance.Instance.Config.Enemy;
 
         // Update wave progression
         UpdateWaveProgression();
 
         // Boss spawning at 5:00 mark
-        if (_floorTimeElapsed >= FloorDuration && !_bossSpawned)
+        if (_floorTimeElapsed >= config.FloorDuration && !_bossSpawned)
         {
             SpawnBoss();
             _bossSpawned = true;
@@ -260,7 +252,8 @@ public partial class Dungeon : Node
     // ===== GAME LOOP - Wave/Floor Progression =====
     private void UpdateWaveProgression()
     {
-        int newWave = Mathf.Min((int)(_floorTimeElapsed / WaveDuration) + 1, WavesPerFloor);
+        var config = GameBalance.Instance.Config.Enemy;
+        int newWave = Mathf.Min((int)(_floorTimeElapsed / config.WaveDuration) + 1, config.WavesPerFloor);
 
         if (newWave != _currentWave)
         {
@@ -287,6 +280,7 @@ public partial class Dungeon : Node
 
     private void OnBossDefeated()
     {
+        var config = GameBalance.Instance.Config.Enemy;
         _bossesKilled++;
 
         // Update highest floor (checkpoint at floor COMPLETION)
@@ -299,7 +293,7 @@ public partial class Dungeon : Node
         // SAVE CHARACTER PROGRESS (floor completed)
         SaveCharacterProgress();
 
-        if (_currentFloor >= MaxFloors)
+        if (_currentFloor >= config.MaxFloors)
         {
             _finalBossDefeated = true;
             ShowVictoryScreen();
@@ -347,32 +341,24 @@ public partial class Dungeon : Node
     // ===== CALCULATION HELPERS =====
     private float GetCurrentSpawnInterval()
     {
-        // Linear interpolation from 2.0s to 0.8s over 10 waves
-        float t = (_currentWave - 1) / (float)(WavesPerFloor - 1);
-        return Mathf.Lerp(InitialSpawnInterval, FinalSpawnInterval, t);
+        var config = GameBalance.Instance.Config.Enemy;
+        float t = (_currentWave - 1) / (float)(config.WavesPerFloor - 1);
+        return Mathf.Lerp(config.InitialSpawnInterval, config.FinalSpawnInterval, t);
     }
 
     private float CalculateHealthMultiplier()
     {
-        // Base = 1.0
-        // Floor scaling: +50% per floor beyond 1
-        float floorMult = 1.0f + (_currentFloor - 1) * StatsPerFloor;
-
-        // Wave scaling: +10% per wave beyond 1
-        float waveMult = 1.0f + (_currentWave - 1) * HealthPerWave;
-
+        var config = GameBalance.Instance.Config.Enemy;
+        float floorMult = 1.0f + (_currentFloor - 1) * config.StatsPerFloor;
+        float waveMult = 1.0f + (_currentWave - 1) * config.HealthPerWave;
         return floorMult * waveMult;
     }
 
     private float CalculateDamageMultiplier()
     {
-        // Base = 1.0
-        // Floor scaling: +50% per floor beyond 1
-        float floorMult = 1.0f + (_currentFloor - 1) * StatsPerFloor;
-
-        // Wave scaling: +5% per wave beyond 1
-        float waveMult = 1.0f + (_currentWave - 1) * DamagePerWave;
-
+        var config = GameBalance.Instance.Config.Enemy;
+        float floorMult = 1.0f + (_currentFloor - 1) * config.StatsPerFloor;
+        float waveMult = 1.0f + (_currentWave - 1) * config.DamagePerWave;
         return floorMult * waveMult;
     }
 

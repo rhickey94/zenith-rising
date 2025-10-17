@@ -24,15 +24,8 @@ public partial class MeleeAttackEffect : CollisionSkillEffect
     {
         base.Initialize(sourceSkill, caster, direction);
 
-        var skill = sourceSkill as MeleeAttackSkill;
-        if (skill == null)
-        {
-            GD.PrintErr("MeleeAttackEffect: sourceSkill is not MeleeAttackSkill!");
-            return;
-        }
-
-        _damage = skill.Damage;
-        _lifetime = skill.Lifetime;
+        _damage = sourceSkill.Damage;
+        _lifetime = sourceSkill.Cooldown;
 
         // Apply mastery bonuses
         ApplyMasteryBonuses();

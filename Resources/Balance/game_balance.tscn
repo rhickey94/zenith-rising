@@ -1,0 +1,10 @@
+[gd_scene load_steps=4 format=3 uid="uid://dv1ynugy6f8o3"]
+
+[ext_resource type="Script" uid="uid://svfekvyvdeh5" path="res://Scripts/Core/GameBalance.cs" id="1_15wvk"]
+[ext_resource type="Resource" uid="uid://dybjpuv1hw2hw" path="res://Resources/Balance/balance_config.tres" id="2_fspwh"]
+[ext_resource type="Resource" uid="uid://dbooxibogc7fp" path="res://Resources/Balance/skill_balance_database.tres" id="3_fspwh"]
+
+[node name="Node" type="Node"]
+script = ExtResource("1_15wvk")
+Config = ExtResource("2_fspwh")
+SkillDatabase = ExtResource("3_fspwh")

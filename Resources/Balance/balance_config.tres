@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="BalanceConfig" load_steps=12 format=3 uid="uid://dybjpuv1hw2hw"]
+
+[ext_resource type="Script" uid="uid://cblqqr48b8led" path="res://Scripts/Core/BalanceConfig.cs" id="1_l1sbf"]
+
+[sub_resource type="CSharpScript" id="CSharpScript_l1sbf"]
+
+[sub_resource type="Resource" id="Resource_sppk0"]
+script = SubResource("CSharpScript_l1sbf")
+
+[sub_resource type="CSharpScript" id="CSharpScript_ca7yt"]
+
+[sub_resource type="Resource" id="Resource_up5h6"]
+script = SubResource("CSharpScript_ca7yt")
+
+[sub_resource type="CSharpScript" id="CSharpScript_5vwc6"]
+
+[sub_resource type="Resource" id="Resource_ejaym"]
+script = SubResource("CSharpScript_5vwc6")
+
+[sub_resource type="CSharpScript" id="CSharpScript_c42uf"]
+
+[sub_resource type="Resource" id="Resource_e487y"]
+script = SubResource("CSharpScript_c42uf")
+
+[sub_resource type="CSharpScript" id="CSharpScript_wxibq"]
+
+[sub_resource type="Resource" id="Resource_kii4d"]
+script = SubResource("CSharpScript_wxibq")
+
+[resource]
+script = ExtResource("1_l1sbf")
+metadata/_custom_type_script = "uid://cblqqr48b8led"

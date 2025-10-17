@@ -1,9 +1,11 @@
+using System;
 using Godot;
 using ZenithRising.Scripts.Skills.Base;
 
 namespace ZenithRising.Scripts.Skills.Data;
 
 [GlobalClass]
+[Obsolete]
 public partial class InstantAOESkill : Skill
 {
     [Export] public float Radius { get; set; } = 100f;

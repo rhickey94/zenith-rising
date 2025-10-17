@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://jb1p3bafbe1"]
+[gd_scene load_steps=28 format=3 uid="uid://jb1p3bafbe1"]
 
 [ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="1_a3d8c"]
 [ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_xpcdj"]
@@ -263,6 +263,12 @@ _data = {
 &"warrior_whirlwind": SubResource("Animation_rcvs5")
 }
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gk6dx"]
+size = Vector2(80, 60)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_jhyir"]
+radius = 150.0
+
 [node name="Player" type="CharacterBody2D" groups=["player"]]
 script = ExtResource("1_xpcdj")
 ProjectileScene = ExtResource("2_jlvik")
@@ -299,3 +305,20 @@ reset_on_save = false
 libraries = {
 &"": SubResource("AnimationLibrary_r5xpd")
 }
+
+[node name="MeleeHitbox" type="Area2D" parent="."]
+collision_layer = 0
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MeleeHitbox"]
+position = Vector2(40, 0)
+shape = SubResource("RectangleShape2D_gk6dx")
+
+[node name="AOEHitbox" type="Area2D" parent="."]
+collision_layer = 0
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AOEHitbox"]
+shape = SubResource("CircleShape2D_jhyir")

@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="SkillBalanceDatabase" load_steps=6 format=3 uid="uid://dbooxibogc7fp"]
+
+[ext_resource type="Script" uid="uid://d25rerypcvb5f" path="res://Scripts/Skills/Balance/SkillBalanceDatabase.cs" id="1_c7wpi"]
+[ext_resource type="Script" uid="uid://bqtal0vugxig6" path="res://Scripts/Skills/Balance/SkillBalanceEntry.cs" id="1_lr0uj"]
+
+[sub_resource type="Resource" id="Resource_ytv5f"]
+script = ExtResource("1_lr0uj")
+SkillId = "warrior_basic_attack"
+SkillName = "Fusion Cutter"
+CastBehavior = 1
+DamageSource = 0
+BaseDamage = 15.0
+Cooldown = 0.5
+Range = 80.0
+Width = 60.0
+StrengthScaling = 1.0
+metadata/_custom_type_script = "uid://bqtal0vugxig6"
+
+[sub_resource type="Resource" id="Resource_mfapk"]
+script = ExtResource("1_lr0uj")
+SkillId = "warrior_whirlwind"
+SkillName = "Whirlwind"
+BalanceType = 1
+CastBehavior = 1
+DamageSource = 0
+BaseDamage = 40.0
+Cooldown = 8.0
+Radius = 150.0
+CastTime = 0.8
+StrengthScaling = 1.2
+metadata/_custom_type_script = "uid://bqtal0vugxig6"
+
+[sub_resource type="Resource" id="Resource_lr0uj"]
+script = ExtResource("1_lr0uj")
+SkillId = "mage_fireball"
+SkillName = "Fireball"
+BalanceType = 2
+DamageType = 1
+Radius = 50.0
+Range = 50.0
+ExplosionDamage = 50.0
+ProjectileSpeed = 10.0
+CastTime = 0.5
+IntelligenceScaling = 1.0
+metadata/_custom_type_script = "uid://bqtal0vugxig6"
+
+[resource]
+script = ExtResource("1_c7wpi")
+Skills = Array[Object]([SubResource("Resource_ytv5f"), SubResource("Resource_mfapk"), SubResource("Resource_lr0uj")])
+metadata/_custom_type_script = "uid://d25rerypcvb5f"

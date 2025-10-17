@@ -1,4 +1,5 @@
 using Godot;
+using SpaceTower.Scripts.Core;
 using System.Collections.Generic;
 using ZenithRising.Scripts.PlayerScripts.Components;
 
@@ -105,7 +106,7 @@ public partial class StatAllocationPanel : Control
     private string FormatStrengthBonus(StatsManager stats)
     {
         float physDmg = (stats.PhysicalDamageMultiplier - 1.0f) * 100f;
-        float hp = stats.Strength * StatsManager.STR_HEALTH_PER_POINT;
+        float hp = stats.Strength * GameBalance.Instance.Config.CharacterProgression.StrengthHealthPerPoint;
         return $"Physical Dmg +{physDmg:F0}%, HP +{hp:F0}";
     }
 
@@ -117,22 +118,22 @@ public partial class StatAllocationPanel : Control
 
     private string FormatAgilityBonus(StatsManager stats)
     {
-        float atkSpd = stats.Agility * StatsManager.AGI_ATTACK_SPEED_PER_POINT * 100f;
-        float crit = Mathf.Min(stats.Agility * StatsManager.AGI_CRIT_PER_POINT, 0.5f) * 100f;
+        float atkSpd = stats.Agility * GameBalance.Instance.Config.CharacterProgression.AgilityAttackSpeedPerPoint * 100f;
+        float crit = Mathf.Min(stats.Agility * GameBalance.Instance.Config.CharacterProgression.AgilityCritPerPoint, 0.5f) * 100f;
         return $"Attack Speed +{atkSpd:F0}%, Crit +{crit:F0}%";
     }
 
     private string FormatVitalityBonus(StatsManager stats)
     {
-        float hp = stats.Vitality * StatsManager.VIT_HEALTH_PER_POINT;
-        float regen = stats.Vitality * StatsManager.VIT_REGEN_PER_POINT;
+        float hp = stats.Vitality * GameBalance.Instance.Config.CharacterProgression.VitalityHealthPerPoint;
+        float regen = stats.Vitality * GameBalance.Instance.Config.CharacterProgression.VitalityRegenPerPoint;
         return $"HP +{hp:F0}, Regen +{regen:F1}/sec";
     }
 
     private string FormatFortuneBonus(StatsManager stats)
     {
         float critDmg = (stats.CritDamageMultiplier - 1.5f) * 100f;
-        float dropRate = stats.Fortune * StatsManager.FOR_DROP_RATE_PER_POINT * 100f;
+        float dropRate = stats.Fortune * GameBalance.Instance.Config.CharacterProgression.FortuneDropRatePerPoint * 100f;
         return $"Crit Dmg +{critDmg:F0}%, Drop Rate +{dropRate:F0}%";
     }
 

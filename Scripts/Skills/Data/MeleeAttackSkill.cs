@@ -1,9 +1,11 @@
+using System;
 using Godot;
 using ZenithRising.Scripts.Skills.Base;
 
 namespace ZenithRising.Scripts.Skills.Data;
 
 [GlobalClass]
+[Obsolete]
 public partial class MeleeAttackSkill : Skill
 {
     [Export] public float Range { get; set; } = 10f;
