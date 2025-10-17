@@ -4,6 +4,7 @@ using SpaceTower.Scripts.Progression.Upgrades;
 using SpaceTower.Scripts.PlayerScripts.Components;
 using SpaceTower.Scripts.UI.Panels;
 using SpaceTower.Scripts.Core;
+using SpaceTower.Scripts.Enemies.Base;
 
 namespace SpaceTower.Scripts.PlayerScripts;
 
@@ -45,6 +46,9 @@ public partial class Player : CharacterBody2D
     private AnimationPlayer _animationPlayer;
     private Vector2 _lastDirection = Vector2.Down;
     private PlayerState _currentState = PlayerState.Idle;
+    private Area2D _basicAttackHitbox;
+    private Area2D _whirlwindHitbox;
+    private readonly HashSet<Enemy> _whirlwindHitEnemies = [];
 
     // ===== LIFECYCLE METHODS =====
     public override void _Ready()

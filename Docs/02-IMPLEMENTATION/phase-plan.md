@@ -109,11 +109,11 @@
 
 ---
 
-## Phase 3: Hub World & Scene Flow ⏳ IN PROGRESS
+## Phase 3: Hub World & Scene Flow ✅ COMPLETE
 
 **Hypothesis:** "Hub as safe zone enables meta-progression systems and improves game feel"
 
-**Status:** ⏳ **IN PROGRESS** - Core hub working, needs polish
+**Status:** ✅ **COMPLETE** - Hub functional and integrated
 
 ### Completed ✅
 
@@ -142,20 +142,92 @@
    - Bug prevented movement on new games (CurrentSpeed = 0)
    - StatsManager.Initialize() now called for fresh starts
 
-### In Progress ⏳
-- Complete flow testing (hub → dungeon → hub)
-- Visual polish (background, lighting, atmosphere)
-
-### Planned 📝
-- Placeholder NPCs (Vendor, Upgrade Master, etc.)
-- Hub ambient sounds/music
-- Portal visual effects (particles, glow)
-
-### Success Criteria
+### Success Criteria ✅ Met
 - Scene transitions smooth
 - Player movement works in both hub and dungeon
 - Save/load works from hub
 - Foundation for future systems (vendors, crafting, idle)
+
+### Deferred to Future Phases 📝
+- Placeholder NPCs (Phase 4+)
+- Hub ambient sounds/music (Phase 7 polish)
+- Portal visual effects (Phase 7 polish)
+
+---
+
+## Phase 3.5: Warrior Combat Implementation ⏳ IN PROGRESS
+
+**Focus:** Complete ONE class (Warrior) fully to validate animation and skill standardization systems
+
+**Status:** ⏳ **IN PROGRESS** - Animation phases 1-4 complete, skill standardization planned
+
+**Why this phase:** Before building 18 skills across 3 classes, validate systems with 5 warrior skills end-to-end.
+
+### Architecture Completed ✅
+
+**Animation System (Custom FSM + AnimationPlayer)**
+- ✅ Phase 1: Foundation (Sprite2D + AnimationPlayer setup)
+- ✅ Phase 2: Locomotion (walk/idle animations, 4 directions)
+- ✅ Phase 3: State Machine (PlayerState enum, transition logic)
+- ✅ Phase 4: Combat Animations (warrior_attack, warrior_whirlwind with Call Method tracks)
+- ⏳ Phase 5: Hitboxes (Area2D nodes + collision handlers) - IN PROGRESS
+
+**Skill Standardization Framework**
+- ✅ Two-axis classification (CastBehavior × DamageSource)
+- ✅ Six implementation patterns identified
+- ✅ All 18 skills mapped to patterns
+- ✅ Hybrid hitbox approach designed (PlayerHitbox for melee/AOE, EffectCollision for projectiles)
+- ✅ Documentation created ([skill-standardization.md](skill-standardization.md), [animation-architecture.md](animation-architecture.md))
+
+### Implementation Phases (A-E)
+
+**Phase A: Skill System Standardization** (2-3 hours) 📝 NEXT
+- Add CastBehavior and DamageSource enums to Skill.cs
+- Update SkillManager.UseSkill() to route based on CastBehavior
+- Add hitbox infrastructure to Player.cs (EnableMeleeHitbox, EnableAOEHitbox, etc.)
+- Create BasicAttackHitbox and WhirlwindHitbox Area2D nodes in player.tscn
+- Wire collision signals to Player.cs handlers
+
+**Phase B: Fusion Cutter (Basic Attack)** (1-2 hours) 📝 PLANNED
+- Configure WarriorBasicAttack.tres (CastBehavior: AnimationDriven, DamageSource: PlayerHitbox)
+- Add Call Method tracks to warrior_attack_down/up/left/right animations
+- Implement OnMeleeHitboxBodyEntered() to apply damage
+- Test: left-click → animation plays → damage applied
+
+**Phase C: Whirlwind** (1-2 hours) 📝 PLANNED
+- Configure Whirlwind.tres (CastBehavior: AnimationDriven, DamageSource: PlayerHitbox)
+- Refactor WhirlwindEffect.cs → WhirlwindVisual.cs (remove collision, keep VFX)
+- Add Call Method tracks to warrior_whirlwind animation
+- Implement OnAOEHitboxBodyEntered() to apply damage
+- Test: Q key → spin animation → AOE damage
+
+**Phase D: Remaining Warrior Skills** (3-4 hours) 📝 PLANNED
+- Leap Slam (E) - AnimationDriven + PlayerHitbox (dash + AOE pattern)
+- Battle Cry (R) - Instant + None (buff pattern)
+- Shield Bash (passive) - AnimationDriven + PlayerHitbox (melee pattern)
+
+**Phase E: Testing & Polish** (1-2 hours) 📝 PLANNED
+- Test all 5 warrior skills in combat
+- Adjust animation timings and hitbox sizes
+- Verify skill mastery tracking
+- Validate upgrade interactions
+- Bug fixing
+
+### Success Criteria
+- All 5 warrior skills functional and feeling good
+- Animation-driven skills properly synced (hitboxes, timing, state transitions)
+- Instant skills work without animation locks
+- Hybrid hitbox approach validated (no rework needed for other classes)
+- Skill standardization patterns proven extensible
+
+### Estimated Duration
+**Total: 8-13 hours** (1-2 work sessions)
+
+**Deferred to Post-Warrior:**
+- Ranger class (5 skills)
+- Mage class (8 skills)
+- Additional enemy types
+- Boss abilities
 
 ---
 

@@ -8,6 +8,19 @@ The skill system is built on a **type-based, data-driven architecture** that sep
 
 ---
 
+## 📋 Related Documentation
+
+**👉 For implementing new skills:** See **[skill-standardization.md](skill-standardization.md)** for:
+- Two-axis classification framework (CastBehavior × DamageSource)
+- Six standardized implementation patterns
+- Complete skill mapping table (all 18 planned skills)
+- Hybrid hitbox approach (PlayerHitbox vs EffectCollision)
+- Step-by-step implementation checklist
+
+**This document** covers the foundational architecture. **skill-standardization.md** provides the practical implementation guide.
+
+---
+
 ## 🏗️ Architecture Components
 
 ### 1️⃣ Skill Data (Resources)

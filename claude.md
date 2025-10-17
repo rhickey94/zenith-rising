@@ -51,12 +51,13 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 
 ## Current Status: Be Honest
 
-**Phase:** Phase 3 (Hub World & First Dungeon) - ⏳ **IN PROGRESS**
+**Phase:** Animation & Skill System (Warrior Focus) - ⏳ **IN PROGRESS**
 
-**🎉 PHASES 1 & 2 COMPLETE! 🎉**
+**🎉 PHASES 1, 2, & 3 COMPLETE! 🎉**
 
 **Phase 1 - Combat:** Proven fun and engaging through multiple playtests
 **Phase 2 - Progression:** Character stats, save/load, stat allocation working
+**Phase 3 - Hub World:** Scene flow and player initialization working
 
 ### ✅ Actually Working
 
@@ -96,10 +97,24 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 - **Player initialization** - Proper setup for new and saved games
 - **Save integration** - Hub correctly loads/saves character state
 
+**Animation System (Warrior):**
+- **Sprite2D + AnimationPlayer** - Custom FSM pattern chosen
+- **Locomotion animations** - Walk/idle in all 4 directions complete
+- **PlayerState enum** - FSM with transition validation working
+- **Combat animations** - warrior_attack_[dir], warrior_whirlwind created
+- **Phases 1-4 complete** - Foundation, locomotion, FSM, combat animations
+
 ### ⏳ In Progress
 
-- Testing complete hub → dungeon → hub flow
-- Visual polish for hub (background, atmosphere)
+**Animation System (Warrior):**
+- ✅ Phases 1-4: Sprite2D, locomotion, FSM, combat animations
+- ⏳ Phase 5: Combat hitboxes (BasicAttackHitbox, WhirlwindHitbox)
+- 📝 Phases 6-7: Skill integration, testing
+
+**Skill Standardization:**
+- ✅ 6 patterns designed (Melee, AOE, Projectile, Cast-Spawn, Buff, Zone)
+- ✅ All 18 skills mapped to implementation patterns
+- 📝 NOT yet implemented (planned for Phase A)
 
 ### 📝 Not Started (Phase 4+)
 
@@ -112,35 +127,52 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 
 ## Current Phase Focus
 
-**Phase 3: Hub World & First Dungeon** ⏳ **IN PROGRESS**
+**Phase 3.5: Warrior Combat Implementation** ⏳ **IN PROGRESS**
 
-**Current goals:**
+**Current goals (Phase A-E):**
 
-1. ✅ Create hub scene as safe zone
-2. ✅ Implement dungeon portal interaction
-3. ✅ Establish scene flow: Main Menu → Hub → Dungeon → Hub
-4. ✅ Fix player initialization for new/saved games
-5. ⏳ Test complete hub → dungeon → hub flow
-6. 📝 Polish hub visuals and atmosphere
-7. 📝 Add placeholder NPCs/vendors (future)
+**Phase A:** Skill System Standardization 📝 NEXT
+- Add CastBehavior and DamageSource enums to Skill.cs
+- Update SkillManager to route based on CastBehavior
+- Add hitbox infrastructure to Player.cs
+- Create hitbox nodes in player.tscn
 
-**Completed this phase:**
-- Hub.cs with player initialization
-- hub.tscn scene with player and portal
-- DungeonPortal.cs with interaction system
-- Fixed critical Player.Initialize() bug (new game support)
-- Renamed game.tscn → dungeon.tscn for clarity
-- Updated all scene transitions to use hub
+**Phase B:** Fusion Cutter (Basic Attack) 📝 PLANNED
+- Prove Melee Pattern works
+- Configure WarriorBasicAttack.tres
+- Add Call Method tracks to attack animations
+- Test: left-click → animation → damage
+
+**Phase C:** Whirlwind 📝 PLANNED
+- Prove Instant AOE Pattern works
+- Configure Whirlwind.tres
+- Refactor WhirlwindEffect → WhirlwindVisual
+- Test: Q key → spin → AOE damage
+
+**Phase D:** Remaining Warrior Skills 📝 PLANNED
+- Crowd Suppression (reuse AOE pattern)
+- Combat Stim (Buff pattern)
+- Breaching Charge (Cast-Spawn pattern)
+
+**Phase E:** Polish 📝 PLANNED
+- Adjust animation timings
+- Add visual effects
+- Tune hitbox sizes
+
+**Architecture completed:**
+- ✅ Custom FSM + AnimationPlayer pattern chosen
+- ✅ Sprite2D with atlas-based animation
+- ✅ PlayerState enum with transition validation
+- ✅ Locomotion animations (walk/idle, all directions)
+- ✅ Combat animations created (attack, whirlwind)
+- ✅ 6 skill implementation patterns designed
+- ✅ All 18 skills mapped to patterns
+
+**See:** [`Docs/02-IMPLEMENTATION/animation-architecture.md`](Docs/02-IMPLEMENTATION/animation-architecture.md) and [`Docs/02-IMPLEMENTATION/skill-standardization.md`](Docs/02-IMPLEMENTATION/skill-standardization.md)
 
 ---
 
-**Next Phase: Gear & Loot System (Phase 4)**
-
-**Future goals:**
-
-1. Item drops from enemies
-2. Equipment slots and inventory
-3. Stat bonuses from gear
+**After Warrior Complete: Return to Phase 4 (Gear & Loot)**
 
 **See [`Docs/02-IMPLEMENTATION/phase-plan.md`](Docs/02-IMPLEMENTATION/phase-plan.md) for full phase details.**
 
@@ -194,6 +226,92 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 - Complete hub → dungeon → hub flow testing
 - Polish hub visuals (background, lighting, atmosphere)
 - Consider adding placeholder NPCs or hub features
+
+### Session 10 - Animation Architecture & Skill Standardization 🎨
+
+**Context:**
+After completing Phase 3 (Hub World), began work on warrior character animations and combat. Realized existing skill system needed standardization before scaling to 18 total skills across 3 classes.
+
+**Research & Planning Completed:**
+
+**Animation Architecture Decision:**
+- ✅ Researched AnimationTree vs Custom FSM approaches
+- ✅ **Decided on Custom FSM + AnimationPlayer pattern**
+  - Reason: Unifies game logic with animation control (single source of truth)
+  - AnimationTree would create two separate state machines requiring constant sync
+  - Custom FSM simpler for sprite-based ability combat
+- ✅ Replacing AnimatedSprite2D with Sprite2D + AnimationPlayer
+  - AnimationPlayer keyframes `region_rect` property to show atlas frames
+  - All animations (locomotion + combat) controlled by single AnimationPlayer
+- ✅ Call Method tracks enable frame-perfect hitbox timing
+- ✅ FSM not extracted as component - each entity gets own state machine
+
+**Animation Implementation Progress:**
+- ✅ **Phases 1-4 COMPLETED:**
+  - Sprite2D setup with warrior.png atlas
+  - Locomotion animations created (walk_down/up/left/right, idle_down/up/left/right)
+  - PlayerState enum implemented (Idle, Running, BasicAttacking, CastingSkill, Hurt, Dead)
+  - State transition logic with CanTransitionTo() validation
+  - Combat animations created (warrior_attack_[dir], warrior_whirlwind)
+- ⏳ **Phase 5 IN PROGRESS:** Creating hitbox nodes and wiring collision
+
+**Skill System Standardization:**
+- ✅ Analyzed all 18 planned skills across 3 classes
+- ✅ Created **6 implementation patterns** based on two-axis classification:
+  - **Axis 1:** CastBehavior (Instant vs AnimationDriven)
+  - **Axis 2:** DamageSource (PlayerHitbox, EffectCollision, None)
+- ✅ **Pattern Matrix Created:**
+  1. **Melee Pattern** (AnimationDriven + PlayerHitbox) - Fusion Cutter, Psionic Wave
+  2. **Instant AOE Pattern** (AnimationDriven + PlayerHitbox) - Whirlwind, Crowd Suppression
+  3. **Projectile Pattern** (Instant + EffectCollision) - Fireball, Arc Lightning, Grenade
+  4. **Cast-Spawn Pattern** (AnimationDriven + EffectCollision) - Breaching Charge, Dash skills
+  5. **Buff Pattern** (Instant/Animated + None) - Combat Stim, Fortify, Overwatch
+  6. **Persistent Zone Pattern** (Instant + EffectCollision) - Void Rift, Singularity
+- ✅ All 18 skills mapped to patterns with implementation checklist
+- ✅ Design validated as extensible (can add new patterns by extending axes)
+
+**Hybrid Hitbox Approach:**
+- **PlayerHitbox for melee/AOE:** Animation-driven timing, Player applies damage
+- **EffectCollision for projectiles/zones:** Independent entity collision, Effect applies damage
+- WhirlwindEffect.cs to be refactored → WhirlwindVisual.cs (remove collision, purely visual)
+
+**Documentation Created:**
+- ✅ Committed animation architecture to memory
+- ✅ Committed skill standardization patterns to memory
+- ✅ Created implementation checklist template
+- ✅ Created skill type mapping table for all 18 skills
+- ✅ Created [`animation-architecture.md`](Docs/02-IMPLEMENTATION/animation-architecture.md)
+- ✅ Created [`skill-standardization.md`](Docs/02-IMPLEMENTATION/skill-standardization.md)
+
+**Current Status:**
+- **Phase 3 (Hub) COMPLETE** ✅
+- **Animation System:** Foundation complete, hitboxes in progress
+- **Skill Standardization:** Fully planned, NOT yet implemented
+
+**Path Forward - Warrior Focus:**
+1. **Phase A:** Implement skill standardization (add enums, hitbox infrastructure)
+2. **Phase B:** Get Fusion Cutter (basic attack) working - prove Melee Pattern
+3. **Phase C:** Get Whirlwind working - prove Instant AOE Pattern
+4. **Phase D:** Implement remaining warrior skills (Crowd Suppression, Combat Stim, Breaching Charge)
+5. **Phase E:** Polish warrior animations and combat feel
+
+**Design Decisions:**
+- Focus on completing ONE class (Warrior) fully to validate system
+- Standardization enables rapid implementation of remaining 13 skills
+- Animation + skill work happens together (not separate phases)
+- Return to Phase 4 (Gear & Loot) after warrior completion
+
+**Lessons Learned:**
+- Taking time to standardize before scaling = smart investment
+- Planning detour was valuable - clear, extensible system designed
+- Breaking overwhelming work into phases (A-E) makes it manageable
+- Warrior best starting point (hardest patterns - melee/AOE/dash)
+
+**Next Session:**
+- Begin Phase A: Skill system standardization implementation
+- Add CastBehavior and DamageSource enums to Skill.cs
+- Create hitbox nodes in player.tscn
+- Update SkillManager.UseSkill() to route based on CastBehavior
 
 ### Session 8 - Victory & Death Screens - PHASE 1 COMPLETE! 🎉
 
@@ -445,5 +563,5 @@ FOR (Fortune): +2% Crit Damage, +1% Drop Rate per point
 
 ---
 
-_Last updated: Session 9 - Hub World implementation_
-_🎉 PHASES 1 & 2 COMPLETE - Phase 3 Hub World in progress! 🎉_
+_Last updated: Session 10 - Animation architecture & skill standardization_
+_🎉 PHASES 1, 2, & 3 COMPLETE - Warrior animations in progress! 🎉_
