@@ -349,6 +349,8 @@ size = Vector2(80, 60)
 radius = 150.0
 
 [node name="Player" type="CharacterBody2D" groups=["player"]]
+collision_layer = 1
+collision_mask = 2
 script = ExtResource("1_xpcdj")
 ProjectileScene = ExtResource("2_jlvik")
 
@@ -386,6 +388,7 @@ libraries = {
 
 [node name="MeleeHitbox" type="Area2D" parent="."]
 collision_layer = 0
+collision_mask = 2
 monitoring = false
 monitorable = false
 
@@ -395,6 +398,7 @@ shape = SubResource("RectangleShape2D_gk6dx")
 
 [node name="AOEHitbox" type="Area2D" parent="."]
 collision_layer = 0
+collision_mask = 2
 monitoring = false
 monitorable = false
 

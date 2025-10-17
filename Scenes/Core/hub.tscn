@@ -18,6 +18,8 @@ Player = NodePath("Player")
 [node name="Player" parent="." instance=ExtResource("2_5jboa")]
 
 [node name="DungeonPortal" type="Area2D" parent="."]
+collision_layer = 32
+collision_mask = 1
 position = Vector2(0, -347)
 script = ExtResource("8_eu2np")
 
