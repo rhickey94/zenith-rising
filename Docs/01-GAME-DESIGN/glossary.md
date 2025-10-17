@@ -101,73 +101,93 @@ This document defines all key terms used throughout Zenith Rising's design docum
 ## Gear & Equipment Terms
 
 ### Gear Rarity Tiers
-**Common (Gray):** 1 primary stat, 0 secondary stats, 0 enchant slots  
-**Uncommon (Green):** 1 primary stat, 1 secondary stat, 0 enchant slots  
-**Rare (Blue):** 1 primary stat, 2 secondary stats, 0 enchant slots  
-**Epic (Purple):** 1 primary stat, 3 secondary stats, 1 enchant slot  
-**Legendary (Orange):** 1 primary stat, 3 secondary stats, 2 enchant slots  
+**Common (Gray):** 50-80 FP, 1-2 affixes (T1-T2)
+**Uncommon (Green):** 80-120 FP, 2-3 affixes (T1-T3)
+**Rare (Blue):** 120-160 FP, 3-4 affixes (T2-T4)
+**Epic (Purple):** 160-200 FP, 4-5 affixes (T3-T5)
+**Legendary (Orange):** 180-200 FP, 4-6 affixes (T4-T6, may include T6-T7 drop-only)  
 
-### Enhancement Level
-**Definition:** Gear upgrade level from 0 to +10  
-**Effect:** Each level adds +10% to ALL stats on the item  
-**Max Enhancement:** +10 = +100% stats (doubles item stats)  
-**Cost:** Refined Energy Cores  
-**System:** Added in Phase 3 via Workshop  
+### Forging Potential (FP)
+**Definition:** Resource on gear that limits how much it can be crafted
+**Range:** 50-200 FP (based on rarity and zone level)
+**Consumption:** Each crafting action costs 5-20 FP
+**Depletion:** At 0 FP, item cannot be crafted further (natural stopping point)
+**Purpose:** Creates optimization decisions and prevents infinite crafting
+**System:** Added in Phase 4 via Forge
 
 **Example:**
 ```
-Iron Sword (Base): +15 STR, +5 VIT, +3 AGI
-Iron Sword +5: +22 STR, +7 VIT, +4 AGI (base × 1.5)
-Iron Sword +10: +30 STR, +10 VIT, +6 AGI (base × 2.0)
+Iron Sword (150 FP):
+- Add +STR affix (10 FP) → 140 FP remaining
+- Upgrade STR T1→T2 (10 FP) → 130 FP remaining
+- Upgrade STR T2→T3 (12 FP) → 118 FP remaining
+- Eventually reaches 0 FP (item "complete")
 ```
 
-### Enchantment Slots
-**Definition:** Special effect slots on Epic+ gear  
-**Added:** Phase 4 via Workshop  
-**Examples:** "+15% Physical Damage", "Restore 2% HP on kill", "10% chance to stun"  
-**Slots:** Epic gear has 1 slot, Legendary gear has 2 slots  
+### Affixes
+**Definition:** Stat modifiers on gear with tier levels
+**Tiers:** T1-T7 (T1 weakest, T7 strongest)
+**Craftable:** T1-T5 via Forge crafting
+**Drop-Only:** T6-T7 (cannot be crafted, only found)
+**Examples:** "+15 Strength (T3)", "+12% Crit Chance (T4)"
+**System:** Core to Forge system (Phase 4)
 
-### Primary Stat
-**Definition:** The main stat bonus on a piece of gear  
-**Always Present:** Every gear piece has exactly 1 primary stat  
-**Examples:** Iron Sword (+15 STR), Leather Armor (+10 VIT), Amulet (+8 AGI)  
-
-### Secondary Stats
-**Definition:** Additional random stat bonuses rolled on gear  
-**Count:** 0-3 depending on rarity (see rarity table)  
-**Values:** Lower than primary stat values  
-**Randomized:** Rolled when item drops  
+**Tier Progression:**
+- T1: Base stat value
+- T2-T5: Increasing stat values (craftable via Forge)
+- T6-T7: Highest values (chase drops from high zones/bosses)
 
 ---
 
 ## Materials & Resources
 
-### Energy Cores
-**Definition:** The primary material for gear enhancement  
-**Drop Source:** All enemies (100% drop rate)  
-**States:** Raw Energy Core → Refined Energy Core  
-**Refinement:** 30 minutes in Workshop  
-**Purpose:** Enhance gear (+10% stats per enhancement level)  
-**Phase:** Added in Phase 3  
+### Essence (Common Material)
+**Definition:** Universal common material from all enemies
+**Drop Source:** All enemies (100% drop rate, 1-3 per enemy)
+**States:** Raw Essence → Refined Essence (4 hours in Workshop)
+**Purpose:** Basic Forge crafts, workshop fuel, common upgrades
+**Usage:** Add T1 affixes (10 Refined Essence)
 
-### Modification Chips
-**Definition:** Rare material for adding enchantments  
-**Drop Source:** Bosses only (50% chance, guaranteed from Floor 5+)  
-**Purpose:** Add enchantments to Epic/Legendary gear  
-**Phase:** Added in Phase 4  
+### Ore (Uncommon Material)
+**Definition:** Material from mini-bosses and tough enemies
+**Drop Source:** Mini-bosses (100%), elite enemies (30%), zone milestones
+**States:** Raw Ore → Ingots (8 hours in Workshop)
+**Purpose:** Upgrade affixes to higher tiers
+**Usage:** Upgrade T1→T2→T3 (5 Ingots per tier)
+
+### Fragments (Rare Material)
+**Definition:** Material from significant zone completion
+**Drop Source:** Zone completion rewards, boss chests (50%), challenge runs
+**States:** Raw Fragments → Gems (12 hours in Workshop)
+**Purpose:** Advanced crafting, reroll numeric values
+**Usage:** Reroll affix values (3 Gems)
+
+### Souls (Very Rare Material)
+**Definition:** Material from major bosses only
+**Drop Source:** Floor bosses (100%), dungeon final bosses (3-5 Souls)
+**States:** Raw Souls → Crystallized Souls (12 hours in Workshop)
+**Purpose:** Ascension system, high-tier crafts
+**Usage:** Ascension tree unlocks, T4-T5 upgrades
+
+### Crystals (Ultra Rare Material)
+**Definition:** Endgame material from challenge content
+**Drop Source:** Challenge runs with modifiers, achievements, leaderboard rewards
+**States:** Pure Crystals (no refinement needed)
+**Purpose:** Endgame crafting, rare ascension unlocks
+**Usage:** T5 upgrades, special ascension nodes  
 
 ### Gold
-**Definition:** Universal currency for various purchases  
+**Definition:** Universal currency for various purchases
 **Sources:**
-- Enemy drops during runs
-- Treasury idle generation (based on highest floor cleared)
-- Salvaging unwanted gear (50% of enhancement investment)
+- Enemy drops during runs (primary source)
+- Treasury idle generation based on (Zone² × 10) formula
+- Salvaging unwanted gear
 
 **Uses:**
+- Forge crafting actions (Add/Upgrade/Reroll affixes)
 - Respec stats (100 gold × character level)
-- Buy consumables (health potions, buffs)
-- Rush Workshop refinement (10 gold per minute remaining)
-- Base upgrades (Workshop/Treasury improvements)
+- Workshop upgrades (Processing Speed, Extra Slots, Quality improvements)
+- Treasury upgrades (Accumulation cap, interest rates)
 
 ---
 
@@ -233,60 +253,90 @@ Iron Sword +10: +30 STR, +10 VIT, +6 AGI (base × 2.0)
 ## Hub & Idle Systems
 
 ### Hub
-**Definition:** Safe base area between runs  
+**Definition:** Safe base area between runs
 **Functions:**
 - Character stat allocation
 - Gear management (equip, salvage)
+- Forge access (gear crafting)
 - Workshop access (material refinement)
 - Treasury collection (idle gold)
 - Dungeon selection
 
-### Workshop
-**Definition:** Idle system for refining raw materials  
-**Function:** Raw Energy Core → Refined Energy Core  
-**Time:** 30 minutes per core (Phase 3 MVP baseline)  
-**Queue:** 3 simultaneous refinements (expandable to 5 in Phase 4)  
-**Offline:** Uses DateTime for progression (works while game is closed)  
+### Forge
+**Definition:** Crafting station for modifying gear using Forging Potential
+**Location:** Hub area (Phase 4)
+**Requirements:** Gear with remaining FP + refined materials + gold
 
-**Upgrades (Phase 4):**
-- Faster refinement (−5 min per level, minimum 15 min)
-- More queue slots (+1 per level, max 5 slots)
-- Batch refinement (refine 5 at once)
+**Three Crafting Actions:**
+
+**1. Add Affix (5-10 FP)**
+- Choose which stat to add (Strength, Crit Chance, etc.)
+- Adds Tier 1 of that stat
+- Cost: 10 Refined Essence + 100 Gold
+
+**2. Upgrade Affix (8-15 FP per tier)**
+- Increase existing affix tier: T1 → T2 → T3 → T4 → T5
+- Each tier significantly increases stat value
+- Cost: 5 Ingots + 200 Gold per tier (scales up at higher tiers)
+
+**3. Reroll Numeric Value (3-5 FP)**
+- Keep affix and tier, reroll the number within range
+- Example: +15 STR (T3) → reroll → +18 STR (T3)
+- Cost: 3 Gems + 50 Gold
+
+**Design:** Creates optimization puzzles (which gear? how much to invest?)
+
+### Workshop
+**Definition:** Idle system for refining raw materials into crafting components
+**Function:** Converts 5 material types (Essence→Refined, Ore→Ingots, Fragments→Gems, Souls→Crystallized)
+**Processing Times:** 4 hours (Essence), 8 hours (Ore), 12 hours (Fragments/Souls)
+**Slots:** 3-5 parallel processing slots (expandable via upgrades)
+**Offline:** Uses DateTime for progression (works while game is closed)
+
+**Upgrade Tiers (Phase 5):**
+- **Tier 1 (1k-5k gold):** Processing Speed I (1.2x), Extra Slot (+1), Bulk Convert (10x batch)
+- **Tier 2 (20k-50k gold):** Processing Speed II (1.5x), Quality Improvement (10% chance 2x output), Auto-Collect
+- **Tier 3 (100k+ gold):** Master Craftsman (2x speed), Overflow Slot (5th slot), Legendary Refinement (5% rare upgrade)
 
 ### Treasury
-**Definition:** Idle system for gold generation  
-**Generation Rate:** Highest Floor Cleared × 10 gold/hour  
-**Cap:** 8 hours maximum accumulation  
-**Max Gold:** Rate × 8  
+**Definition:** Idle system for passive gold generation
+**Generation Formula:** (Highest Zone Reached)² × 10 gold/hour
+**Accumulation Cap:** 12 hours maximum
+**Active Bonus:** Dungeon runs give 3-5x more gold than idle time
 
-**Example:**
-- Floor 5 cleared = 50 gold/hour
-- After 8 hours = 400 gold accumulated
+**Examples:**
+- Zone 20 cleared = (20² × 10) = 4,000 gold/hour → 48,000 gold max (12h)
+- Zone 50 cleared = (50² × 10) = 25,000 gold/hour → 300,000 gold max (12h)
+- Zone 100 cleared = (100² × 10) = 100,000 gold/hour → 1,200,000 gold max (12h)
 
-**Upgrades (Phase 4):**
-- Increase rate (+10 gold/hour per level)
-- Increase cap (8h → 10h → 12h)
-- Interest system (5% daily on unspent gold, 1000 gold cap)
+**Upgrade Tiers (Phase 5-6):**
+- **Expansion Upgrades:** Increase cap (12h → 18h → 24h)
+- **Interest Rate Upgrades:** Compound bonus (1.1x → 1.3x → 1.5x)
+- **Instant Collection:** Collect 2 hours early (1/day)
 
 ### Salvage
-**Definition:** Converting unwanted gear into gold  
-**Returns:** 50% of enhancement investment (or base value for unenhanced)  
-**Purpose:** Prevent inventory bloat, give bad drops value  
+**Definition:** Converting unwanted gear into gold
+**Returns:** Base gold value (scales with rarity and item level)
+**Purpose:** Prevent inventory bloat, give all drops value
+**Note:** Cannot recover materials spent on Forge crafting (sunk cost)  
 
 ---
 
 ## Game Structure Terms
 
 ### Phase
-**Definition:** Development milestone with specific feature sets  
-**MVP = Phases 1-3:** Core combat, progression, and enhancement systems  
+**Definition:** Development milestone with specific feature sets
+**MVP = Phases 1-3:** Core combat, progression, hub world, and balance systems
 
 **Phase Overview:**
-- **Phase 1:** Combat core + first character
-- **Phase 2:** Character stats + equipment
-- **Phase 3:** Enhancement + idle systems (Workshop/Treasury)
-- **Phase 4:** Skill mastery + enchantments + depth
-- **Phase 5:** Endgame content + ascension (post-launch)
+- **Phase 1:** Combat core (proven fun) ✅
+- **Phase 2:** Character stats + save system ✅
+- **Phase 3:** Hub world + scene flow ✅
+- **Phase 3.5:** Warrior skills + balance systems ✅ (in progress)
+- **Phase 4:** Gear & Forge system (FP, affixes, crafting)
+- **Phase 5:** Idle systems (Workshop, Treasury)
+- **Phase 6:** Depth & Ascension (prestige progression)
+- **Phase 7:** Endgame (multiple dungeons, challenges)
 
 ### Zenith Station
 **Definition:** The first dungeon, used for MVP  
@@ -294,11 +344,19 @@ Iron Sword +10: +30 STR, +10 VIT, +6 AGI (base × 2.0)
 **Theme:** Sci-fi tower facility  
 **Duration:** 25-30 minute runs  
 
-### Ascension (Phase 5)
-**Definition:** Post-launch endgame system for long-term progression  
-**Function:** Reset progress for permanent bonuses and new challenges  
-**Purpose:** Endless content for dedicated players  
-**Status:** Planned for Phase 5, not in MVP  
+### Ascension (Phase 6)
+**Definition:** Prestige system for long-term meta-progression
+**Timing:** Soft reset every 15-25 hours of play (player choice)
+**Mechanics:** Reset dungeon progress (back to Zone 1), keep gear/workshop/treasury
+**Rewards:** Ascension Points (AP) based on zones cleared + challenges completed
+
+**Three Ascension Branches:**
+- **Combat Branch:** Damage, HP, extra lives, material drop bonuses
+- **Economy Branch:** Treasury rates, workshop speed, forge cost reduction
+- **Utility Branch:** Extra slots, extended caps, free respec
+
+**Purpose:** Provides 50-100+ hour goals for optimizers while remaining optional
+**Status:** Planned for Phase 6  
 
 ---
 
@@ -343,5 +401,5 @@ Iron Sword +10: +30 STR, +10 VIT, +6 AGI (base × 2.0)
 
 ---
 
-_Last updated: 2025-01-15 - Added Power Level vs Character Level distinction_  
+_Last updated: 2025-10-17 - Complete overhaul for updated idle systems vision (5 materials, Forge/FP system, updated Workshop/Treasury)_
 _Living document - Update when new terms are introduced_
