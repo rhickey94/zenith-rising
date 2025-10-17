@@ -1,6 +1,6 @@
-using SpaceTower.Scripts.PlayerScripts;
+using ZenithRising.Scripts.PlayerScripts;
 
-namespace SpaceTower.Scripts.Skills.Base;
+namespace ZenithRising.Scripts.Skills.Base;
 
 public interface ISkillExecutor
 {

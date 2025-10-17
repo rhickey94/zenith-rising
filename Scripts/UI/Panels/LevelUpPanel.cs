@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Godot;
-using SpaceTower.Scripts.Progression.Upgrades;
+using ZenithRising.Scripts.Progression.Upgrades;
 
-namespace SpaceTower.Scripts.UI.Panels;
+namespace ZenithRising.Scripts.UI.Panels;
 
 public partial class LevelUpPanel : Control
 {

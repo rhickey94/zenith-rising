@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Text.Json;
 
-namespace SpaceTower.Scripts.Core;
+namespace ZenithRising.Scripts.Core;
 
 public partial class SaveManager : Node
 {

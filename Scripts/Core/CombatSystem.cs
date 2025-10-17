@@ -1,8 +1,8 @@
 using Godot;
-using SpaceTower.Scripts.PlayerScripts;
-using SpaceTower.Scripts.PlayerScripts.Components;
+using ZenithRising.Scripts.PlayerScripts;
+using ZenithRising.Scripts.PlayerScripts.Components;
 
-namespace SpaceTower.Scripts.Core;
+namespace ZenithRising.Scripts.Core;
 
 public enum DamageType
 {

@@ -1,6 +1,6 @@
 using Godot;
 
-namespace SpaceTower.Scripts.Progression.Upgrades;
+namespace ZenithRising.Scripts.Progression.Upgrades;
 
 [GlobalClass]
 public partial class Upgrade : Resource

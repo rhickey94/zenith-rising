@@ -1,6 +1,6 @@
 using Godot;
 
-namespace SpaceTower.Scripts.UI.Panels;
+namespace ZenithRising.Scripts.UI.Panels;
 
 public partial class FloorTransitionPanel : Control
 {

@@ -1,8 +1,8 @@
 using Godot;
-using SpaceTower.Scripts.PlayerScripts;
-using SpaceTower.Scripts.PlayerScripts.Components;
+using ZenithRising.Scripts.PlayerScripts;
+using ZenithRising.Scripts.PlayerScripts.Components;
 
-namespace SpaceTower.Scripts.Items.Collectibles;
+namespace ZenithRising.Scripts.Items.Collectibles;
 
 public partial class ExperienceShard : Area2D
 {

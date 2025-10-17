@@ -1,11 +1,11 @@
 using Godot;
-using SpaceTower.Scripts.Core;
-using SpaceTower.Scripts.Enemies.Base;
-using SpaceTower.Scripts.PlayerScripts;
-using SpaceTower.Scripts.PlayerScripts.Components;
-using SpaceTower.Scripts.Skills.Base;
+using ZenithRising.Scripts.Core;
+using ZenithRising.Scripts.Enemies.Base;
+using ZenithRising.Scripts.PlayerScripts;
+using ZenithRising.Scripts.PlayerScripts.Components;
+using ZenithRising.Scripts.Skills.Base;
 
-namespace SpaceTower.Scripts.Skills.Effects;
+namespace ZenithRising.Scripts.Skills.Effects;
 
 /// <summary>
 /// Base class for all skill effects. Provides standardized initialization and kill tracking.

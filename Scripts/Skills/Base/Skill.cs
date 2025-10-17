@@ -1,9 +1,9 @@
 using Godot;
-using SpaceTower.Scripts.Core;
-using SpaceTower.Scripts.PlayerScripts;
-using SpaceTower.Scripts.Skills.Executors;
+using ZenithRising.Scripts.Core;
+using ZenithRising.Scripts.PlayerScripts;
+using ZenithRising.Scripts.Skills.Executors;
 
-namespace SpaceTower.Scripts.Skills.Base;
+namespace ZenithRising.Scripts.Skills.Base;
 
 [GlobalClass]
 public partial class Skill : Resource

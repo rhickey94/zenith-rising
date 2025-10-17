@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using Godot;
-using SpaceTower.Scripts.Enemies.Base;
-using SpaceTower.Scripts.PlayerScripts;
-using SpaceTower.Scripts.PlayerScripts.Components;
-using SpaceTower.Scripts.UI.HUD;
-using SpaceTower.Scripts.UI.Panels;
+using ZenithRising.Scripts.Enemies.Base;
+using ZenithRising.Scripts.PlayerScripts;
+using ZenithRising.Scripts.PlayerScripts.Components;
+using ZenithRising.Scripts.UI.HUD;
+using ZenithRising.Scripts.UI.Panels;
 
-namespace SpaceTower.Scripts.Core;
+namespace ZenithRising.Scripts.Core;
 
 public partial class Dungeon : Node
 {

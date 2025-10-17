@@ -1,10 +1,10 @@
 using Godot;
-using SpaceTower.Scripts.PlayerScripts;
-using SpaceTower.Scripts.Skills.Base;
-using SpaceTower.Scripts.Skills.Data;
-using SpaceTower.Scripts.Skills.Effects;
+using ZenithRising.Scripts.PlayerScripts;
+using ZenithRising.Scripts.Skills.Base;
+using ZenithRising.Scripts.Skills.Data;
+using ZenithRising.Scripts.Skills.Effects;
 
-namespace SpaceTower.Scripts.Skills.Executors;
+namespace ZenithRising.Scripts.Skills.Executors;
 
 public class ProjectileSkillExecutor : ISkillExecutor
 {

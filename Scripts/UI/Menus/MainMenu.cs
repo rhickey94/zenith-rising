@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Godot;
-using SpaceTower.Scripts.Core;
+using ZenithRising.Scripts.Core;
 
-namespace SpaceTower.Scripts.UI.Menus;
+namespace ZenithRising.Scripts.UI.Menus;
 
 public partial class MainMenu : Control
 {

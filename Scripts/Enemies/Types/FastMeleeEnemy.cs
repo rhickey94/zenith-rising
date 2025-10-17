@@ -1,7 +1,7 @@
 using Godot;
-using SpaceTower.Scripts.Enemies.Base;
+using ZenithRising.Scripts.Enemies.Base;
 
-namespace SpaceTower.Scripts.Enemies.Types;
+namespace ZenithRising.Scripts.Enemies.Types;
 
 public partial class FastMeleeEnemy : Enemy
 {

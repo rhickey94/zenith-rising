@@ -1,7 +1,7 @@
 using Godot;
-using SpaceTower.Scripts.Skills.Base;
+using ZenithRising.Scripts.Skills.Base;
 
-namespace SpaceTower.Scripts.PlayerScripts.Components;
+namespace ZenithRising.Scripts.PlayerScripts.Components;
 
 [GlobalClass]
 public partial class SkillManager : Node

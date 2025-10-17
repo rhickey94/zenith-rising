@@ -1,7 +1,7 @@
 using Godot;
-using SpaceTower.Scripts.PlayerScripts;
+using ZenithRising.Scripts.PlayerScripts;
 
-namespace SpaceTower.Scripts.Enemies.Effects;
+namespace ZenithRising.Scripts.Enemies.Effects;
 
 public partial class EnemyProjectile : Area2D
 {

@@ -1,4 +1,4 @@
-namespace SpaceTower.Scripts.PlayerScripts;
+namespace ZenithRising.Scripts.PlayerScripts;
 
 public enum PlayerClass
 {

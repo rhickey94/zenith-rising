@@ -1,6 +1,6 @@
 using Godot;
 
-namespace SpaceTower.Scripts.Core;
+namespace ZenithRising.Scripts.Core;
 
 public partial class DungeonPortal : Area2D
 {

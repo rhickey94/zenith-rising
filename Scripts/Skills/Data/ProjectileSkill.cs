@@ -1,7 +1,7 @@
 using Godot;
-using SpaceTower.Scripts.Skills.Base;
+using ZenithRising.Scripts.Skills.Base;
 
-namespace SpaceTower.Scripts.Skills.Data;
+namespace ZenithRising.Scripts.Skills.Data;
 
 [GlobalClass]
 public partial class ProjectileSkill : Skill

@@ -1,7 +1,7 @@
 using Godot;
-using SpaceTower.Scripts.PlayerScripts;
+using ZenithRising.Scripts.PlayerScripts;
 
-namespace SpaceTower.Scripts.UI.HUD;
+namespace ZenithRising.Scripts.UI.HUD;
 
 public partial class Hud : Control
 {

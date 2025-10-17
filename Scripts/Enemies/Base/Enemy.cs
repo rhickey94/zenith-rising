@@ -1,8 +1,8 @@
 using Godot;
-using SpaceTower.Scripts.Items.Collectibles;
-using SpaceTower.Scripts.PlayerScripts;
+using ZenithRising.Scripts.Items.Collectibles;
+using ZenithRising.Scripts.PlayerScripts;
 
-namespace SpaceTower.Scripts.Enemies.Base;
+namespace ZenithRising.Scripts.Enemies.Base;
 
 public partial class Enemy : CharacterBody2D
 {

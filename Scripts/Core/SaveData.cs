@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using SpaceTower.Scripts.Progression.Upgrades;
+using ZenithRising.Scripts.Progression.Upgrades;
 
-namespace SpaceTower.Scripts.Core;
+namespace ZenithRising.Scripts.Core;
 
 public struct SaveData
 {

@@ -1,11 +1,11 @@
 using Godot;
-using SpaceTower.Scripts.Core;
-using SpaceTower.Scripts.Enemies.Base;
-using SpaceTower.Scripts.PlayerScripts;
-using SpaceTower.Scripts.Skills.Base;
-using SpaceTower.Scripts.Skills.Data;
+using ZenithRising.Scripts.Core;
+using ZenithRising.Scripts.Enemies.Base;
+using ZenithRising.Scripts.PlayerScripts;
+using ZenithRising.Scripts.Skills.Base;
+using ZenithRising.Scripts.Skills.Data;
 
-namespace SpaceTower.Scripts.Skills.Effects;
+namespace ZenithRising.Scripts.Skills.Effects;
 
 public partial class WhirlwindEffect : SkillEffect
 {

@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using Godot;
-using SpaceTower.Scripts.Progression.Upgrades;
-using SpaceTower.Scripts.PlayerScripts.Components;
-using SpaceTower.Scripts.UI.Panels;
-using SpaceTower.Scripts.Core;
-using SpaceTower.Scripts.Enemies.Base;
+using ZenithRising.Scripts.Progression.Upgrades;
+using ZenithRising.Scripts.PlayerScripts.Components;
+using ZenithRising.Scripts.UI.Panels;
+using ZenithRising.Scripts.Core;
+using ZenithRising.Scripts.Enemies.Base;
 
-namespace SpaceTower.Scripts.PlayerScripts;
+namespace ZenithRising.Scripts.PlayerScripts;
 
 public enum PlayerState
 {

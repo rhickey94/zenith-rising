@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-namespace SpaceTower.Scripts.UI.Panels;
+namespace ZenithRising.Scripts.UI.Panels;
 
 public partial class VictoryScreen : Control
 {

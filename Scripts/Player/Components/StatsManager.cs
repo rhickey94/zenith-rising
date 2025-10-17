@@ -1,8 +1,8 @@
 using System;
 using Godot;
-using SpaceTower.Scripts.Core;
+using ZenithRising.Scripts.Core;
 
-namespace SpaceTower.Scripts.PlayerScripts.Components;
+namespace ZenithRising.Scripts.PlayerScripts.Components;
 
 public struct StatModifiers
 {

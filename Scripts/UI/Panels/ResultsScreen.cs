@@ -1,7 +1,7 @@
 using Godot;
-using SpaceTower.Scripts.PlayerScripts.Components;
+using ZenithRising.Scripts.PlayerScripts.Components;
 
-namespace SpaceTower.Scripts.UI.Panels;
+namespace ZenithRising.Scripts.UI.Panels;
 
 public partial class ResultsScreen : Control
 {

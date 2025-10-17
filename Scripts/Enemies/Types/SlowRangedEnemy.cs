@@ -1,9 +1,9 @@
 using Godot;
-using SpaceTower.Scripts.Enemies.Base;
-using SpaceTower.Scripts.Enemies.Effects;
-using SpaceTower.Scripts.PlayerScripts;
+using ZenithRising.Scripts.Enemies.Base;
+using ZenithRising.Scripts.Enemies.Effects;
+using ZenithRising.Scripts.PlayerScripts;
 
-namespace SpaceTower.Scripts.Enemies.Types;
+namespace ZenithRising.Scripts.Enemies.Types;
 
 public partial class SlowRangedEnemy : Enemy
 {

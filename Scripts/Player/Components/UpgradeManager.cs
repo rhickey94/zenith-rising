@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using SpaceTower.Scripts.Progression.Upgrades;
+using ZenithRising.Scripts.Progression.Upgrades;
 
-namespace SpaceTower.Scripts.PlayerScripts.Components;
+namespace ZenithRising.Scripts.PlayerScripts.Components;
 
 [GlobalClass]
 public partial class UpgradeManager : Node

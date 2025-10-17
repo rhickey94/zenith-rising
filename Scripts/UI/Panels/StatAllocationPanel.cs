@@ -1,8 +1,8 @@
 using Godot;
 using System.Collections.Generic;
-using SpaceTower.Scripts.PlayerScripts.Components;
+using ZenithRising.Scripts.PlayerScripts.Components;
 
-namespace SpaceTower.Scripts.UI.Panels;
+namespace ZenithRising.Scripts.UI.Panels;
 
 public partial class StatAllocationPanel : Control
 {
