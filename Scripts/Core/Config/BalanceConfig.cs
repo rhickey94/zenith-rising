@@ -1,5 +1,3 @@
-using Godot;
-
 namespace ZenithRising.Scripts.Core.Config;
 
 public class BalanceConfig
