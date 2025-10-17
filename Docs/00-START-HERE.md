@@ -40,14 +40,15 @@ Check: **[`04-VISUAL-AUDIO/visual-style-guide.md`](04-VISUAL-AUDIO/visual-style-
 
 ## 📊 Current Project Status
 
-**Phase:** Phase 3.5 (Warrior Combat) - Sub-Phase A (Balance Systems Foundation)
+**Phase:** Phase 3.5 (Warrior Combat) - Sub-Phases B+ (Remaining Warrior Skills)
 
-**🎉 PHASES 1, 2, & 3 COMPLETE! 🎉**
+**🎉 PHASES 1, 2, 3, & 3.5-A COMPLETE! 🎉**
 
 - **Phase 1 (Combat):** Proven fun through playtesting ✅
-- **Phase 2 (Progression):** Character stats, save/load working ✅  
+- **Phase 2 (Progression):** Character stats, save/load working ✅
 - **Phase 3 (Hub World):** Scene flow and player initialization working ✅
-- **Phase 3.5 (Warrior):** Animation foundation complete, balance systems in progress ⏳
+- **Phase 3.5-A (Balance Systems):** Centralized config infrastructure complete ✅
+- **Phase 3.5 (B-F):** Warrior skills implementation in progress ⏳
 
 ### ✅ Currently Working
 
@@ -67,22 +68,21 @@ Check: **[`04-VISUAL-AUDIO/visual-style-guide.md`](04-VISUAL-AUDIO/visual-style-
 - Combat animations (attack, whirlwind)
 - PlayerState transitions validated
 
+**Balance Systems (Phase 3.5-A):**
+- GameBalance singleton with centralized config access
+- 5 config Resources (PlayerStatsConfig, CharacterProgressionConfig, CombatSystemConfig, EnemyConfig, UpgradeSystemConfig)
+- SkillBalanceDatabase for skill-specific parameters
+- Inspector-based tuning (edit values without recompiling)
+- Warrior basic attack and Whirlwind functional with hitbox damage
+
 ### ⏳ In Progress
 
-**Phase 3.5-A: Balance Systems Foundation (CURRENT PRIORITY)**
-- BalanceConfig system (game-wide parameters)
-- SkillBalanceDatabase (skill-specific parameters)
-- GameBalance singleton (global access autoload)
-- StatsManager/UpgradeManager/Dungeon refactor to use config
-- **Goal:** Centralize all balance tuning BEFORE implementing 18 skills
-- **Investment:** 4-6 hours now saves 10+ hours during warrior implementation
+**Phase 3.5 (B-F): Remaining Warrior Skills**
+- 2 skills working (Basic Attack, Whirlwind)
+- 3 skills remaining: Crowd Suppression, Combat Stim, Breaching Charge
+- Combat polish: animation timing, hitbox tuning, visual effects
 
 ### 📝 Not Started
-
-**Phase 3.5 (B-F):**
-- Skill system standardization (CastBehavior/DamageSource enums)
-- Player hitbox infrastructure (melee/AOE collision)
-- Remaining 5 warrior skills implementation
 
 **Phase 4+:**
 - Gear/equipment drops and inventory

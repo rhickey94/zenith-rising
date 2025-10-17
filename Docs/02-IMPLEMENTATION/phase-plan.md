@@ -184,10 +184,10 @@
 
 ### Implementation Phases (A-F)
 
-**Phase A: Balance Systems Foundation** (4-6 hours) ⏳ **CURRENT PRIORITY**
+**Phase A: Balance Systems Foundation** (4-6 hours) ✅ **COMPLETE**
 
-**Why this phase comes first:**
-Setting up centralized balance systems BEFORE implementing remaining skills prevents:
+**Why this phase came first:**
+Setting up centralized balance systems BEFORE implementing remaining skills prevented:
 - Hardcoded magic numbers scattered across 18 skill files
 - Manual recompilation for every balance tweak
 - Inconsistent formulas between similar skills
@@ -473,9 +473,17 @@ Validates second hitbox pattern (AOE vs Melee).
 
 ## Current Focus
 
-**Phase 3.5 - Phase A (Balance Systems Foundation)**
+**Phase 3.5 - Phases B-E (Remaining Warrior Skills)**
 
-Implementing centralized balance infrastructure before scaling to 18 skills. This 4-6 hour investment creates sustainable architecture and dramatically accelerates future skill implementation.
+Phase A (Balance Systems) is complete! Now implementing the remaining 3 warrior skills using the established patterns and centralized balance database.
+
+**Current Status:**
+- ✅ Phase A Complete: Balance infrastructure ready
+- ✅ Basic Attack (Fusion Cutter) functional
+- ✅ Whirlwind functional
+- 📝 Crowd Suppression - planned
+- 📝 Combat Stim - planned
+- 📝 Breaching Charge - planned
 
 **See [`../../CLAUDE.md`](../../CLAUDE.md) for current session progress and next tasks.**
 

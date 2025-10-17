@@ -1,10 +1,9 @@
-[gd_scene load_steps=28 format=3 uid="uid://jb1p3bafbe1"]
+[gd_scene load_steps=27 format=3 uid="uid://jb1p3bafbe1"]
 
 [ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="1_a3d8c"]
 [ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_xpcdj"]
 [ext_resource type="Texture2D" uid="uid://c71rfpwxsxsap" path="res://Assets/Sprites/Characters/warrior.png" id="2_0u5uq"]
 [ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/SkillEffects/projectile.tscn" id="2_jlvik"]
-[ext_resource type="PackedScene" uid="uid://du4yo1vulblyh" path="res://Scenes/SkillEffects/melee_attack.tscn" id="3_gk6dx"]
 [ext_resource type="Script" uid="uid://b3km77lyp5ba3" path="res://Scripts/Player/Components/StatsManager.cs" id="4_mtuoh"]
 [ext_resource type="Script" uid="uid://cx5d7m8au6iit" path="res://Scripts/Player/Components/UpgradeManager.cs" id="5_htcer"]
 [ext_resource type="Resource" uid="uid://dfssvafd8e1nw" path="res://Resources/Skills/Warrior/WarriorBasicAttack.tres" id="6_gk6dx"]
@@ -352,7 +351,6 @@ radius = 150.0
 [node name="Player" type="CharacterBody2D" groups=["player"]]
 script = ExtResource("1_xpcdj")
 ProjectileScene = ExtResource("2_jlvik")
-MeleeAttackScene = ExtResource("3_gk6dx")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_0u5uq")

@@ -26,7 +26,6 @@ public partial class Player : CharacterBody2D
 
     // ===== EXPORT FIELDS - Scenes =====
     [Export] public PackedScene ProjectileScene;
-    [Export] public PackedScene MeleeAttackScene;
 
     // ===== EXPORT FIELDS - UI Dependencies =====
     [Export] public LevelUpPanel LevelUpPanel;
