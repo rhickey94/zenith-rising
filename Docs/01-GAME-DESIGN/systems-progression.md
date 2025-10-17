@@ -151,346 +151,354 @@ Every character has 5 base stats that define their combat capabilities:
 
 ## Equipment System 📝 Phase 4 - PLANNED
 
-### Gear Slots
+### Gear Acquisition: Drops + Deterministic Crafting
+
+**Philosophy:** Drops provide 80% of needs, Forge crafting provides 100%
+
+**Two-Part System:**
+1. **Gear Drops** - Random stats, varying quality
+2. **Forge Crafting** - Deterministic improvement via Forging Potential
+
+### Forging Potential (FP) System
+
+**Core Mechanic:**
+- All gear drops with 50-200 FP (based on rarity and zone level)
+- Each craft action costs 5-20 FP
+- At 0 FP, item is "complete" → natural stopping point
+- Creates decision: Keep crafting or save FP?
+
+**Crafting Actions:**
+
+**1. Add Affix** (5-10 FP cost)
+- Choose which stat to add (Strength, Crit, Attack Speed)
+- Adds Tier 1 of that stat
+- Cost: 10 Refined Essence + 100 Gold
+
+**2. Upgrade Affix** (8-15 FP per tier)
+- Increase tier: T1 → T2 → T3 → T4 → T5
+- Each tier significantly stronger
+- Cost: 5 Ingots + 200 Gold per tier
+- Diminishing returns (T4→T5 costs more than T1→T2)
+
+**3. Reroll Numeric Value** (3-5 FP)
+- Keep affix tier, reroll number within range
+- Cheap optimization after getting desired affixes
+- Cost: 3 Gems + 50 Gold
+
+### Affix Tier System
+
+- **T1-T5:** Craftable at Forge (deterministic)
+- **T6-T7:** DROP-ONLY (cannot be crafted)
+- **Design Intent:** Rare drops remain exciting even with crafting
+
+**Example:** Finding gear with T6 Life is valuable even if other stats are mediocre—you craft offense around it.
+
+### Why FP Creates Optimization Puzzles
+
+**Decision Points:**
+1. **Which gear to invest in?** High FP bad stats vs Low FP good stats
+2. **How much to optimize?** "Good enough" vs "Perfect"
+3. **Build focus:** Target specific stats for synergies
+4. **When to start fresh?** Found new item, current has 10 FP left
+
+**Multiple Valid Strategies:**
+- **Safe:** Stop at "good enough" (T3-T4), save FP for future crafts
+- **Aggressive:** Push to T5 everything, risk running out of FP
+- **Experimental:** Unusual stat combinations for hybrid builds
+
+### Gear Slots & Rarities
 
 **4 Equipment Slots:**
-
-1. **Weapon** - Primary stat + damage scaling
+1. **Weapon** - Primary damage + stat bonuses
 2. **Armor** - Defense + secondary stats
 3. **Accessory** - Pure stat bonuses
-4. **Relic** - Special build-defining properties (Phase 4+)
+4. **Relic** - Build-defining properties (Phase 5+)
 
-### Rarity Tiers
-
-Equipment drops in 5 rarity tiers:
-
-| Rarity    | Color  | Primary Stat | Secondary Stats | Enchant Slots |
-| --------- | ------ | ------------ | --------------- | ------------- |
-| Common    | Gray   | 1            | 0               | 0             |
-| Uncommon  | Green  | 1            | 1               | 0             |
-| Rare      | Blue   | 1            | 2               | 0             |
-| Epic      | Purple | 1            | 3               | 1             |
-| Legendary | Orange | 1            | 3               | 2             |
+**Rarity determines FP range:**
+- Common: 50-80 FP
+- Uncommon: 70-110 FP
+- Rare: 100-150 FP
+- Epic: 130-180 FP
+- Legendary: 150-200 FP + higher stat rolls
 
 **Drop Rates:**
-
 - Common: 60%
 - Uncommon: 25%
 - Rare: 10%
 - Epic: 4%
 - Legendary: 1%
 
-**Boss Drops:**
-
-- Guaranteed gear drop
-- 50% chance for Rare+
-- 10% chance for Epic+
-- 2% chance for Legendary
-
-### Gear Stat Structure
-
-Each piece has multiple layers:
-
-#### **1. Primary Stat (Always Present)**
-
-The main stat bonus for this gear type
-
-**Examples:**
-
-- Iron Sword: +15 Strength
-- Leather Armor: +10 Vitality
-- Amulet: +8 Agility
-
-Scales with item level and rarity.
-
-#### **2. Secondary Stats (0-3 Random)**
-
-Additional stat bonuses rolled on drop
-
-**Examples:**
-
-- +8 Vitality
-- +5 Agility
-- +3 Resilience
-
-Lower values than primary stat.
-Number depends on rarity (see table above).
-
-#### **3. Enhancement Level (0-10)**
-
-**Added via Workshop in Phase 3**
-
-- Each level: +10% to ALL stats on item
-- Costs refined materials
-- Max +10 = +100% stats (item stats × 2)
-
-**Example:**
-
-```
-Iron Sword (Base):
-+15 STR, +5 VIT, +3 AGI
-
-Iron Sword +5:
-+22 STR, +7 VIT, +4 AGI  (base × 1.5)
-
-Iron Sword +10:
-+30 STR, +10 VIT, +6 AGI  (base × 2.0)
-```
-
-#### **4. Enchantment Slots (0-3)**
-
-**Added in Phase 4**
-
-Special effects added via Workshop
-
-**Examples:**
-
-- "+15% Physical Damage"
-- "Restore 2% HP on kill"
-- "Attacks have 10% chance to stun"
-
-Unlock slots with rare materials.
-Add enchantments with refined components.
-
-### Gear Acquisition
-
-**Drops Only (No Crafting):**
-
-- Enemies drop gear at random
-- Bosses guaranteed drops
-- Elites have higher quality drops
-
-**Why No Crafting:**
-
-- Keeps excitement of drops
-- Simpler system
-- Enhancement provides long-term goals
-- Materials used for upgrades, not creation
+**Boss Drops:** Guaranteed gear drop, 50% chance for Rare+
 
 ### Gear Management
 
 **Inventory:**
-
 - Unlimited storage (for MVP)
-- Sort by rarity, type, level
+- Sort by rarity, FP remaining, type
 - Quick-equip from inventory
+- Highlight high-FP items
 
 **Salvaging:**
-
 - Convert unwanted gear → gold
-- Returns 50% of enhancement investment
+- Returns materials based on affixes added
 - Prevents inventory bloat
 - Gives bad drops purpose
 
 **Respec-Friendly:**
-
 - Can freely swap gear
 - Try different builds
 - No gear binding or soulbound
 
 ---
 
-## Material Economy (Simplified) 📝 Phase 5 - PLANNED
+## Material Economy 📝 Phase 4-5 - PLANNED
 
-> ⚠️ **MATERIAL COUNT:** ONE material type (Energy Cores) for MVP. Future phases may add Modification Chips.
+> **🎯 UPDATED VISION:** Five material types (Essence, Ore, Fragments, Souls, Crystals) enable diverse crafting and upgrade paths while preventing single-resource bottlenecks.
 
 ### Design Philosophy
 
-**Problem with complex systems:**
+**Why Five Materials:**
+- Prevents bottlenecks (single resource can't gate everything)
+- Creates interesting acquisition strategies (which content to farm?)
+- Enables parallel progression systems
+- Different rarities for different purposes
 
-- 3 materials × 2 states = 6 item types
-- Confusing purposes
-- Multiple conversion paths
-- Analysis paralysis
+**Core Principle:** Materials ONLY from active play (dungeons). Idle systems process materials, never generate them.
 
-**Our solution:**
+### The Five Material Types
 
-- **Phase 3:** ONE material type (Energy Cores)
-- **Phase 4:** Add second material (Modification Chips)
-- **Never:** Add third material
+**1. Essence (Common)** - Universal material
+- **Drops from:** All enemies (100% drop rate)
+- **Amount:** 1-3 per enemy, scales with tier
+- **Used for:** Basic forge crafts, workshop fuel, common upgrades
 
-### Phase 3: Energy Cores (MVP)
+**2. Ore (Uncommon)** - Gear enhancement
+- **Drops from:** Elite enemies, mini-bosses (50% drop rate)
+- **Amount:** 1-2 per drop
+- **Used for:** Gear affix upgrades, workshop expansion
 
-**Energy Cores** (THE core material)
+**3. Fragments (Rare)** - Advanced crafting
+- **Drops from:** Floor completion, zone milestones
+- **Amount:** 3-5 per floor clear
+- **Used for:** High-tier forge actions, workshop speed upgrades
 
-**Drops from:**
+**4. Souls (Very Rare)** - Prestige currency
+- **Drops from:** Bosses only (100% drop rate)
+- **Amount:** 1 per boss
+- **Used for:** Ascension system, unlock workshop tiers
 
-- All enemies (100% drop rate)
-- Amount scales with enemy tier
-- Basic: 1-2 cores
-- Elite: 3-5 cores
-- Boss: 10-15 cores
+**5. Crystals (Ultra Rare)** - Endgame optimization
+- **Drops from:** Challenge runs, achievements
+- **Amount:** 1-3 per challenge
+- **Used for:** Endgame forge actions, ascension tree unlocks
 
-**Raw → Refined:**
+### Material Flow
 
-- Raw Energy Core → Refined Energy Core
-- Takes 30 minutes in Workshop
-- Process offline via DateTime
-- Queue up to 3 refinements
-
-**Used for:**
-
-- Gear enhancement only (+10% stats per level)
-- Clear, single purpose
-- Always valuable
+```
+Active Dungeon Run → Raw Materials (direct to inventory)
+↓
+Workshop Processing (3-5 parallel slots, 4-12 hours)
+  • Essence → Refined Essence
+  • Ore → Ingots
+  • Fragments → Gems
+↓
+Forge Crafting (Refined materials + gold)
+  • Add/Upgrade gear affixes
+  • Consumes Forging Potential (FP)
+↓
+Better Gear → Higher Zones → More Materials per Run (1.5-3x)
+```
 
 **Why This Works:**
-
-- Simple to understand
-- One decision: "Enhance which gear?"
-- No complex material webs
-- Active play = get cores, Idle = refine cores
-
-### Phase 4: Modification Chips (Depth)
-
-**Modification Chips** (optional complexity)
-
-**Drops from:**
-
-- Bosses only (50% chance)
-- Guaranteed from Floor 5 boss
-
-**Used for:**
-
-- Adding enchantments to gear
-- One enchantment per item
-- Choose from pool of 10-15 effects
-
-**Why Add This:**
-
-- Build customization
-- Chase mechanic (rare drops)
-- Doesn't confuse core loop
-- Optional optimization
-
-### Never Adding
-
-**❌ Third Material Type**
-
-- Two materials is enough
-- More = complexity creep
-- Diminishing returns on engagement
-
-**❌ Material Conversions**
-
-- No core → chip conversion
-- No chip → core conversion
-- Keeps each material valuable
-
-**❌ Material Types Per Slot**
-
-- No "weapon materials" vs "armor materials"
-- Same materials for all slots
-- Reduces inventory bloat
+- Active play required (no idle material farming)
+- Multiple parallel goals (which material to prioritize?)
+- Clear upgrade paths (know what you're farming for)
+- Natural bottlenecks prevent instant power spikes
 
 ---
 
 ## Idle Systems 📝 Phase 5 - PLANNED
 
-### Design Constraints
+### Design Constraints (Preserved)
 
 **Golden Rules:**
+1. Only processes what you actively farmed ✅
+2. Caps at 12-24 hours maximum (not 8 hours)
+3. Never more rewarding than active play (Active = **3-5x better**) ✅
+4. No "wait to play" mechanics ✅
+5. No FOMO pressure ✅
 
-1. Only processes what you actively farmed
-2. Caps at 8 hours maximum
-3. Never more rewarding than active play
-4. No "wait to play" mechanics
-5. No FOMO pressure
+### Workshop (Material Processing)
 
-### Workshop (Material Refinement)
-
-**Purpose:** Convert raw materials → refined components
+**Purpose:** Convert raw materials → refined components for forge crafting
 
 **How It Works:**
 
 ```
-Raw Energy Core → Refined Energy Core
-Time: 30 minutes per core
-Offline: Uses DateTime for progression
-Queue: Up to 3 refinements simultaneously
+Raw Material → Refined Material
+Processing Time: 4-12 hours depending on tier
+Offline Processing: Uses DateTime
+Queue: 3-5 slots (upgradeable)
 ```
 
-**Process:**
+**Conversion Options:**
+- **Fast** (4 hours): Essence → Refined Essence
+- **Medium** (8 hours): Ore → Ingots
+- **Slow** (12 hours): Fragments → Gems
 
-1. Finish combat run, collect Raw Cores
-2. Open Workshop, add cores to queue
-3. Close game
-4. Return 30+ minutes later
-5. Collect Refined Cores
-6. Use at Blacksmith to enhance gear
+**Upgrades (Purchased with Gold):**
 
-**Upgrades (Phase 4):**
+**Tier 1** (Early game, 1k-5k gold):
+- Processing Speed I: 1.2x faster
+- Extra Slot: Unlock 4th slot
+- Bulk Convert: Process 10x materials (same time)
 
-- Faster refinement (−5 min per level, min 15 min)
-- More queue slots (+1 slot per level, max 5)
-- Batch refinement (refine 5 at once)
+**Tier 2** (Mid game, 20k-50k gold):
+- Processing Speed II: 1.5x faster
+- Quality Improvement: 10% chance for 2x output
+- Auto-Collect: Completed conversions auto-deposit
 
-**Why This Works:**
+**Tier 3** (Late game, 100k+ gold):
+- Master Craftsman: 2x speed
+- Overflow Slot: 5th processing slot
+- Legendary Refinement: 5% chance for rare upgrade
 
-- Clear input → output
-- Respects active grinding (only refines what you earned)
-- Has cap (queue fills, then stops)
-- Offline-friendly (DateTime calculation)
+**Between-Run Interaction:** 2-5 minutes per session
 
 ### Treasury (Idle Gold Generation)
 
-**Purpose:** Provide steady income for flexible spending
+**Purpose:** Provide steady income for forge costs and workshop upgrades without forcing gold farming
 
-**How It Works:**
+**Formula:** Gold/hour = (Highest Zone Reached)² × 10
+- Zone 20 → 4,000 gold/hour
+- Zone 50 → 25,000 gold/hour
+- Zone 100 → 100,000 gold/hour
 
-```
-Generation Rate = Highest Floor Cleared × 10 gold/hour
-Cap Duration: 8 hours
-Max Accumulation: Rate × 8
-```
+**Accumulation Cap:** 12 hours maximum (prevents weekly check-ins)
 
-**Examples:**
+**Active Bonus:** Completing dungeons gives **3-5x more gold** than idle time
 
-- Floor 3 cleared = 30 gold/hour, max 240
-- Floor 5 cleared = 50 gold/hour, max 400
-- Floor 10 cleared = 100 gold/hour, max 800
+**Upgrades (Gold Cost):**
+- Treasury Expansion: Increase cap (12h → 18h → 24h)
+- Interest Rate: +10% generation per tier (5 tiers)
+- Instant Collection: Tap for 2 hours worth (1/day)
 
-**Collection:**
+**Between-Run Interaction:** 30 seconds (collect and see satisfying totals)
 
-- Open Treasury UI
-- See accumulated gold
-- Click "Collect" button
-- Gold added to total
+**Why This Works:**
+- Never blocks gameplay ✅
+- Active play significantly better (3-5x multiplier) ✅
+- Scales with progression (higher zones = better rate) ✅
+- Appointment mechanic (12-hour cap) without punishment ✅
 
-**Why 8-Hour Cap:**
+### Gold Uses
 
-- Encourages daily check-ins (not week-long AFK)
-- Prevents runaway passive income
-- Respects player time (don't miss much if busy)
-- Active play still better (combat drops gold too)
-
-**Gold Uses:**
-
-1. **Respec stats** (100g × Character Level)
-2. **Buy consumables** (health potions, buffs)
-3. **Salvage gear** (convert to gold)
-4. **Rush Workshop** (10g per minute remaining)
-5. **Base upgrades** (Workshop/Treasury improvements)
-
-**Upgrades (Phase 4):**
-
-- Increase rate (+10 gold/hour per level)
-- Increase cap (8h → 10h → 12h)
-- Interest system (unspent gold gains 5% daily, cap 1000)
+1. **Workshop upgrades** (speed, slots, quality)
+2. **Treasury upgrades** (expansion, interest rate)
+3. **Forge costs** (material + gold for each craft)
+4. **Respec stats** (100g × Character Level)
+5. **Consumables** (health potions, buffs - Phase 6+)
 
 ### Workshop vs Treasury Comparison
 
 | System   | Active Input  | Passive Output    | Purpose              |
 | -------- | ------------- | ----------------- | -------------------- |
-| Workshop | Raw materials | Refined materials | Enable gear upgrades |
-| Treasury | Floor clears  | Gold              | Flexible spending    |
+| Workshop | Raw materials | Refined materials | Enable forge crafting |
+| Treasury | Zone clears  | Gold              | Fund upgrades & crafts    |
 
 **Both respect the same rules:**
 
 - ✅ Only rewards past active play
 - ✅ Caps prevent FOMO
 - ✅ Offline-friendly (DateTime)
-- ✅ Never better than active grinding
+- ✅ Never better than active grinding (3-5x multiplier)
+
+---
+
+## Ascension System 📝 Phase 6 - PLANNED
+
+### Purpose
+
+Long-term meta-progression providing goals spanning weeks while maintaining challenge.
+
+### When to Ascend (Player Choice)
+
+**Soft Reset (every 15-25 hours of play):**
+- **Keep:** Workshop upgrades, forge gear, treasury level, skill mastery
+- **Reset:** Dungeon progress (back to Zone 1), character level, per-run upgrades
+- **Gain:** Ascension Points (based on zones cleared + challenges completed)
+- **Optimal Timing:** Player discovery through experimentation
+
+### Ascension Tree (Three Branches)
+
+**Combat Branch:**
+- +5% damage (1 AP)
+- +10% HP (2 AP)
+- Start with extra life (5 AP)
+- Enemies drop +25% materials (10 AP)
+
+**Economy Branch:**
+- Treasury generates 1.2x gold (1 AP)
+- Workshop processes 1.2x faster (2 AP)
+- Forge costs 10% less materials (5 AP)
+- Start runs with gold (10 AP)
+
+**Utility Branch:**
+- Unlock 4th workshop slot (3 AP)
+- Extended offline processing (5 AP)
+- Unlimited treasury collection (8 AP)
+- Free forge respec (12 AP)
+
+### Power Budget
+
+- Ascension provides ~5-10% total power
+- Focus on **convenience and variety**, not pure stats
+- Diminishing returns: First 10 AP huge, next 50 incremental
+
+### Build Diversity
+
+- Multiple viable paths (Combat rush, Economy scaling, Utility QoL)
+- Free Respec: Costs 1 AP, encourages experimentation
+- Always have next goal (short/mid/long-term AP targets)
+
+---
+
+## Power Budget: Keeping Systems Optional
+
+### Critical Balance Target
+
+**ALL content must be completable with:**
+- Base stats from dungeon runs
+- Random gear drops (no forge crafting)
+- Zero workshop upgrades
+- Zero ascension points
+
+**Target:** New player should reach Zone 30-40 with NO idle system engagement.
+
+### Optional Power Breakdown
+
+| System | Power Contribution | Purpose |
+|--------|-------------------|----------|
+| Core stats from dungeons | 50% | Baseline progression |
+| Gear from drops | 30% | RNG excitement |
+| Forge crafting | 15-20% | Targeted optimization |
+| Ascension tree | 5-10% | Long-term scaling |
+| Workshop efficiency | 0% direct | Enables other systems faster |
+
+**Total optional power:** 25-30%
+
+### Why This Target Works
+
+**Research-Validated Sweet Spot:**
+- <10% = "Barely noticeable" (not worth pursuing)
+- **25-40% = "Worth pursuing"** ← OUR TARGET
+- >60% = "Mandatory despite label" (anti-pattern)
+
+**25-30% Power Feels:**
+- Worth the time investment
+- Not mandatory for progression
+- Creates optimization depth
+- Respects different playstyles (active grinders vs. idle optimizers)
 
 ---
 
@@ -543,17 +551,21 @@ Collect Treasury Gold
   ↓
 Collect Refined Materials
   ↓
-Enhance Gear → Respec Stats → Buy Consumables
+Forge Gear → Spend Gold on Workshop Upgrades
   ↓
 Push Further in Tower
   ↓
-Unlock Higher Floors → Better Treasury Rate
+Unlock Higher Zones → Better Treasury Rate + More Materials
   ↓
-Repeat
+(Every 15-25 hours) Consider Ascension
+  ↓
+Ascend → Gain Ascension Points → Unlock Permanent Bonuses
+  ↓
+Repeat Climb with Permanent Advantages
 ```
 
-**Duration:** 1-2 weeks to max MVP content
-**Rewards:** Mastery, optimization, completion
+**Duration:** 1-2 weeks to reach first ascension, ongoing cycles
+**Rewards:** Mastery, optimization, permanent progression
 
 ---
 
@@ -661,12 +673,13 @@ Repeat
 
 - Combat details: [`combat-skills.md`](combat-skills.md)
 - Narrative context: [`narrative-framework.md`](narrative-framework.md)
-- Technical implementation: [`../02-IMPLEMENTATION/skill-system-architecture.md`](../02-IMPLEMENTATION/skill-system-architecture.md)
+- **Idle systems implementation:** [`../02-IMPLEMENTATION/idle-systems-implementation.md`](../02-IMPLEMENTATION/idle-systems-implementation.md) - Detailed technical guide for Forge, Workshop, Treasury, Ascension
+- Technical skill system: [`../02-IMPLEMENTATION/skill-system-architecture.md`](../02-IMPLEMENTATION/skill-system-architecture.md)
 
 **Current Implementation Status:**
-See [`CLAUDE.md`](../../CLAUDE.md) for what's actually built vs planned.
+See [`../../CLAUDE.md`](../../CLAUDE.md) for what's actually built vs planned.
 
 ---
 
-_Last updated: Full documentation reorganization_
+_Last updated: Idle systems vision overhaul - 5 materials, Forge/FP system, Ascension, Power Budget_
 _Living document - Update when systems change_

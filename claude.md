@@ -21,6 +21,7 @@
 
 - [`phase-plan.md`](Docs/02-IMPLEMENTATION/phase-plan.md) - **Development phases & current focus**
 - [`skill-system-architecture.md`](Docs/02-IMPLEMENTATION/skill-system-architecture.md) - Technical skill system
+- [`idle-systems-implementation.md`](Docs/02-IMPLEMENTATION/idle-systems-implementation.md) - Technical idle/meta-progression systems
 - [`project-structure.md`](Docs/02-IMPLEMENTATION/project-structure.md) - File organization
 - [`godot-patterns.md`](Docs/02-IMPLEMENTATION/godot-patterns.md) - Best practices & gotchas
 

@@ -111,6 +111,7 @@ Technical architecture and development plan
 
 - `phase-plan.md` - Sequential development phases
 - `skill-system-architecture.md` - Technical skill system
+- `idle-systems-implementation.md` - Technical idle/meta-progression systems
 - `project-structure.md` - File organization and patterns
 - `godot-patterns.md` - Godot-specific best practices
 

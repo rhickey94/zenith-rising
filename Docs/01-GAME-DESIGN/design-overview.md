@@ -23,12 +23,13 @@
    - Material refinement, gold generation
    - Processes resources you collected actively
    - Makes your active time more effective
+   - **Active play 3-5x more rewarding than idle time**
 
 3. **Idle Enhances, Never Replaces**
 
    - No "wait to play" mechanics
    - No energy systems
-   - Idle systems have caps (8 hours max)
+   - Idle systems have caps (12-24 hours max)
    - Always better to play than wait
 
 4. **Every Run Matters**
@@ -80,8 +81,8 @@
 
 **What Happens While Away:**
 
-- **Workshop** refines raw materials → refined components (15-60 min per batch)
-- **Treasury** generates gold based on highest floor cleared (caps at 8 hours)
+- **Workshop** refines raw materials → refined components (4-12 hours per batch)
+- **Treasury** generates gold based on highest floor cleared (caps at 12 hours)
 
 **What You Get When You Return:**
 
@@ -174,9 +175,9 @@
 2. **Honest Idle Mechanics**
 
    - Only refines materials you actively farmed
-   - Caps at 8 hours (no week-long AFK gains)
+   - Caps at 12-24 hours (no week-long AFK gains)
    - Gold generation is bonus income, not primary
-   - Active play always beats waiting
+   - Active play always beats waiting (3-5x multiplier)
 
 3. **Sequential Phases**
 
@@ -212,9 +213,9 @@
 - Save/load system
 - 5 distinct floors
 
-**Idle Systems (Phase 3):**
+**Idle Systems (Phase 5):**
 
-- Workshop (1 material type: Energy Cores)
+- Workshop (5 material types: Essence, Ore, Fragments, Souls, Crystals)
 - Treasury (gold generation)
 - Material drop and refinement
 
@@ -231,7 +232,6 @@
 
 - Research Lab (passive power gain contradicts design)
 - Training Ground (QoL tokens are weird currency)
-- Multiple material types (start with 1)
 - Complex gear synergies
 - Multiple dungeons (just Tower for MVP)
 - PvP or multiplayer
@@ -246,16 +246,29 @@
 
 ---
 
-## Post-Launch Expansion (Phase 4-5)
+## Post-Launch Expansion (Phase 4-7)
 
-### Phase 4: Add Depth
+### Phase 4: Gear & Forge System
 
-- Skill mastery system (3 tiers)
-- Gear modifications (2nd material type)
-- More skills (expand pool)
-- Build diversity
+- Gear drops with Forging Potential (FP)
+- Forge crafting (add/upgrade/reroll affixes)
+- Material acquisition system (5 types)
+- Inventory and Forge UI
 
-### Phase 5: Endgame
+### Phase 5: Idle Systems
+
+- Workshop processing (3-5 slots, 4-12 hour conversions)
+- Treasury gold generation
+- Workshop upgrades (3 tiers)
+
+### Phase 6: Depth & Ascension
+
+- Ascension system (soft resets, prestige progression)
+- Ascension tree (Combat/Economy/Utility branches)
+- Advanced workshop/treasury upgrades
+- Forge expansion (T4-T5 affixes, reroll action)
+
+### Phase 7: Endgame
 
 - **Multiple dungeons (6 total)** with varying lengths to respect different session times:
   - **Zenith Station** (5 floors, 25-30 min) - MVP dungeon
@@ -264,8 +277,8 @@
   - **Megacity New Babel** (8 floors, 40-45 min) - Epic run
   - **Frost Grave** (6 floors, 30-35 min) - Mind-bender
   - **Verdant Tomb** (9 floors, 45-50 min) - Ultimate challenge
-- Ascension system (long-term progression)
-- Weekly challenges
+- Skill mastery system (Bronze/Silver/Gold tiers)
+- Challenge runs with modifiers
 - **See [`dungeon-structure.md`](dungeon-structure.md) for complete dungeon design**
 
 ### Future Considerations

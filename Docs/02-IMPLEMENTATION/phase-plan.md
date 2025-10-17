@@ -351,60 +351,136 @@ Validates second hitbox pattern (AOE vs Melee).
 
 ---
 
-## Phase 4: Gear & Loot System 📝 NEXT
+## Phase 4: Gear & Forge System 📝 NEXT
 
-**Hypothesis:** "Loot drops add excitement and build variety"
+**Hypothesis:** "Forge crafting creates optimization puzzles without mandatory grind"
 
 ### Planned Tasks
 
-1. **Basic Gear Drops**
-   - 3 slots: Weapon, Armor, Accessory
-   - 3 rarities: Common, Rare, Epic
-   - Flat stat bonuses (read from BalanceConfig)
-   - Drops from bosses (100%) and enemies (5-10%)
+**1. Material Drop System**
+   - 5 material types (Essence, Ore, Fragments, Souls, Crystals)
+   - Drop rates tied to enemy types and zone milestones
+   - Integrate with loot tables
 
-2. **Inventory UI**
-   - Equipment screen
+**2. Basic Forge (FP System MVP)**
+   - Forging Potential mechanics
+   - Add Affix action (choose stat, T1 only)
+   - Upgrade Affix action (T1→T2→T3)
+   - FP consumption and depletion
+   - Cost: Refined materials + gold
+
+**3. Inventory UI**
+   - Equipment screen showing 4 slots
+   - Forge interface (FP bar, affix list, cost preview)
+   - Material inventory view
    - Gear comparison tooltips
-   - Equip/unequip functionality
 
-3. **Gear Save/Load**
-   - Persist equipped gear
-   - Integrate with save system
+**4. Gear Save/Load**
+   - Persist equipped gear + inventory
+   - Track FP remaining per item
+   - Integrate with existing save system
 
 ### Success Criteria
-- Players excited by drops
-- Gear choices matter
-- Build variety emerges
+- Players excited by finding high-FP items
+- Forge feels impactful (T1→T3 noticeable power gain)
+- FP creates "good enough" vs "perfect" decisions
+- 70% of players engage with forge at least once
+- Optional (can complete content with drops alone)
+
+### Deferred to Phase 5
+- Workshop (material processing)
+- Treasury (gold generation)
+- Advanced forge (T4-T5 affixes, reroll action)
+
+**Estimated Duration:** 2-3 weeks
 
 ---
 
-## Phase 5: Prove Idle Hook 📝 PLANNED
+## Phase 5: Idle Systems 📝 PLANNED
 
-**Hypothesis:** "Players return after being away because idle progress matters"
+**Hypothesis:** "Players return after being away because idle progress feels rewarding (not mandatory)"
 
 ### Tasks
 
-1. **Workshop (MVP)** - ONE material type: Energy Cores
-2. **Treasury (MVP)** - Gold generation
-3. **Material Drop System**
-4. **Gear Power Level** (+1 to +10 enhancement)
+**1. Workshop System (MVP)**
+   - 3 processing slots
+   - Basic conversions (Essence, Ore, Fragments → Refined)
+   - Processing times (4-8-12 hours)
+   - DateTime-based offline progression
+   - Simple UI (queue view, collect button)
+
+**2. Treasury System (MVP)**
+   - Formula: (Zone² × 10) gold/hour
+   - 12-hour accumulation cap
+   - Collect UI with satisfying animations
+   - Active bonus (dungeon runs give 3-5x gold)
+
+**3. Workshop Upgrades (Tier 1)**
+   - Processing Speed I (1.2x faster, 1k gold)
+   - Extra Slot (+1 slot, 3k gold)
+   - Bulk Convert (10x batch, 5k gold)
+
+**4. Treasury Upgrades (Basic)**
+   - Expansion I (12h → 18h cap, 5k gold)
+   - Interest Rate I (+10% generation, 3k gold)
 
 ### Success Criteria
-- 70% 1-week retention
-- Players check in after 2+ hours
-- Treasury gold gets spent
+- 70% 1-week retention (up from 60%)
+- Players check in after 4+ hours
+- Treasury/Workshop gold gets spent
+- Players DON'T feel forced to engage
+- Active play still feels better (3-5x validation)
+
+### Deferred to Phase 6
+- Advanced workshop upgrades (Tiers 2-3)
+- Advanced treasury upgrades
+- Ascension system
+
+**Estimated Duration:** 2-3 weeks
 
 ---
 
-## Phase 6: Add Depth 📝 PLANNED
+## Phase 6: Depth & Ascension 📝 PLANNED
 
-**Hypothesis:** "Build diversity increases engagement"
+**Hypothesis:** "Build diversity and long-term goals increase retention without overwhelming casuals"
 
 ### Tasks
-1. Skill mastery (3 tiers)
-2. Gear mods (add 2nd material)
-3. Expand skill pool (10+ more skills)
+
+**1. Ascension System (MVP)**
+   - Basic ascension tree (2 branches: Combat + Economy)
+   - 15-20 unlock nodes per branch
+   - Soft reset mechanics (keep gear, reset zones)
+   - Ascension Point calculation (zones + challenges)
+   - UI for tree view and unlock confirmation
+
+**2. Workshop Upgrades (Tiers 2-3)**
+   - Tier 2: Processing Speed II, Quality Improvement, Auto-Collect (20k-50k gold)
+   - Tier 3: Master Craftsman, 5th Slot, Legendary Refinement (100k+ gold)
+
+**3. Treasury Upgrades (Advanced)**
+   - Expansion II-III (18h → 24h cap)
+   - Interest Rate II-V (compound to 1.5x)
+   - Instant Collection (2 hours, 1/day)
+
+**4. Forge Expansion**
+   - Add T4-T5 affix tiers (higher costs, FP)
+   - Add Reroll action (3-5 FP, cheap optimization)
+   - T6-T7 affixes (drop-only, cannot craft)
+
+### Success Criteria
+- Optimizers have 50+ hour goals (complete ascension trees)
+- Casuals not overwhelmed (can ignore ascension, still progress)
+- 30% 1-month retention
+- Players experiment with ascension builds
+- "Good enough" vs "perfect" forge decisions validated
+
+### Deferred to Phase 7
+- Utility ascension branch (3rd branch)
+- Challenge runs (modify dungeon rules for Crystals)
+- Skill mastery system
+- Additional dungeons
+
+**Estimated Duration:** 2-3 weeks
 
 ---
 
@@ -414,29 +490,34 @@ Validates second hitbox pattern (AOE vs Melee).
 
 ### Tasks
 
-1. **Multiple Dungeons (6 total)** - Varying lengths for different session times
-   - **Research Station Kepler** (4 floors, 20-25 min) - Quick challenge dungeon
-   - **Military Blacksite Omega** (7 floors, 35-40 min) - Extended commitment dungeon
-   - **Megacity New Babel** (8 floors, 40-45 min) - Epic run dungeon
-   - **Frost Grave** (6 floors, 30-35 min) - Mind-bender dungeon
-   - **Verdant Tomb** (9 floors, 45-50 min) - Ultimate challenge dungeon
-   - Note: Zenith Station (5 floors, 25-30 min) is the MVP dungeon built in Phases 1-3
+**1. Ascension System Completion**
+   - Add Utility branch (3rd branch)
+   - Expand to 30+ total nodes per branch
+   - Challenge-based AP bonuses
+   - Ascension cosmetic rewards
 
-2. **Ascension System**
-   - Unlocks at Character Level 50+
-   - Reset to Character Level 1, keep gear and skill mastery
-   - Gain +5% permanent damage per ascension
-   - Unlock new Power Upgrade tiers and cosmetics
+**2. Multiple Dungeons (6 total)** - Varying lengths for different session times
+   - Research Station Kepler (4 floors, 20-25 min)
+   - Military Blacksite Omega (7 floors, 35-40 min)
+   - Megacity New Babel (8 floors, 40-45 min)
+   - Frost Grave (6 floors, 30-35 min)
+   - Verdant Tomb (9 floors, 45-50 min)
+   - Note: Zenith Station (5 floors, 25-30 min) is MVP dungeon
 
-3. **Difficulty Tiers**
-   - Normal dungeons (current)
-   - True difficulty (higher enemy scaling, 2x loot)
-   - Nightmare difficulty (extreme scaling, 5x loot)
+**3. Challenge Runs**
+   - Modifiers (increased enemy HP, no healing, timer)
+   - Reward: Crystals (ultra-rare material)
+   - Leaderboards (optional)
 
-4. **Weekly Challenges** (stretch goal)
-   - Special modifiers on dungeons
-   - Leaderboards
-   - Exclusive rewards
+**4. Difficulty Tiers** (Stretch Goal)
+   - Normal (current)
+   - Hard (higher scaling, 2x loot)
+   - Nightmare (extreme scaling, 5x loot)
+
+**5. Skill Mastery System** (Stretch Goal)
+   - 3 mastery tiers (Bronze/Silver/Gold)
+   - Permanent skill improvements
+   - Track kills per skill
 
 ### Design Philosophy
 **Respect player time through content variety:**
@@ -447,19 +528,13 @@ Validates second hitbox pattern (AOE vs Melee).
 
 ### Success Criteria
 - 20% 3-month retention
-- Players engage with multiple dungeons (not just farming one)
-- Average 5+ different dungeon completions per week
-- Positive feedback on "respecting time" in reviews
+- Multiple dungeon engagement
+- Ascension provides long-term goals (100+ hours)
+- Positive "respects time" feedback
 
-### Implementation Priority
-**Ship dungeons sequentially, not all at once:**
-1. Research Station + Military Blacksite (update 1)
-2. Megacity + Frost Grave (update 2)
-3. Verdant Tomb + Ascension system (update 3)
+**Estimated Duration:** 2-3 weeks per update (ship sequentially)
 
-**Each release = content update = renewed player engagement**
-
-**See [`../01-GAME-DESIGN/dungeon-structure.md`](../01-GAME-DESIGN/dungeon-structure.md) for complete dungeon designs**
+**See [`../01-GAME-DESIGN/dungeon-structure.md`](../01-GAME-DESIGN/dungeon-structure.md) for complete dungeon designs (if exists)**
 
 ---
 
@@ -468,14 +543,15 @@ Validates second hitbox pattern (AOE vs Melee).
 **Cut Forever:**
 - Research Lab (passive power gain)
 - Training Ground (weird currency)
-- 3+ material types
-- Complex gear synergies
+- 6+ material types (5 is the limit)
+- Gear crafting from scratch (Forge modifies drops, doesn't create)
 - PvP/multiplayer (for MVP)
 
 **Why Cut:**
 - Doesn't serve core loop
 - Adds complexity without value
 - Can add later if players demand
+- 5 materials already provides enough complexity
 
 ---
 
