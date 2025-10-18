@@ -140,7 +140,7 @@ public partial class SkillAnimationController : Node
             return;
         }
 
-        Vector2 playerDirection = _player.GetLastDirection();
+        Vector2 playerDirection = _player.GetAttackDirection();
         Vector2 spawnOffset = playerDirection * 40f;
         Vector2 spawnPos = _player.GlobalPosition + spawnOffset;
 
@@ -152,7 +152,7 @@ public partial class SkillAnimationController : Node
         for (int i = 0; i < projectileCount; i++)
         {
             SpawnSingleProjectile(spawnPos, baseAngle, i, projectileCount, spreadAngle);
-            GD.Print($">>> Spawned projectile {i+1}/{projectileCount}");
+            GD.Print($">>> Spawned projectile {i + 1}/{projectileCount}");
         }
     }
 

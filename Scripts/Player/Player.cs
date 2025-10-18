@@ -160,7 +160,7 @@ public partial class Player : CharacterBody2D
             if (direction != Vector2.Zero)
             {
                 _lastDirection = direction;
-                PlayWalkAnimation(direction);
+                PlayWalkAnimation(GetMouseDirection());
 
                 if (_currentState != PlayerState.Running)
                 {
@@ -169,7 +169,7 @@ public partial class Player : CharacterBody2D
             }
             else
             {
-                PlayIdleAnimation(_lastDirection);
+                PlayIdleAnimation(GetMouseDirection());
 
                 if (_currentState != PlayerState.Idle)
                 {
@@ -223,6 +223,11 @@ public partial class Player : CharacterBody2D
     public void AddExperience(int amount)
     {
         _statsManager?.AddPowerExperience(amount);
+    }
+
+    public Vector2 GetAttackDirection()
+    {
+        return GetMouseDirection();
     }
 
     public bool TryCastSkill(Skill skill)
@@ -307,6 +312,19 @@ public partial class Player : CharacterBody2D
     }
 
     // ===== PRIVATE HELPERS - Animation =====
+    private Vector2 GetMouseDirection()
+    {
+        Vector2 mousePosition = GetGlobalMousePosition();
+        Vector2 direction = mousePosition - GlobalPosition;
+
+        // Guard against mouse exactly on player
+        if (direction.LengthSquared() < 0.01f)
+        {
+            return _lastDirection; // Fallback to movement direction
+        }
+
+        return direction.Normalized();
+    }
 
     private void PlayWalkAnimation(Vector2 direction)
     {
@@ -363,7 +381,7 @@ public partial class Player : CharacterBody2D
         }
 
         return skill.UsesDirectionalAnimation
-            ? GetDirectionalAnimationName(skill.AnimationBaseName, _lastDirection)
+            ? GetDirectionalAnimationName(skill.AnimationBaseName, GetMouseDirection())
             : skill.AnimationBaseName;
     }
 
