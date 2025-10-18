@@ -951,5 +951,38 @@ For complete stat formulas and progression details, see [`Docs/01-GAME-DESIGN/sy
 
 ---
 
-_Last updated: Session 13 - Energy Wave & Mouse-Aimed Combat!_
+### Session 14 - Planned: Composition Refactor + Leap Slam 📋
+
+**Status:** Ready for next session
+
+**Part 1: Composition Pattern Refactor (1-2 hours)**
+- Create sub-Resource classes: ProjectileData, MeleeData, AOEData, ExplosionData
+- Refactor SkillBalanceEntry to use composition (remove skill-type-specific properties)
+- Update Skill.Initialize() with helper methods for loading sub-Resources
+- Update existing .tres files (warrior_basic_attack, warrior_whirlwind, warrior_energy_wave)
+- Validate all 3 existing warrior skills still work
+
+**Part 2: Leap Slam Implementation (1-2 hours)**
+- Create leap_slam database entry using new composition architecture
+- Create warrior_leap_slam_[dir] animations with jump sprite frames
+- Add Call Method tracks for takeoff/apex/landing hitbox
+- Create Resources/Skills/Warrior/LeapSlam.tres
+- Wire to Q key, test in all 4 directions
+
+**Why Refactor Now:**
+- SkillBalanceEntry already showing bloat (whirlwind-specific rotation properties)
+- Composition pattern scales to 30+ skills without class bloat
+- Inspector will only show relevant properties per skill type
+- Memory efficient (skills only load properties they use)
+
+**Architecture Decision:**
+- Composition + Strategy Pattern recommended (deferred Strategy to later)
+- Sub-Resources map to 6 skill patterns (Projectile, Melee, AOE, Explosion, Buff, Zone)
+- Data-driven approach maintains current philosophy
+
+**See Session 13 conversation for full scalability analysis and technique comparison.**
+
+---
+
+_Last updated: Session 13 - Energy Wave & Mouse-Aimed Combat complete, Session 14 planned!_
 _🎉 PHASES 1, 2, 3, & 3.5-A COMPLETE - 3 warrior skills working, hybrid pattern validated! 🎉_

@@ -172,7 +172,7 @@ public partial class SkillAnimationController : Node
             return;
         }
 
-        var visual = WhirlwindVisualScene.Instantiate<Node2D>();
+        var visual = WhirlwindVisualScene.Instantiate<WhirlwindVisual>();
 
         // Initialize BEFORE adding to scene tree (so _Ready has valid data)
         if (visual is WhirlwindVisual whirlwindVisual)
