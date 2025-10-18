@@ -5,13 +5,13 @@ using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.PlayerScripts.Components;
 using ZenithRising.Scripts.Skills.Base;
 
-namespace ZenithRising.Scripts.Skills.Effects;
+namespace ZenithRising.Scripts.Skills.Entities;
 
 /// <summary>
 /// Base class for all skill effects. Provides standardized initialization and kill tracking.
 /// Inherits from Node2D - use CollisionSkillEffect for effects that need Area2D collision detection.
 /// </summary>
-public abstract partial class SkillEffect : Node2D
+public abstract partial class SkillEntityBase : Node2D
 {
     protected Skill _sourceSkill;
     protected Player _caster;

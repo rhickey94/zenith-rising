@@ -10,7 +10,6 @@ radius = 1.0
 
 [node name="EnemyProjectile" type="Area2D"]
 collision_layer = 16
-collision_mask = 1
 script = ExtResource("1_m5ex3")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

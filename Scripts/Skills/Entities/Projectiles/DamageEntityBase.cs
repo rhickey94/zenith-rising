@@ -5,14 +5,14 @@ using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.PlayerScripts.Components;
 using ZenithRising.Scripts.Skills.Base;
 
-namespace ZenithRising.Scripts.Skills.Effects;
+namespace ZenithRising.Scripts.Skills.Entities.Projectiles;
 
 /// <summary>
 /// Base class for skill effects that need collision detection (Area2D).
 /// Use this for projectiles, melee attacks, and other effects that interact with Area2D/CharacterBody2D.
 /// For instant effects without collision (like Whirlwind), use SkillEffect instead.
 /// </summary>
-public abstract partial class CollisionSkillEffect : Area2D
+public abstract partial class DamageEntityBase : Area2D
 {
     protected Skill _sourceSkill;
     protected Player _caster;

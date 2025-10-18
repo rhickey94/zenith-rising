@@ -29,7 +29,11 @@ public partial class SkillManager : Node
             GD.PrintErr("SkillManager: Could not find Player parent!");
         }
 
+        ValidateSkill(BasicAttackSkill, SkillSlot.BasicAttack);
+        ValidateSkill(SpecialAttackSkill, SkillSlot.SpecialAttack);
         ValidateSkill(PrimarySkill, SkillSlot.Primary);
+        ValidateSkill(SecondarySkill, SkillSlot.Secondary);
+        ValidateSkill(UltimateSkill, SkillSlot.Ultimate);
     }
 
     public void Update(float delta)
@@ -122,9 +126,11 @@ public partial class SkillManager : Node
         }
         else // CastBehavior.Instant
         {
-            // Execute immediately via existing executor system
-            skill.Execute(_player);
-            cooldownRemaining = skill.Cooldown;
+            bool success = skill.Execute(_player);
+            if (success)
+            {
+                cooldownRemaining = skill.Cooldown;
+            }
         }
     }
 
@@ -134,7 +140,6 @@ public partial class SkillManager : Node
         {
             return;
         }
-
 
         if (skill.AllowedClass != _player.CurrentClass)
         {

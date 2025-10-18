@@ -9,6 +9,7 @@ SkillId = "warrior_basic_attack"
 SkillName = "Fusion Cutter"
 CastBehavior = 1
 DamageSource = 0
+MovementBehavior = 0
 BaseDamage = 100.0
 Cooldown = 0.5
 Range = 80.0
@@ -31,16 +32,18 @@ metadata/_custom_type_script = "uid://bqtal0vugxig6"
 
 [sub_resource type="Resource" id="Resource_lr0uj"]
 script = ExtResource("1_lr0uj")
-SkillId = "mage_fireball"
-SkillName = "Fireball"
-BalanceType = 2
-DamageType = 1
-Radius = 50.0
-Range = 50.0
-ExplosionDamage = 50.0
-ProjectileSpeed = 10.0
-CastTime = 0.5
-IntelligenceScaling = 1.0
+SkillId = "warrior_energy_wave"
+SkillName = "Energy Wave"
+CastBehavior = 1
+DamageSource = 0
+MovementBehavior = 0
+BaseDamage = 30.0
+Cooldown = 5.0
+Range = 60.0
+ProjectileSpeed = 400.0
+ProjectileCount = 3
+ProjectileDamage = 15.0
+ProjectileSpreadAngle = 25.0
 metadata/_custom_type_script = "uid://bqtal0vugxig6"
 
 [resource]

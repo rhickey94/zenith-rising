@@ -7,12 +7,17 @@ namespace ZenithRising.Scripts.Skills.Balance;
 [GlobalClass]
 public partial class SkillBalanceEntry : Resource
 {
+    [ExportGroup("Animation")]
+    [Export] public string AnimationBaseName { get; set; } = "";
+    [Export] public bool UsesDirectionalAnimation { get; set; } = true;
+
     [ExportGroup("Identity")]
     [Export] public string SkillId { get; set; } = "";
     [Export] public string SkillName { get; set; } = "";
     [Export] public SkillBalanceType BalanceType { get; set; }
     [Export] public CastBehavior CastBehavior { get; set; } = CastBehavior.Instant;
     [Export] public DamageSource DamageSource { get; set; } = DamageSource.EffectCollision;
+    [Export] public MovementBehavior MovementBehavior { get; set; } = MovementBehavior.Allowed;
 
     [ExportGroup("Base Stats")]
     [Export] public float BaseDamage { get; set; } = 10f;

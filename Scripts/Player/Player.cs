@@ -6,7 +6,6 @@ using ZenithRising.Scripts.UI.Panels;
 using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.Enemies.Base;
 using ZenithRising.Scripts.Skills.Base;
-using ZenithRising.Scripts.Skills.Effects;
 
 namespace ZenithRising.Scripts.PlayerScripts;
 
@@ -14,7 +13,6 @@ public enum PlayerState
 {
     Idle,
     Running,
-    BasicAttacking,
     CastingSkill,
     Hurt,
     Dead
@@ -24,9 +22,6 @@ public partial class Player : CharacterBody2D
 {
     // ===== EXPORT FIELDS - Config =====
     [Export] public PlayerClass CurrentClass = PlayerClass.Warrior;
-
-    // ===== EXPORT FIELDS - Scenes =====
-    [Export] public PackedScene ProjectileScene;
 
     // ===== EXPORT FIELDS - UI Dependencies =====
     [Export] public LevelUpPanel LevelUpPanel;
@@ -43,24 +38,22 @@ public partial class Player : CharacterBody2D
     private SkillManager _skillManager;
     private StatsManager _statsManager;
     private UpgradeManager _upgradeManager;
+    private SkillAnimationController _skillAnimationController;
     private Sprite2D _sprite;
     private AnimationPlayer _animationPlayer;
     private Vector2 _lastDirection = Vector2.Down;
     private PlayerState _currentState = PlayerState.Idle;
-    private Area2D _meleeHitbox;
-    private Area2D _aoeHitbox;
-    private readonly HashSet<Enemy> _hitEnemiesThisCast = [];
     private Skill _currentCastingSkill;
+    private bool _isCastingWhileMoving = false;
+    private bool _movementControlledBySkill = false;
+    private PlayerState _previousState = PlayerState.Idle;
+
+    public Vector2 GetLastDirection() => _lastDirection;
 
     // ===== LIFECYCLE METHODS =====
     public override void _Ready()
     {
         AddToGroup("player");
-
-        if (ProjectileScene == null)
-        {
-            GD.PrintErr("Player: ProjectileScene not assigned!");
-        }
 
         // Get components
         _skillManager = GetNode<SkillManager>("SkillManager");
@@ -102,25 +95,15 @@ public partial class Player : CharacterBody2D
             _animationPlayer.AnimationFinished += OnAnimationFinished;
         }
 
-        // Get hitbox nodes
-        _meleeHitbox = GetNode<Area2D>("MeleeHitbox");
-        if (_meleeHitbox == null)
+        // Get or create SkillAnimationController
+        _skillAnimationController = GetNode<SkillAnimationController>("SkillAnimationController");
+        if (_skillAnimationController == null)
         {
-            GD.PrintErr("Player: MeleeHitbox not found!");
+            GD.PrintErr("Player: SkillAnimationController not found!");
         }
         else
         {
-            _meleeHitbox.BodyEntered += OnMeleeHitboxBodyEntered;
-        }
-
-        _aoeHitbox = GetNode<Area2D>("AOEHitbox");
-        if (_aoeHitbox == null)
-        {
-            GD.PrintErr("Player: AOEHitbox not found!");
-        }
-        else
-        {
-            _aoeHitbox.BodyEntered += OnAOEHitboxBodyEntered;
+            _skillAnimationController.Initialize(this, _statsManager, _animationPlayer);
         }
 
         // Connect to LevelUpPanel
@@ -145,20 +128,25 @@ public partial class Player : CharacterBody2D
     {
         Vector2 direction = Vector2.Zero;
 
-        // Only allow movement input in locomotion states
-        if (_currentState == PlayerState.Idle || _currentState == PlayerState.Running)
+        // Skip manual movement if skill controls it (dash)
+        if (_movementControlledBySkill)
+        {
+            // Animation position keyframes control movement
+            MoveAndSlide();
+            return;
+        }
+
+        // Allow movement in locomotion states OR while casting with MovementAllowed
+        if (_currentState == PlayerState.Idle ||
+            _currentState == PlayerState.Running ||
+            _isCastingWhileMoving)
         {
             direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
         }
         else if (_currentState == PlayerState.CastingSkill)
         {
-            // Block movement during skill cast
+            // Movement locked during cast
             direction = Vector2.Zero;
-        }
-        else if (_currentState == PlayerState.BasicAttacking)
-        {
-            // Allow movement during basic attack for responsiveness
-            direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
         }
 
         if (_statsManager != null)
@@ -166,7 +154,7 @@ public partial class Player : CharacterBody2D
             Velocity = direction * _statsManager.CurrentSpeed;
         }
 
-        // Update locomotion animations only in locomotion states
+        // Update locomotion animations only in pure locomotion states
         if (_currentState == PlayerState.Idle || _currentState == PlayerState.Running)
         {
             if (direction != Vector2.Zero)
@@ -237,78 +225,47 @@ public partial class Player : CharacterBody2D
         _statsManager?.AddPowerExperience(amount);
     }
 
-    public bool TryBasicAttack()
+    public bool TryCastSkill(Skill skill)
     {
-        if (!CanTransitionTo(PlayerState.BasicAttacking))
+        if (_currentState == PlayerState.Dead)
         {
             return false;
         }
 
-        ChangeState(PlayerState.BasicAttacking);
+        // Store previous state for returning after cast
+        if (_currentState == PlayerState.Idle || _currentState == PlayerState.Running)
+        {
+            _previousState = _currentState;
+        }
 
-        // Store the basic attack skill for hitbox damage calculation
-        _currentCastingSkill = _skillManager?.BasicAttackSkill;  // ✅ ADD THIS LINE
+        // Store skill reference
+        _currentCastingSkill = skill;
+        _skillAnimationController?.SetCurrentSkill(skill);
 
-        string attackAnim = GetDirectionalAnimationName("warrior_attack", _lastDirection);
-        _animationPlayer.Play(attackAnim);
-
-        return true;
-    }
-
-    public bool TryCastSkill(Skill skill)
-    {
-        if (!CanTransitionTo(PlayerState.CastingSkill))
+        // Handle movement based on skill's MovementBehavior
+        if (_currentState != PlayerState.Idle && _currentState != PlayerState.Running)
         {
             return false;
         }
 
         ChangeState(PlayerState.CastingSkill);
 
-        // Store skill for hitbox damage calculation
-        _currentCastingSkill = skill;
+        // Set movement flags based on behavior
+        if (skill.MovementBehavior == MovementBehavior.Allowed)
+        {
+            _isCastingWhileMoving = true;
+        }
+        else if (skill.MovementBehavior == MovementBehavior.Forced)
+        {
+            _movementControlledBySkill = true;
+        }
 
-        // Determine animation name based on skill
+        // Play animation
         string animName = GetSkillAnimationName(skill);
         _animationPlayer.Play(animName);
 
-        GD.Print($"Playing skill animation: {animName}");
+        GD.Print($"Playing skill animation: {animName} (Movement: {skill.MovementBehavior})");
         return true;
-    }
-
-    public void SpawnWaveProjectiles()
-    {
-        if (_currentCastingSkill == null)
-        {
-            GD.PrintErr("SpawnEnergyWaveProjectiles: No casting skill set!");
-            return;
-        }
-
-        if (_currentCastingSkill.ProjectileCount <= 0)
-        {
-            return; // Not a projectile-spawning skill
-        }
-
-        if (ProjectileScene == null)
-        {
-            GD.PrintErr("SpawnEnergyWaveProjectiles: ProjectileScene not assigned!");
-            return;
-        }
-
-        // Spawn position: slightly in front of player
-        Vector2 spawnOffset = _lastDirection * 40f;
-        Vector2 spawnPos = GlobalPosition + spawnOffset;
-
-        // Base angle from player's facing direction
-        float baseAngle = Mathf.Atan2(_lastDirection.Y, _lastDirection.X);
-
-        int projectileCount = _currentCastingSkill.ProjectileCount;
-        float spreadAngle = _currentCastingSkill.ProjectileSpreadAngle;
-
-        // Spawn each projectile in cone
-        for (int i = 0; i < projectileCount; i++)
-        {
-            SpawnSingleProjectile(spawnPos, baseAngle, i, projectileCount, spreadAngle);
-        }
     }
 
     // ===== PRIVATE HELPERS - Event Handlers =====
@@ -381,33 +338,6 @@ public partial class Player : CharacterBody2D
         }
     }
 
-    private void SpawnSingleProjectile(Vector2 spawnPos, float baseAngle, int index, int totalCount, float spreadAngle)
-    {
-        // Calculate angle offset for this projectile
-        float angleOffset = 0f;
-
-        if (totalCount > 1)
-        {
-            // Spread evenly: 3 projectiles = -25°, 0°, +25°
-            float step = (spreadAngle * 2) / (totalCount - 1);
-            angleOffset = -spreadAngle + (step * index);
-        }
-
-        float finalAngle = baseAngle + Mathf.DegToRad(angleOffset);
-        Vector2 direction = new Vector2(Mathf.Cos(finalAngle), Mathf.Sin(finalAngle));
-
-        // Spawn projectile
-        var projectile = ProjectileScene.Instantiate<Node2D>();
-        GetTree().Root.AddChild(projectile);
-        projectile.GlobalPosition = spawnPos;
-
-        // Initialize with skill data
-        if (projectile is SkillEffect effect)
-        {
-            effect.Initialize(_currentCastingSkill, this, direction);
-        }
-    }
-
     private string GetDirectionalAnimationName(string baseAnimation, Vector2 direction)
     {
         string directionSuffix;
@@ -426,19 +356,15 @@ public partial class Player : CharacterBody2D
 
     private string GetSkillAnimationName(Skill skill)
     {
-        // For now, handle known skills
-        // Later this can be data-driven via skill.AnimationName property
-        if (skill.SkillId == "warrior_basic_attack")
+        if (string.IsNullOrEmpty(skill.AnimationBaseName))
         {
-            return GetDirectionalAnimationName("warrior_attack", _lastDirection);
-        }
-        else if (skill.SkillId == "warrior_whirlwind")
-        {
-            return "warrior_whirlwind";
+            GD.PrintErr($"No AnimationBaseName for skill: {skill.SkillId}");
+            return "idle_down";
         }
 
-        GD.PrintErr($"No animation mapped for skill: {skill.SkillId}");
-        return "idle_down"; // Fallback
+        return skill.UsesDirectionalAnimation
+            ? GetDirectionalAnimationName(skill.AnimationBaseName, _lastDirection)
+            : skill.AnimationBaseName;
     }
 
     private bool CanTransitionTo(PlayerState newState)
@@ -457,7 +383,6 @@ public partial class Player : CharacterBody2D
         {
             PlayerState.Idle => true,
             PlayerState.Running => true,
-            PlayerState.BasicAttacking => newState == PlayerState.Idle || newState == PlayerState.Running,
             PlayerState.CastingSkill => newState == PlayerState.Idle || newState == PlayerState.Running,
             PlayerState.Hurt => newState == PlayerState.Idle || newState == PlayerState.Running,
             _ => false
@@ -478,128 +403,21 @@ public partial class Player : CharacterBody2D
 
     private void OnAnimationFinished(StringName animName)
     {
-        string anim = animName.ToString();
+        // Clear casting flags
+        bool wasCasting = _currentState == PlayerState.CastingSkill || _isCastingWhileMoving;
 
-        // Return to locomotion state after attacks/skills
-        if (anim.StartsWith("warrior_attack") || anim.StartsWith("warrior_whirlwind"))
+        if (wasCasting)
         {
-            // Check if player is moving to determine next state
-            Vector2 direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
+            _isCastingWhileMoving = false;
+            _movementControlledBySkill = false;
+            _currentCastingSkill = null;
+            _skillAnimationController.ClearCurrentSkill();
 
-            if (direction != Vector2.Zero)
+            // Return to previous state
+            if (_currentState == PlayerState.CastingSkill)
             {
-                ChangeState(PlayerState.Running);
+                ChangeState(_previousState);
             }
-            else
-            {
-                ChangeState(PlayerState.Idle);
-            }
-        }
-    }
-
-    // ===== HITBOX SYSTEM =====
-
-    public void EnableMeleeHitbox()
-    {
-        if (_meleeHitbox == null)
-        {
-            return;
-        }
-
-        _hitEnemiesThisCast.Clear();
-        _meleeHitbox.Monitoring = true;
-        GD.Print("Melee hitbox enabled");
-    }
-
-    public void DisableMeleeHitbox()
-    {
-        if (_meleeHitbox == null)
-        {
-            return;
-        }
-
-        _meleeHitbox.Monitoring = false;
-        GD.Print("Melee hitbox disabled");
-    }
-
-    public void EnableAOEHitbox()
-    {
-        if (_aoeHitbox == null)
-        {
-            return;
-        }
-
-        _hitEnemiesThisCast.Clear();
-        _aoeHitbox.Monitoring = true;
-        GD.Print("AOE hitbox enabled");
-    }
-
-    public void DisableAOEHitbox()
-    {
-        if (_aoeHitbox == null)
-        {
-            return;
-        }
-
-        _aoeHitbox.Monitoring = false;
-        GD.Print("AOE hitbox disabled");
-    }
-
-    private void OnMeleeHitboxBodyEntered(Node2D body)
-    {
-        if (body is not Enemy enemy)
-        {
-            return;
-        }
-
-        if (_hitEnemiesThisCast.Contains(enemy))
-        {
-            return;
-        }
-
-        _hitEnemiesThisCast.Add(enemy);
-        ApplyHitboxDamage(enemy);
-    }
-
-    private void OnAOEHitboxBodyEntered(Node2D body)
-    {
-        if (body is not Enemy enemy)
-        {
-            return;
-        }
-
-        if (_hitEnemiesThisCast.Contains(enemy))
-        {
-            return;
-        }
-
-        _hitEnemiesThisCast.Add(enemy);
-        ApplyHitboxDamage(enemy);
-    }
-
-    private void ApplyHitboxDamage(Enemy enemy)
-    {
-        if (_currentCastingSkill == null || _statsManager == null)
-        {
-            GD.PrintErr("ApplyHitboxDamage called but no active skill or stats!");
-            return;
-        }
-
-        float baseDamage = _currentCastingSkill.BaseDamage;
-        float damage = CombatSystem.CalculateDamage(
-            baseDamage,
-            _statsManager,
-            _currentCastingSkill.DamageType
-        );
-
-        float healthBefore = enemy.Health;
-        enemy.TakeDamage(damage);
-        GD.Print($"{_currentCastingSkill.SkillName} hit {enemy.Name} for {damage} damage");
-
-        // Track kill if enemy died
-        if (healthBefore > 0 && enemy.Health <= 0)
-        {
-            _currentCastingSkill.RecordKill();
         }
     }
 }

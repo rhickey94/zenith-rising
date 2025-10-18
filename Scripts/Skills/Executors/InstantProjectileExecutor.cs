@@ -1,25 +1,25 @@
 using Godot;
 using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.Skills.Base;
-using ZenithRising.Scripts.Skills.Effects;
+using ZenithRising.Scripts.Skills.Entities.Projectiles;
 
 namespace ZenithRising.Scripts.Skills.Executors;
 
-public class ProjectileSkillExecutor : ISkillExecutor
+public class InstantProjectileExecutor : ISkillExecutor
 {
-    public void ExecuteSkill(Player player, Skill skill)
+    public bool ExecuteSkill(Player player, Skill skill)
     {
         if (skill.SkillEffectScene == null)
         {
             GD.PrintErr("ProjectileSkillExecutor: SkillEffectScene not set!");
-            return;
+            return false;
         }
 
         // Get direction toward mouse
         Vector2 direction = (player.GetGlobalMousePosition() - player.GlobalPosition).Normalized();
 
         // Spawn projectile effect (generic - works for any projectile type)
-        var effect = skill.SkillEffectScene.Instantiate<CollisionSkillEffect>();
+        var effect = skill.SkillEffectScene.Instantiate<DamageEntityBase>();
         effect.GlobalPosition = player.GlobalPosition;
 
         // Standardized initialization
@@ -29,5 +29,6 @@ public class ProjectileSkillExecutor : ISkillExecutor
         player.GetTree().Root.AddChild(effect);
 
         GD.Print($"{skill.SkillName} launched!");
+        return true;
     }
 }

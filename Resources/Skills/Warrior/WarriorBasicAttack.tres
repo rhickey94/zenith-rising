@@ -6,4 +6,3 @@
 script = ExtResource("1_sbfav")
 SkillId = "warrior_basic_attack"
 SkillName = "Fusion Cutter"
-Description = "Swings a melee weapon to do minor damage."
