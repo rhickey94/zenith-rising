@@ -94,7 +94,7 @@ Every skill is classified along **two independent axes**:
 **Flow:**
 ```
 Input → SkillManager.UseSkill()
-  → Player.TryBasicAttack() / TryCastSkill()
+  → Player.TryCastSkill()
   → Player state: CastingSkill, play animation
   → Animation frame 0.1s: Call Player.EnableMeleeHitbox()
   → Player.OnHitboxBodyEntered(): Apply damage via CombatSystem

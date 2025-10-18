@@ -63,11 +63,12 @@ public partial class EnergyProjectile : DamageEntityBase
         BodyEntered += OnBodyEntered;
 
         GetTree().CreateTimer(_lifetime).Timeout += QueueFree;
+        GD.Print($">>> EnergyProjectile _Ready: Position={GlobalPosition}, Speed={_speed}, Lifetime={_lifetime}, Direction={_direction}");
     }
 
     public override void _PhysicsProcess(double delta)
     {
-        Position += _direction * _speed * (float)delta;
+        GlobalPosition += _direction * _speed * (float)delta;
     }
 
     private void OnBodyEntered(Node2D body)

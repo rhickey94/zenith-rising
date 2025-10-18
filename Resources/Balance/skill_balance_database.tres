@@ -5,11 +5,11 @@
 
 [sub_resource type="Resource" id="Resource_ytv5f"]
 script = ExtResource("1_lr0uj")
+AnimationBaseName = "warrior_attack"
 SkillId = "warrior_basic_attack"
 SkillName = "Fusion Cutter"
 CastBehavior = 1
 DamageSource = 0
-MovementBehavior = 0
 BaseDamage = 100.0
 Cooldown = 0.5
 Range = 80.0
@@ -19,6 +19,8 @@ metadata/_custom_type_script = "uid://bqtal0vugxig6"
 
 [sub_resource type="Resource" id="Resource_mfapk"]
 script = ExtResource("1_lr0uj")
+AnimationBaseName = "warrior_whirlwind"
+UsesDirectionalAnimation = false
 SkillId = "warrior_whirlwind"
 SkillName = "Whirlwind"
 BalanceType = 1
@@ -32,13 +34,13 @@ metadata/_custom_type_script = "uid://bqtal0vugxig6"
 
 [sub_resource type="Resource" id="Resource_lr0uj"]
 script = ExtResource("1_lr0uj")
+AnimationBaseName = "warrior_energy_wave"
 SkillId = "warrior_energy_wave"
 SkillName = "Energy Wave"
 CastBehavior = 1
 DamageSource = 0
 MovementBehavior = 0
 BaseDamage = 30.0
-Cooldown = 5.0
 Range = 60.0
 ProjectileSpeed = 400.0
 ProjectileCount = 3

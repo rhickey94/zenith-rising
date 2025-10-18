@@ -1,10 +1,9 @@
 using Godot;
-using System;
 using System.Collections.Generic;
 using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.Enemies.Base;
 using ZenithRising.Scripts.Skills.Base;
-using ZenithRising.Scripts.Skills.Entities;
+using ZenithRising.Scripts.Skills.Entities.Projectiles;
 
 namespace ZenithRising.Scripts.PlayerScripts.Components;
 
@@ -118,14 +117,19 @@ public partial class SkillAnimationController : Node
 
     public void SpawnWaveProjectiles()
     {
+        GD.Print(">>> SpawnWaveProjectiles() CALLED");
+
         if (_currentCastingSkill == null || _player == null)
         {
-            GD.PrintErr("SpawnWaveProjectiles: Missing skill or player reference!");
+            GD.PrintErr($"SpawnWaveProjectiles: Missing references! Skill={_currentCastingSkill != null}, Player={_player != null}");
             return;
         }
 
+        GD.Print($">>> Skill: {_currentCastingSkill.SkillName}, ProjectileCount: {_currentCastingSkill.ProjectileCount}");
+
         if (_currentCastingSkill.ProjectileCount <= 0)
         {
+            GD.PrintErr($"SpawnWaveProjectiles: ProjectileCount is {_currentCastingSkill.ProjectileCount}, aborting!");
             return;
         }
 
@@ -144,9 +148,11 @@ public partial class SkillAnimationController : Node
         int projectileCount = _currentCastingSkill.ProjectileCount;
         float spreadAngle = _currentCastingSkill.ProjectileSpreadAngle;
 
+        GD.Print($">>> Spawning {projectileCount} projectiles with {spreadAngle}° spread");
         for (int i = 0; i < projectileCount; i++)
         {
             SpawnSingleProjectile(spawnPos, baseAngle, i, projectileCount, spreadAngle);
+            GD.Print($">>> Spawned projectile {i+1}/{projectileCount}");
         }
     }
 
@@ -215,7 +221,7 @@ public partial class SkillAnimationController : Node
 
         if (totalCount > 1)
         {
-            float step = (spreadAngle * 2) / (totalCount - 1);
+            float step = spreadAngle * 2 / (totalCount - 1);
             angleOffset = -spreadAngle + (step * index);
         }
 
@@ -223,12 +229,21 @@ public partial class SkillAnimationController : Node
         var direction = new Vector2(Mathf.Cos(finalAngle), Mathf.Sin(finalAngle));
 
         var projectile = ProjectileScene.Instantiate<Node2D>();
-        _player.GetTree().Root.AddChild(projectile);
-        projectile.GlobalPosition = spawnPos;
 
-        if (projectile is SkillEntityBase entity)
+        // Initialize BEFORE adding to scene tree (so _Ready has valid data)
+        if (projectile is DamageEntityBase entity)
         {
             entity.Initialize(_currentCastingSkill, _player, direction);
+            GD.Print($">>> Projectile initialized! Angle: {Mathf.RadToDeg(finalAngle)}°, Speed: {_currentCastingSkill.ProjectileSpeed}");
         }
+        else
+        {
+            GD.PrintErr($">>> Projectile is NOT DamageEntityBase! Type: {projectile.GetType().FullName}");
+            return; // Don't add invalid projectiles
+        }
+
+        // NOW add to scene tree (triggers _Ready with initialized values)
+        _player.GetTree().Root.AddChild(projectile);
+        projectile.GlobalPosition = spawnPos;
     }
 }
