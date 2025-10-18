@@ -32,6 +32,7 @@ public partial class Skill : Resource
     public float BaseDamage { get; private set; }
     public float Range { get; private set; }
     public float Radius { get; private set; }
+    public float Duration { get; private set; }
     public int ProjectileCount { get; private set; }
     public float ProjectileSpeed { get; private set; }
     public float ProjectileDamage { get; private set; }
@@ -46,6 +47,11 @@ public partial class Skill : Resource
     public float SilverDamageBonus { get; private set; }
     public float GoldDamageBonus { get; private set; }
     public float DiamondDamageBonus { get; private set; }
+    public int WhirlwindRotations { get; private set; }
+    public int BronzeRotationBonus { get; private set; }
+    public int SilverRotationBonus { get; private set; }
+    public int GoldRotationBonus { get; private set; }
+    public int DiamondRotationBonus { get; private set; }
 
     private bool _initialized = false;
 
@@ -86,6 +92,7 @@ public partial class Skill : Resource
         BaseDamage = entry.BaseDamage;
         Range = entry.Range;
         Radius = entry.Radius;
+        Duration = entry.CastTime;
 
         PierceCount = entry.PierceCount;
 
@@ -99,6 +106,22 @@ public partial class Skill : Resource
         SilverDamageBonus = entry.SilverDamageBonus;
         GoldDamageBonus = entry.GoldDamageBonus;
         DiamondDamageBonus = entry.DiamondDamageBonus;
+
+        // Load whirlwind-specific parameters
+        WhirlwindRotations = entry.WhirlwindRotations;
+
+        // Apply mastery bonuses for rotations
+        if (SkillId == "warrior_whirlwind")
+        {
+            WhirlwindRotations += CurrentTier switch
+            {
+                SkillMasteryTier.Bronze => entry.BronzeRotationBonus,
+                SkillMasteryTier.Silver => entry.SilverRotationBonus,
+                SkillMasteryTier.Gold => entry.GoldRotationBonus,
+                SkillMasteryTier.Diamond => entry.DiamondRotationBonus,
+                _ => 0
+            };
+        }
 
         _initialized = true;
         GD.Print($"Skill '{SkillName}' ({SkillId}) initialized from database");

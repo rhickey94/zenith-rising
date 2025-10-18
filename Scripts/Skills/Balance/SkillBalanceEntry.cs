@@ -54,4 +54,9 @@ public partial class SkillBalanceEntry : Resource
     [Export] public float SilverDamageBonus { get; set; } = 0.10f; // +10%
     [Export] public float GoldDamageBonus { get; set; } = 0.15f; // +15%
     [Export] public float DiamondDamageBonus { get; set; } = 0.25f; // +25%
+    [Export] public int WhirlwindRotations { get; set; } = 1; // Base: 1 rotation
+    [Export] public int BronzeRotationBonus { get; set; } = 0; // Mastery tier bonuses
+    [Export] public int SilverRotationBonus { get; set; } = 1; // +1 rotation at Silver
+    [Export] public int GoldRotationBonus { get; set; } = 2;   // +2 rotations at Gold
+    [Export] public int DiamondRotationBonus { get; set; } = 3; // +3 rotations at Diamond
 }

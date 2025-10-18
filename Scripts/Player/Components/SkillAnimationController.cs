@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.Enemies.Base;
 using ZenithRising.Scripts.Skills.Base;
+using ZenithRising.Scripts.Skills.Effects;
 using ZenithRising.Scripts.Skills.Entities.Projectiles;
 
 namespace ZenithRising.Scripts.PlayerScripts.Components;
@@ -22,9 +23,11 @@ public partial class SkillAnimationController : Node
     // State
     private readonly HashSet<Enemy> _hitEnemiesThisCast = [];
     private Skill _currentCastingSkill;
+    private Vector2 _currentAttackDirection;
 
     // Exports
     [Export] public PackedScene ProjectileScene { get; set; }
+    [Export] public PackedScene WhirlwindVisualScene { get; set; }
 
     public void Initialize(Player player, StatsManager statsManager, AnimationPlayer animationPlayer)
     {
@@ -75,6 +78,11 @@ public partial class SkillAnimationController : Node
         }
 
         _hitEnemiesThisCast.Clear();
+
+        // Get attack direction and position hitbox accordingly
+        _currentAttackDirection = _player.GetAttackDirection();
+        UpdateMeleeHitboxPosition(_currentAttackDirection);
+
         _meleeHitbox.Monitoring = true;
         GD.Print("Melee hitbox enabled");
     }
@@ -156,7 +164,44 @@ public partial class SkillAnimationController : Node
         }
     }
 
+    public void SpawnWhirlwindVisual()
+    {
+        if (WhirlwindVisualScene == null || _currentCastingSkill == null)
+        {
+            GD.PrintErr("WhirlwindVisualScene or current skill not assigned!");
+            return;
+        }
+
+        var visual = WhirlwindVisualScene.Instantiate<Node2D>();
+
+        // Initialize BEFORE adding to scene tree (so _Ready has valid data)
+        if (visual is WhirlwindVisual whirlwindVisual)
+        {
+            whirlwindVisual.Initialize(_currentCastingSkill);
+            GD.Print($"Whirlwind visual initialized - Duration: {_currentCastingSkill.Duration}, Radius: {_currentCastingSkill.Radius}");
+        }
+        else
+        {
+            GD.PrintErr($"WhirlwindVisual is wrong type! Type: {visual.GetType().FullName}");
+        }
+
+        // NOW add to scene tree (triggers _Ready with initialized values)
+        _player.GetParent().AddChild(visual);
+        visual.GlobalPosition = _player.GlobalPosition;
+
+        GD.Print("Whirlwind visual spawned");
+    }
+
     // ===== COLLISION HANDLERS =====
+    private void UpdateMeleeHitboxPosition(Vector2 direction)
+    {
+        // Position hitbox in front of player based on attack direction
+        float distance = 40f; // How far in front of player
+        _meleeHitbox.Position = direction * distance;
+
+        // Rotate hitbox to match direction
+        _meleeHitbox.Rotation = direction.Angle();
+    }
 
     private void OnMeleeHitboxBodyEntered(Node2D body)
     {

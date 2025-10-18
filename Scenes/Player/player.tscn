@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://jb1p3bafbe1"]
+[gd_scene load_steps=34 format=3 uid="uid://jb1p3bafbe1"]
 
 [ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="1_a3d8c"]
 [ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_xpcdj"]
@@ -10,6 +10,7 @@
 [ext_resource type="Resource" uid="uid://dfssvafd8e1nw" path="res://Resources/Skills/Warrior/WarriorBasicAttack.tres" id="6_gk6dx"]
 [ext_resource type="Resource" uid="uid://5g8accyxr8hh" path="res://Resources/Skills/Warrior/Whirlwind.tres" id="7_jhyir"]
 [ext_resource type="Script" uid="uid://crelh1yuijku7" path="res://Scripts/Player/Components/SkillAnimationController.cs" id="9_gk6dx"]
+[ext_resource type="PackedScene" uid="uid://bvyx7q6quoo64" path="res://Scenes/SkillEffects/whirlwind_visual.tscn" id="11_74mp2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
 size = Vector2(50, 62)
@@ -459,9 +460,12 @@ tracks/1/path = NodePath("SkillAnimationController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0.1, 1.1),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0, 0.1, 1.1),
+"transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
+"args": [],
+"method": &"SpawnWhirlwindVisual"
+}, {
 "args": [],
 "method": &"EnableAOEHitbox"
 }, {
@@ -493,7 +497,7 @@ _data = {
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gk6dx"]
-size = Vector2(80, 60)
+size = Vector2(51, 38)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_jhyir"]
 radius = 150.0
@@ -505,7 +509,7 @@ script = ExtResource("1_xpcdj")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_0u5uq")
 region_enabled = true
-region_rect = Rect2(0, 3584, 128, 128)
+region_rect = Rect2(640, 3584, 128, 128)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
@@ -532,6 +536,7 @@ metadata/_custom_type_script = "uid://cx5d7m8au6iit"
 [node name="SkillAnimationController" type="Node" parent="."]
 script = ExtResource("9_gk6dx")
 ProjectileScene = ExtResource("2_jlvik")
+WhirlwindVisualScene = ExtResource("11_74mp2")
 metadata/_custom_type_script = "uid://crelh1yuijku7"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
@@ -547,7 +552,7 @@ monitoring = false
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MeleeHitbox"]
-position = Vector2(40, 0)
+position = Vector2(25.5, 11)
 shape = SubResource("RectangleShape2D_gk6dx")
 
 [node name="AOEHitbox" type="Area2D" parent="."]

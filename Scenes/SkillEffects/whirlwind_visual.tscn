@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bvyx7q6quoo64"]
+
+[ext_resource type="Script" uid="uid://lf53h54md8gv" path="res://Scripts/Skills/Entities/Visuals/WhirlwindVisual.cs" id="1_thqjb"]
+
+[node name="WhirlwindVisual" type="Node2D"]
+script = ExtResource("1_thqjb")

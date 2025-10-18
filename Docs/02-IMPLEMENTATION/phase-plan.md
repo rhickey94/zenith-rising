@@ -566,11 +566,12 @@ Phase A (Balance Systems) is complete! Now implementing the remaining 3 warrior 
 
 **Current Status:**
 - ✅ Phase A Complete: Balance infrastructure ready
-- ✅ Basic Attack (Fusion Cutter) functional
-- ✅ Whirlwind functional
-- 📝 Crowd Suppression - planned
-- 📝 Combat Stim - planned
-- 📝 Breaching Charge - planned
+- ✅ Basic Attack (Fusion Cutter) functional - Melee Pattern
+- ✅ Whirlwind functional - Instant AOE Pattern + visual effect
+- ✅ Energy Wave functional - Hybrid Pattern (melee + 3 projectiles)
+- 📝 Leap Slam - Database entry added (not implemented)
+- 📝 Combat Stim - Planned (Buff Pattern)
+- 📝 Breaching Charge - Planned (Cast-Spawn Pattern)
 
 **See [`../../CLAUDE.md`](../../CLAUDE.md) for current session progress and next tasks.**
 
