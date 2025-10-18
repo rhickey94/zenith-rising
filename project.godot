@@ -13,7 +13,6 @@ config_version=5
 config/name="Zenith Rising"
 run/main_scene="uid://clcv4udp5a1qj"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
-config/icon="res://icon.svg"
 
 [autoload]
 

@@ -3,14 +3,12 @@ using ZenithRising.Scripts.Enemies.Base;
 using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.Skills.Base;
 
-namespace ZenithRising.Scripts.Skills.Effects;
+namespace ZenithRising.Scripts.Skills.Entities.Projectiles;
 
-public partial class BasicProjectile : CollisionSkillEffect
+public partial class EnergyProjectile : DamageEntityBase
 {
-    [Export] public float Speed = 600.0f;
-    [Export] public float BaseDamage = 25.0f;
-    [Export] public float Lifetime = 3.0f;
-
+    private float _speed;
+    private float _lifetime;
     private int _pierceCount = 0;
     private int _maxPierce = 0;
     private float _totalDamage;
@@ -18,9 +16,11 @@ public partial class BasicProjectile : CollisionSkillEffect
     public override void Initialize(Skill skill, Player caster, Vector2 direction)
     {
         base.Initialize(skill, caster, direction);
+        _speed = skill.ProjectileSpeed;
+        _lifetime = skill.ProjectileLifetime;
 
-        BaseDamage = skill.Damage;
-        _totalDamage = BaseDamage;
+        float damageToUse = skill.ProjectileDamage > 0 ? skill.ProjectileDamage : skill.BaseDamage;
+        _totalDamage = damageToUse;
 
         // Apply upgrade bonuses
         _maxPierce = _statsManager.ProjectilePierceCount;
@@ -33,20 +33,28 @@ public partial class BasicProjectile : CollisionSkillEffect
 
     private void ApplyMasteryBonuses()
     {
-        switch (_sourceSkill.CurrentTier)
+        if (_sourceSkill == null)
         {
-            case SkillMasteryTier.Silver:
-                _totalDamage *= 1.5f;
-                break;
-            case SkillMasteryTier.Gold:
-                _totalDamage *= 2.0f;
-                Speed *= 1.2f;
-                break;
-            case SkillMasteryTier.Diamond:
-                _totalDamage *= 3.0f;
-                Speed *= 1.5f;
-                _maxPierce += 2; // +2 pierce at Diamond
-                break;
+            return;
+        }
+
+        float damageMultiplier = _sourceSkill.CurrentTier switch
+        {
+            SkillMasteryTier.Bronze => 1f + _sourceSkill.BronzeDamageBonus,
+            SkillMasteryTier.Silver => 1f + _sourceSkill.SilverDamageBonus,
+            SkillMasteryTier.Gold => 1f + _sourceSkill.GoldDamageBonus,
+            SkillMasteryTier.Diamond => 1f + _sourceSkill.DiamondDamageBonus,
+            _ => 1f
+        };
+
+        _totalDamage *= damageMultiplier;
+
+        // Diamond tier bonuses: +50% speed, +2 pierce
+        // (These could also be data-driven in the future)
+        if (_sourceSkill.CurrentTier == SkillMasteryTier.Diamond)
+        {
+            _speed *= 1.5f;
+            _maxPierce += 2;
         }
     }
 
@@ -54,12 +62,13 @@ public partial class BasicProjectile : CollisionSkillEffect
     {
         BodyEntered += OnBodyEntered;
 
-        GetTree().CreateTimer(Lifetime).Timeout += QueueFree;
+        GetTree().CreateTimer(_lifetime).Timeout += QueueFree;
+        GD.Print($">>> EnergyProjectile _Ready: Position={GlobalPosition}, Speed={_speed}, Lifetime={_lifetime}, Direction={_direction}");
     }
 
     public override void _PhysicsProcess(double delta)
     {
-        Position += _direction * Speed * (float)delta;
+        GlobalPosition += _direction * _speed * (float)delta;
     }
 
     private void OnBodyEntered(Node2D body)

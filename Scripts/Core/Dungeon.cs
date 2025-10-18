@@ -1,5 +1,4 @@
 using Godot;
-using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.Enemies.Base;
 using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.PlayerScripts.Components;

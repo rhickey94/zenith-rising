@@ -7,12 +7,17 @@ namespace ZenithRising.Scripts.Skills.Balance;
 [GlobalClass]
 public partial class SkillBalanceEntry : Resource
 {
+    [ExportGroup("Animation")]
+    [Export] public string AnimationBaseName { get; set; } = "";
+    [Export] public bool UsesDirectionalAnimation { get; set; } = true;
+
     [ExportGroup("Identity")]
     [Export] public string SkillId { get; set; } = "";
     [Export] public string SkillName { get; set; } = "";
     [Export] public SkillBalanceType BalanceType { get; set; }
     [Export] public CastBehavior CastBehavior { get; set; } = CastBehavior.Instant;
     [Export] public DamageSource DamageSource { get; set; } = DamageSource.EffectCollision;
+    [Export] public MovementBehavior MovementBehavior { get; set; } = MovementBehavior.Allowed;
 
     [ExportGroup("Base Stats")]
     [Export] public float BaseDamage { get; set; } = 10f;
@@ -25,10 +30,16 @@ public partial class SkillBalanceEntry : Resource
     [Export] public float Width { get; set; } = 0f; // For melee arcs
 
     [ExportGroup("Projectile Properties")]
-    [Export] public float ExplosionDamage { get; set; } = 0f;
     [Export] public float ProjectileSpeed { get; set; } = 0f;
     [Export] public int PierceCount { get; set; } = 0;
     [Export] public float ProjectileLifetime { get; set; } = 5f;
+    [Export] public int ProjectileCount { get; set; } = 0;
+    [Export] public float ProjectileDamage { get; set; } = 0f;
+    [Export] public float ProjectileSpreadAngle { get; set; } = 0f;
+
+    [ExportGroup("Explosion Properties")]
+    [Export] public float ExplosionDamage { get; set; } = 0f;
+    [Export] public float ExplosionRadius { get; set; } = 0f;
 
     [ExportGroup("Timing")]
     [Export] public float CastTime { get; set; } = 0f; // Animation duration
@@ -43,4 +54,9 @@ public partial class SkillBalanceEntry : Resource
     [Export] public float SilverDamageBonus { get; set; } = 0.10f; // +10%
     [Export] public float GoldDamageBonus { get; set; } = 0.15f; // +15%
     [Export] public float DiamondDamageBonus { get; set; } = 0.25f; // +25%
+    [Export] public int WhirlwindRotations { get; set; } = 1; // Base: 1 rotation
+    [Export] public int BronzeRotationBonus { get; set; } = 0; // Mastery tier bonuses
+    [Export] public int SilverRotationBonus { get; set; } = 1; // +1 rotation at Silver
+    [Export] public int GoldRotationBonus { get; set; } = 2;   // +2 rotations at Gold
+    [Export] public int DiamondRotationBonus { get; set; } = 3; // +3 rotations at Diamond
 }

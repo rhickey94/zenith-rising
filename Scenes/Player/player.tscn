@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://jb1p3bafbe1"]
+[gd_scene load_steps=34 format=3 uid="uid://jb1p3bafbe1"]
 
 [ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="1_a3d8c"]
 [ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_xpcdj"]
@@ -6,8 +6,11 @@
 [ext_resource type="PackedScene" uid="uid://cm4rpp2gwgqnc" path="res://Scenes/SkillEffects/projectile.tscn" id="2_jlvik"]
 [ext_resource type="Script" uid="uid://b3km77lyp5ba3" path="res://Scripts/Player/Components/StatsManager.cs" id="4_mtuoh"]
 [ext_resource type="Script" uid="uid://cx5d7m8au6iit" path="res://Scripts/Player/Components/UpgradeManager.cs" id="5_htcer"]
+[ext_resource type="Resource" uid="uid://bhgnogl1ofs6o" path="res://Resources/Skills/Warrior/WarriorEnergyWave.tres" id="5_jhyir"]
 [ext_resource type="Resource" uid="uid://dfssvafd8e1nw" path="res://Resources/Skills/Warrior/WarriorBasicAttack.tres" id="6_gk6dx"]
 [ext_resource type="Resource" uid="uid://5g8accyxr8hh" path="res://Resources/Skills/Warrior/Whirlwind.tres" id="7_jhyir"]
+[ext_resource type="Script" uid="uid://crelh1yuijku7" path="res://Scripts/Player/Components/SkillAnimationController.cs" id="9_gk6dx"]
+[ext_resource type="PackedScene" uid="uid://bvyx7q6quoo64" path="res://Scenes/SkillEffects/whirlwind_visual.tscn" id="11_74mp2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
 size = Vector2(50, 62)
@@ -177,11 +180,11 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".")
+tracks/1/path = NodePath("SkillAnimationController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0.16666667, 0.33333334),
+"times": PackedFloat32Array(0.03333333, 0.46666667),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [],
@@ -210,11 +213,11 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".")
+tracks/1/path = NodePath("SkillAnimationController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0.15, 0.3),
+"times": PackedFloat32Array(0.06666666, 0.5),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [],
@@ -243,11 +246,11 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".")
+tracks/1/path = NodePath("SkillAnimationController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0.15, 0.3),
+"times": PackedFloat32Array(0.06666666, 0.5),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [],
@@ -276,15 +279,159 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".")
+tracks/1/path = NodePath("SkillAnimationController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0.15, 0.3),
+"times": PackedFloat32Array(0.06666666, 0.46666667),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
 "args": [],
 "method": &"EnableMeleeHitbox"
+}, {
+"args": [],
+"method": &"DisableMeleeHitbox"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_h8ma5"]
+resource_name = "warrior_energy_wave_down"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-5.9604645e-08, 0.099999964, 0.19999993, 0.29999995, 0.39999998, 0.49999988),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Rect2(0, 3712, 128, 128), Rect2(128, 3712, 128, 128), Rect2(256, 3712, 128, 128), Rect2(384, 3712, 128, 128), Rect2(512, 3712, 128, 128), Rect2(640, 3712, 128, 128)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.03333333, 0.23333333, 0.46666667),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [],
+"method": &"EnableMeleeHitbox"
+}, {
+"args": [],
+"method": &"SpawnWaveProjectiles"
+}, {
+"args": [],
+"method": &"DisableMeleeHitbox"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_eksi1"]
+resource_name = "warrior_energy_wave_left"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-5.9604645e-08, 0.099999964, 0.19999993, 0.29999995, 0.39999998, 0.49999988),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Rect2(0, 3584, 128, 128), Rect2(128, 3584, 128, 128), Rect2(256, 3584, 128, 128), Rect2(384, 3584, 128, 128), Rect2(512, 3584, 128, 128), Rect2(640, 3584, 128, 128)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.06666666, 0.26666668, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [],
+"method": &"EnableMeleeHitbox"
+}, {
+"args": [],
+"method": &"SpawnWaveProjectiles"
+}, {
+"args": [],
+"method": &"DisableMeleeHitbox"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_jincj"]
+resource_name = "warrior_energy_wave_right"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-5.9604645e-08, 0.099999964, 0.19999993, 0.29999995, 0.39999998, 0.49999988),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Rect2(0, 3840, 128, 128), Rect2(128, 3840, 128, 128), Rect2(256, 3840, 128, 128), Rect2(384, 3840, 128, 128), Rect2(512, 3840, 128, 128), Rect2(640, 3840, 128, 128)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.06666666, 0.26666668, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [],
+"method": &"EnableMeleeHitbox"
+}, {
+"args": [],
+"method": &"SpawnWaveProjectiles"
+}, {
+"args": [],
+"method": &"DisableMeleeHitbox"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_rqdc0"]
+resource_name = "warrior_energy_wave_up"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-5.9604645e-08, 0.099999964, 0.19999993, 0.29999995, 0.39999998, 0.49999988),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Rect2(0, 3456, 128, 128), Rect2(128, 3456, 128, 128), Rect2(256, 3456, 128, 128), Rect2(384, 3456, 128, 128), Rect2(512, 3456, 128, 128), Rect2(640, 3456, 128, 128)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.06666666, 0.26666668, 0.46666667),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [],
+"method": &"EnableMeleeHitbox"
+}, {
+"args": [],
+"method": &"SpawnWaveProjectiles"
 }, {
 "args": [],
 "method": &"DisableMeleeHitbox"
@@ -309,13 +456,16 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".")
+tracks/1/path = NodePath("SkillAnimationController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0.1, 1.15),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0, 0.1, 1.1),
+"transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
+"args": [],
+"method": &"SpawnWhirlwindVisual"
+}, {
 "args": [],
 "method": &"EnableAOEHitbox"
 }, {
@@ -339,25 +489,27 @@ _data = {
 &"warrior_attack_left": SubResource("Animation_hnuln"),
 &"warrior_attack_right": SubResource("Animation_aqm4k"),
 &"warrior_attack_up": SubResource("Animation_ks1b7"),
+&"warrior_energy_wave_down": SubResource("Animation_h8ma5"),
+&"warrior_energy_wave_left": SubResource("Animation_eksi1"),
+&"warrior_energy_wave_right": SubResource("Animation_jincj"),
+&"warrior_energy_wave_up": SubResource("Animation_rqdc0"),
 &"warrior_whirlwind": SubResource("Animation_rcvs5")
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gk6dx"]
-size = Vector2(80, 60)
+size = Vector2(51, 38)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_jhyir"]
 radius = 150.0
 
 [node name="Player" type="CharacterBody2D" groups=["player"]]
-collision_layer = 1
 collision_mask = 2
 script = ExtResource("1_xpcdj")
-ProjectileScene = ExtResource("2_jlvik")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_0u5uq")
 region_enabled = true
-region_rect = Rect2(0, 3456, 128, 128)
+region_rect = Rect2(640, 3584, 128, 128)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
@@ -369,6 +521,7 @@ shape = SubResource("RectangleShape2D_4flbx")
 [node name="SkillManager" type="Node" parent="."]
 script = ExtResource("1_a3d8c")
 BasicAttackSkill = ExtResource("6_gk6dx")
+SpecialAttackSkill = ExtResource("5_jhyir")
 PrimarySkill = ExtResource("7_jhyir")
 metadata/_custom_type_script = "uid://bvjyaqpu6dell"
 
@@ -379,6 +532,12 @@ metadata/_custom_type_script = "uid://b3km77lyp5ba3"
 [node name="UpgradeManager" type="Node" parent="."]
 script = ExtResource("5_htcer")
 metadata/_custom_type_script = "uid://cx5d7m8au6iit"
+
+[node name="SkillAnimationController" type="Node" parent="."]
+script = ExtResource("9_gk6dx")
+ProjectileScene = ExtResource("2_jlvik")
+WhirlwindVisualScene = ExtResource("11_74mp2")
+metadata/_custom_type_script = "uid://crelh1yuijku7"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 reset_on_save = false
@@ -393,7 +552,7 @@ monitoring = false
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MeleeHitbox"]
-position = Vector2(40, 0)
+position = Vector2(25.5, 11)
 shape = SubResource("RectangleShape2D_gk6dx")
 
 [node name="AOEHitbox" type="Area2D" parent="."]

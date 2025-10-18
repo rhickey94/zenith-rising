@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://cm4rpp2gwgqnc"]
 
-[ext_resource type="Script" uid="uid://be5ht774uyvke" path="res://Scripts/Skills/Effects/BasicProjectile.cs" id="1_f8cdk"]
+[ext_resource type="Script" uid="uid://be5ht774uyvke" path="res://Scripts/Skills/Entities/Projectiles/EnergyProjectile.cs" id="1_f8cdk"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_yr2qt"]
 size = Vector2(10, 10)
@@ -9,6 +9,7 @@ size = Vector2(10, 10)
 radius = 5.0
 
 [node name="Projectile" type="Area2D"]
+scale = Vector2(4, 4)
 collision_layer = 8
 collision_mask = 2
 script = ExtResource("1_f8cdk")

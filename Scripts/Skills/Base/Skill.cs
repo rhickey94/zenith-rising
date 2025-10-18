@@ -1,6 +1,5 @@
 using Godot;
 using ZenithRising.Scripts.Core;
-using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.Skills.Balance;
 using ZenithRising.Scripts.Skills.Executors;
@@ -27,21 +26,32 @@ public partial class Skill : Resource
     [Export] public SkillMasteryTier CurrentTier { get; set; } = SkillMasteryTier.Bronze;
 
     // Runtime properties (loaded from database)
+    public string AnimationBaseName { get; private set; }
+    public bool UsesDirectionalAnimation { get; private set; }
+
     public float BaseDamage { get; private set; }
     public float Range { get; private set; }
     public float Radius { get; private set; }
+    public float Duration { get; private set; }
+    public int ProjectileCount { get; private set; }
     public float ProjectileSpeed { get; private set; }
+    public float ProjectileDamage { get; private set; }
+    public float ProjectileSpreadAngle { get; private set; }
+    public float ProjectileLifetime { get; private set; }
     public int PierceCount { get; private set; }
     public SkillBalanceType BalanceType { get; private set; }
     public CastBehavior CastBehavior { get; private set; }
     public DamageSource DamageSource { get; private set; }
-
-    public float Damage
-    {
-        get => BaseDamage;
-        set => BaseDamage = value;
-    }
-
+    public MovementBehavior MovementBehavior { get; private set; }
+    public float BronzeDamageBonus { get; private set; }
+    public float SilverDamageBonus { get; private set; }
+    public float GoldDamageBonus { get; private set; }
+    public float DiamondDamageBonus { get; private set; }
+    public int WhirlwindRotations { get; private set; }
+    public int BronzeRotationBonus { get; private set; }
+    public int SilverRotationBonus { get; private set; }
+    public int GoldRotationBonus { get; private set; }
+    public int DiamondRotationBonus { get; private set; }
 
     private bool _initialized = false;
 
@@ -68,31 +78,64 @@ public partial class Skill : Resource
         }
 
         // Load balance values
+        AnimationBaseName = entry.AnimationBaseName;
+        UsesDirectionalAnimation = entry.UsesDirectionalAnimation;
+
         SkillName = entry.SkillName;
-        Cooldown = entry.Cooldown;
         DamageType = entry.DamageType;
+        CastBehavior = entry.CastBehavior;
+        DamageSource = entry.DamageSource;
+        BalanceType = entry.BalanceType;
+        MovementBehavior = entry.MovementBehavior;
+
+        Cooldown = entry.Cooldown;
         BaseDamage = entry.BaseDamage;
         Range = entry.Range;
         Radius = entry.Radius;
-        ProjectileSpeed = entry.ProjectileSpeed;
-        PierceCount = entry.PierceCount;
-        BalanceType = entry.BalanceType;
-        Damage = entry.BaseDamage;
+        Duration = entry.CastTime;
 
-        CastBehavior = entry.CastBehavior;
-        DamageSource = entry.DamageSource;
+        PierceCount = entry.PierceCount;
+
+        ProjectileSpeed = entry.ProjectileSpeed;
+        ProjectileCount = entry.ProjectileCount;
+        ProjectileDamage = entry.ProjectileDamage;
+        ProjectileSpreadAngle = entry.ProjectileSpreadAngle;
+        ProjectileLifetime = entry.ProjectileLifetime;
+
+        BronzeDamageBonus = entry.BronzeDamageBonus;
+        SilverDamageBonus = entry.SilverDamageBonus;
+        GoldDamageBonus = entry.GoldDamageBonus;
+        DiamondDamageBonus = entry.DiamondDamageBonus;
+
+        // Load whirlwind-specific parameters
+        WhirlwindRotations = entry.WhirlwindRotations;
+
+        // Apply mastery bonuses for rotations
+        if (SkillId == "warrior_whirlwind")
+        {
+            WhirlwindRotations += CurrentTier switch
+            {
+                SkillMasteryTier.Bronze => entry.BronzeRotationBonus,
+                SkillMasteryTier.Silver => entry.SilverRotationBonus,
+                SkillMasteryTier.Gold => entry.GoldRotationBonus,
+                SkillMasteryTier.Diamond => entry.DiamondRotationBonus,
+                _ => 0
+            };
+        }
 
         _initialized = true;
         GD.Print($"Skill '{SkillName}' ({SkillId}) initialized from database");
     }
 
-    public void Execute(Player player)
+    public bool Execute(Player player)
     {
-        // Instantiate executor based on skill name
-
+        if (CastBehavior == CastBehavior.AnimationDriven)
+        {
+            GD.PrintErr($"{SkillName} is AnimationDriven - should not call Execute()!");
+            return false;
+        }
         _executor ??= CreateExecutor();
-
-        _executor?.ExecuteSkill(player, this);
+        return _executor?.ExecuteSkill(player, this) ?? false;
     }
 
     /// <summary>
@@ -147,12 +190,19 @@ public partial class Skill : Resource
         // Route by BalanceType for effect-based skills
         return BalanceType switch
         {
-            SkillBalanceType.Projectile => new ProjectileSkillExecutor(),
+            SkillBalanceType.Projectile => new InstantProjectileExecutor(),
             SkillBalanceType.PersistentZone => null, // Future implementation
             SkillBalanceType.CastSpawn => null, // Future implementation
             _ => null
         };
     }
+}
+
+public enum MovementBehavior
+{
+    Locked,
+    Allowed,
+    Forced
 }
 
 public enum CastBehavior

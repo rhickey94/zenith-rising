@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://bhgnogl1ofs6o"]
+
+[ext_resource type="Script" uid="uid://dff1q4v5i7rpk" path="res://Scripts/Skills/Base/Skill.cs" id="1_xrvrs"]
+
+[resource]
+script = ExtResource("1_xrvrs")
+SkillId = "warrior_energy_wave"
+SkillName = "Energy Wave"
+Cooldown = 2.0
+Slot = 1
+metadata/_custom_type_script = "uid://dff1q4v5i7rpk"
