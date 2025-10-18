@@ -5,7 +5,7 @@ using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.PlayerScripts.Components;
 using ZenithRising.Scripts.Skills.Base;
 
-namespace ZenithRising.Scripts.Skills.Entities.Projectiles;
+namespace ZenithRising.Scripts.Skills.Entities;
 
 /// <summary>
 /// Base class for skill effects that need collision detection (Area2D).

@@ -1,10 +1,21 @@
-[gd_resource type="Resource" script_class="SkillBalanceDatabase" load_steps=6 format=3 uid="uid://dbooxibogc7fp"]
+[gd_resource type="Resource" script_class="SkillBalanceDatabase" load_steps=13 format=3 uid="uid://dbooxibogc7fp"]
 
 [ext_resource type="Script" uid="uid://d25rerypcvb5f" path="res://Scripts/Skills/Balance/SkillBalanceDatabase.cs" id="1_c7wpi"]
 [ext_resource type="Script" uid="uid://bqtal0vugxig6" path="res://Scripts/Skills/Balance/SkillBalanceEntry.cs" id="1_lr0uj"]
+[ext_resource type="Script" uid="uid://bcoj0h1njugjh" path="res://Scripts/Skills/Balance/Data/MeleeData.cs" id="1_rvwwg"]
+[ext_resource type="Script" uid="uid://cc24cwmf7qnpn" path="res://Scripts/Skills/Balance/Data/AOEData.cs" id="3_37tpb"]
+[ext_resource type="Script" uid="uid://cya6f24ct573v" path="res://Scripts/Skills/Balance/Data/ProjectileData.cs" id="4_36pqe"]
+
+[sub_resource type="Resource" id="Resource_kcspd"]
+script = ExtResource("1_rvwwg")
+Range = 80.0
+Width = 60.0
+CastTime = 0.6
+metadata/_custom_type_script = "uid://bcoj0h1njugjh"
 
 [sub_resource type="Resource" id="Resource_ytv5f"]
 script = ExtResource("1_lr0uj")
+Melee = SubResource("Resource_kcspd")
 AnimationBaseName = "warrior_attack"
 SkillId = "warrior_basic_attack"
 SkillName = "Fusion Cutter"
@@ -12,13 +23,18 @@ CastBehavior = 1
 DamageSource = 0
 BaseDamage = 100.0
 Cooldown = 0.5
-Range = 80.0
-Width = 60.0
 StrengthScaling = 1.0
 metadata/_custom_type_script = "uid://bqtal0vugxig6"
 
+[sub_resource type="Resource" id="Resource_8ce7q"]
+script = ExtResource("3_37tpb")
+Radius = 150.0
+Duration = 1.1
+metadata/_custom_type_script = "uid://cc24cwmf7qnpn"
+
 [sub_resource type="Resource" id="Resource_mfapk"]
 script = ExtResource("1_lr0uj")
+AOE = SubResource("Resource_8ce7q")
 AnimationBaseName = "warrior_whirlwind"
 UsesDirectionalAnimation = false
 SkillId = "warrior_whirlwind"
@@ -27,13 +43,29 @@ BalanceType = 1
 CastBehavior = 1
 DamageSource = 0
 BaseDamage = 40.0
-Radius = 150.0
-CastTime = 0.8
 StrengthScaling = 1.2
 metadata/_custom_type_script = "uid://bqtal0vugxig6"
 
+[sub_resource type="Resource" id="Resource_gsc1o"]
+script = ExtResource("1_rvwwg")
+Range = 60.0
+Width = 60.0
+CastTime = 0.6
+metadata/_custom_type_script = "uid://bcoj0h1njugjh"
+
+[sub_resource type="Resource" id="Resource_1hxth"]
+script = ExtResource("4_36pqe")
+ProjectileSpeed = 500.0
+ProjectileLifetime = 2.0
+ProjectileCount = 3
+ProjectileDamage = 20.0
+ProjectileSpreadAngle = 25.0
+metadata/_custom_type_script = "uid://cya6f24ct573v"
+
 [sub_resource type="Resource" id="Resource_lr0uj"]
 script = ExtResource("1_lr0uj")
+Projectile = SubResource("Resource_1hxth")
+Melee = SubResource("Resource_gsc1o")
 AnimationBaseName = "warrior_energy_wave"
 SkillId = "warrior_energy_wave"
 SkillName = "Energy Wave"
@@ -41,11 +73,6 @@ CastBehavior = 1
 DamageSource = 0
 MovementBehavior = 0
 BaseDamage = 30.0
-Range = 60.0
-ProjectileSpeed = 400.0
-ProjectileCount = 3
-ProjectileDamage = 15.0
-ProjectileSpreadAngle = 25.0
 metadata/_custom_type_script = "uid://bqtal0vugxig6"
 
 [resource]

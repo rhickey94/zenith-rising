@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://jb1p3bafbe1"]
+[gd_scene load_steps=35 format=3 uid="uid://jb1p3bafbe1"]
 
 [ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="1_a3d8c"]
 [ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_xpcdj"]
@@ -11,6 +11,7 @@
 [ext_resource type="Resource" uid="uid://5g8accyxr8hh" path="res://Resources/Skills/Warrior/Whirlwind.tres" id="7_jhyir"]
 [ext_resource type="Script" uid="uid://crelh1yuijku7" path="res://Scripts/Player/Components/SkillAnimationController.cs" id="9_gk6dx"]
 [ext_resource type="PackedScene" uid="uid://bvyx7q6quoo64" path="res://Scenes/SkillEffects/whirlwind_visual.tscn" id="11_74mp2"]
+[ext_resource type="PackedScene" uid="uid://c132prycoiyp0" path="res://Scenes/SkillEffects/explosion_effect.tscn" id="12_oikmp"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
 size = Vector2(50, 62)
@@ -509,7 +510,7 @@ script = ExtResource("1_xpcdj")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_0u5uq")
 region_enabled = true
-region_rect = Rect2(640, 3584, 128, 128)
+region_rect = Rect2(0, 3840, 128, 128)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
@@ -537,6 +538,7 @@ metadata/_custom_type_script = "uid://cx5d7m8au6iit"
 script = ExtResource("9_gk6dx")
 ProjectileScene = ExtResource("2_jlvik")
 WhirlwindVisualScene = ExtResource("11_74mp2")
+ExplosionEffectScene = ExtResource("12_oikmp")
 metadata/_custom_type_script = "uid://crelh1yuijku7"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]

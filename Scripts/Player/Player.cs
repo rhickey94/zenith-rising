@@ -4,7 +4,6 @@ using ZenithRising.Scripts.Progression.Upgrades;
 using ZenithRising.Scripts.PlayerScripts.Components;
 using ZenithRising.Scripts.UI.Panels;
 using ZenithRising.Scripts.Core;
-using ZenithRising.Scripts.Enemies.Base;
 using ZenithRising.Scripts.Skills.Base;
 
 namespace ZenithRising.Scripts.PlayerScripts;

@@ -52,6 +52,8 @@ public partial class Skill : Resource
     public int SilverRotationBonus { get; private set; }
     public int GoldRotationBonus { get; private set; }
     public int DiamondRotationBonus { get; private set; }
+    public float ExplosionDamage { get; private set; }
+    public float ExplosionRadius { get; private set; }
 
     private bool _initialized = false;
 
@@ -90,38 +92,11 @@ public partial class Skill : Resource
 
         Cooldown = entry.Cooldown;
         BaseDamage = entry.BaseDamage;
-        Range = entry.Range;
-        Radius = entry.Radius;
-        Duration = entry.CastTime;
 
-        PierceCount = entry.PierceCount;
-
-        ProjectileSpeed = entry.ProjectileSpeed;
-        ProjectileCount = entry.ProjectileCount;
-        ProjectileDamage = entry.ProjectileDamage;
-        ProjectileSpreadAngle = entry.ProjectileSpreadAngle;
-        ProjectileLifetime = entry.ProjectileLifetime;
-
-        BronzeDamageBonus = entry.BronzeDamageBonus;
-        SilverDamageBonus = entry.SilverDamageBonus;
-        GoldDamageBonus = entry.GoldDamageBonus;
-        DiamondDamageBonus = entry.DiamondDamageBonus;
-
-        // Load whirlwind-specific parameters
-        WhirlwindRotations = entry.WhirlwindRotations;
-
-        // Apply mastery bonuses for rotations
-        if (SkillId == "warrior_whirlwind")
-        {
-            WhirlwindRotations += CurrentTier switch
-            {
-                SkillMasteryTier.Bronze => entry.BronzeRotationBonus,
-                SkillMasteryTier.Silver => entry.SilverRotationBonus,
-                SkillMasteryTier.Gold => entry.GoldRotationBonus,
-                SkillMasteryTier.Diamond => entry.DiamondRotationBonus,
-                _ => 0
-            };
-        }
+        LoadProjectileData(entry);
+        LoadMeleeData(entry);
+        LoadAOEData(entry);
+        LoadExplosionData(entry);
 
         _initialized = true;
         GD.Print($"Skill '{SkillName}' ({SkillId}) initialized from database");
@@ -195,6 +170,68 @@ public partial class Skill : Resource
             SkillBalanceType.CastSpawn => null, // Future implementation
             _ => null
         };
+    }
+
+    private void LoadProjectileData(SkillBalanceEntry entry)
+    {
+        if (entry.Projectile == null)
+        {
+            return;
+        }
+
+        ProjectileSpeed = entry.Projectile.ProjectileSpeed;
+        PierceCount = entry.Projectile.PierceCount;
+        ProjectileLifetime = entry.Projectile.ProjectileLifetime;
+        ProjectileCount = entry.Projectile.ProjectileCount;
+        ProjectileDamage = entry.Projectile.ProjectileDamage;
+        ProjectileSpreadAngle = entry.Projectile.ProjectileSpreadAngle;
+    }
+
+    private void LoadMeleeData(SkillBalanceEntry entry)
+    {
+        if (entry.Melee == null)
+        {
+            return;
+        }
+
+        Range = entry.Melee.Range;
+        Duration = entry.Melee.CastTime;
+    }
+
+    private void LoadAOEData(SkillBalanceEntry entry)
+    {
+        if (entry.AOE == null)
+        {
+            return;
+        }
+
+        Radius = entry.AOE.Radius;
+        Duration = entry.AOE.Duration;
+        WhirlwindRotations = entry.AOE.RotationCount;
+
+        // Apply mastery rotation bonuses (if skill uses rotations)
+        if (entry.AOE.RotationCount > 0)  // ← Generic check
+        {
+            WhirlwindRotations += CurrentTier switch
+            {
+                SkillMasteryTier.Bronze => entry.AOE.BronzeRotationBonus,
+                SkillMasteryTier.Silver => entry.AOE.SilverRotationBonus,
+                SkillMasteryTier.Gold => entry.AOE.GoldRotationBonus,
+                SkillMasteryTier.Diamond => entry.AOE.DiamondRotationBonus,
+                _ => 0
+            };
+        }
+    }
+
+    private void LoadExplosionData(SkillBalanceEntry entry)
+    {
+        if (entry.Explosion == null)
+        {
+            return;
+        }
+
+        ExplosionDamage = entry.Explosion.ExplosionDamage;
+        ExplosionRadius = entry.Explosion.ExplosionRadius;
     }
 }
 

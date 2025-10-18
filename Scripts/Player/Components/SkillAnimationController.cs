@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.Enemies.Base;
 using ZenithRising.Scripts.Skills.Base;
-using ZenithRising.Scripts.Skills.Effects;
-using ZenithRising.Scripts.Skills.Entities.Projectiles;
+using ZenithRising.Scripts.Skills.Entities;
+using ZenithRising.Scripts.Skills.Entities.Visuals;
+using ZenithRising.Scripts.Skills.Entities.Zones;
 
 namespace ZenithRising.Scripts.PlayerScripts.Components;
 
@@ -28,6 +29,7 @@ public partial class SkillAnimationController : Node
     // Exports
     [Export] public PackedScene ProjectileScene { get; set; }
     [Export] public PackedScene WhirlwindVisualScene { get; set; }
+    [Export] public PackedScene ExplosionEffectScene { get; set; }
 
     public void Initialize(Player player, StatsManager statsManager, AnimationPlayer animationPlayer)
     {
@@ -53,7 +55,18 @@ public partial class SkillAnimationController : Node
 
         if (ProjectileScene == null)
         {
-            GD.PrintErr("Player: ProjectileScene not assigned!");
+            GD.PrintErr("SkillAnimationController: ProjectileScene not assigned!");
+        }
+
+
+        if (WhirlwindVisualScene == null)
+        {
+            GD.PrintErr("SkillAnimationController: WhirlwindVisualScene not assigned!");
+        }
+
+        if (ExplosionEffectScene == null)
+        {
+            GD.PrintErr("SkillAnimationController: ExplosionEffectScene not assigned!");
         }
     }
 
@@ -190,6 +203,32 @@ public partial class SkillAnimationController : Node
         visual.GlobalPosition = _player.GlobalPosition;
 
         GD.Print("Whirlwind visual spawned");
+    }
+
+    // Called from animation tracks for explosion effects (Leap Slam, Breaching Charge, etc.)
+    public void SpawnExplosionEffect()
+    {
+        if (ExplosionEffectScene == null || _currentCastingSkill == null)
+        {
+            GD.PrintErr("SpawnExplosionEffect: Scene or skill not ready!");
+            return;
+        }
+
+        var explosion = ExplosionEffectScene.Instantiate<ExplosionEffect>();
+
+        // Explosions spawn at player position (can be overridden for projectile explosions)
+        Vector2 spawnPosition = _player.GlobalPosition;
+
+        // Initialize BEFORE adding to tree
+        explosion.Initialize(_currentCastingSkill, _player, Vector2.Zero);
+
+        // Set position BEFORE adding to tree
+        explosion.GlobalPosition = spawnPosition;
+
+        // Add to world (not as child of player)
+        _player.GetParent().AddChild(explosion);
+
+        GD.Print($"Spawned explosion at {spawnPosition} with radius {_currentCastingSkill.ExplosionRadius}");
     }
 
     // ===== COLLISION HANDLERS =====

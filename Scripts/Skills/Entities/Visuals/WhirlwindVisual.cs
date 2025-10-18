@@ -1,7 +1,7 @@
 using Godot;
 using ZenithRising.Scripts.Skills.Base;
 
-namespace ZenithRising.Scripts.Skills.Effects;
+namespace ZenithRising.Scripts.Skills.Entities.Visuals;
 
 public partial class WhirlwindVisual : Node2D
 {

@@ -1,7 +1,7 @@
 using Godot;
 using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.Skills.Base;
-using ZenithRising.Scripts.Skills.Entities.Projectiles;
+using ZenithRising.Scripts.Skills.Entities;
 
 namespace ZenithRising.Scripts.Skills.Executors;
 
