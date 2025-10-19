@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://ce7pfefkpj56w"]
+
+[ext_resource type="Script" uid="uid://dff1q4v5i7rpk" path="res://Scripts/Skills/Base/Skill.cs" id="1_7piws"]
+
+[resource]
+script = ExtResource("1_7piws")
+SkillId = "warrior_leap_slam"
+SkillName = "Leap Slam"
+Description = "Leaps to target location, creating a shockwave upon landing."
+Slot = 3
+metadata/_custom_type_script = "uid://dff1q4v5i7rpk"

@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=3 uid="uid://jb1p3bafbe1"]
+[gd_scene load_steps=46 format=3 uid="uid://jb1p3bafbe1"]
 
 [ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="1_a3d8c"]
 [ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_xpcdj"]
@@ -7,10 +7,11 @@
 [ext_resource type="Script" uid="uid://cffwkrfst1ikj" path="res://Scripts/Player/Components/InputManager.cs" id="3_7g0yx"]
 [ext_resource type="Script" uid="uid://b3km77lyp5ba3" path="res://Scripts/Player/Components/StatsManager.cs" id="4_mtuoh"]
 [ext_resource type="Script" uid="uid://cx5d7m8au6iit" path="res://Scripts/Player/Components/UpgradeManager.cs" id="5_htcer"]
-[ext_resource type="Resource" uid="uid://bhgnogl1ofs6o" path="res://Resources/Skills/Warrior/WarriorEnergyWave.tres" id="5_jhyir"]
+[ext_resource type="Resource" uid="uid://bhgnogl1ofs6o" path="res://Resources/Skills/Warrior/EnergyWave.tres" id="5_jhyir"]
 [ext_resource type="Resource" uid="uid://dfssvafd8e1nw" path="res://Resources/Skills/Warrior/WarriorBasicAttack.tres" id="6_gk6dx"]
 [ext_resource type="Resource" uid="uid://cfhxmf7mcmobn" path="res://Resources/Skills/Universal/Dash.tres" id="7_06tpx"]
 [ext_resource type="Resource" uid="uid://5g8accyxr8hh" path="res://Resources/Skills/Warrior/Whirlwind.tres" id="7_jhyir"]
+[ext_resource type="Resource" uid="uid://ce7pfefkpj56w" path="res://Resources/Skills/Warrior/LeapSlam.tres" id="8_dey5f"]
 [ext_resource type="Script" uid="uid://crelh1yuijku7" path="res://Scripts/Player/Components/SkillAnimationController.cs" id="9_gk6dx"]
 [ext_resource type="PackedScene" uid="uid://bvyx7q6quoo64" path="res://Scenes/SkillEffects/whirlwind_visual.tscn" id="11_74mp2"]
 [ext_resource type="PackedScene" uid="uid://c132prycoiyp0" path="res://Scenes/SkillEffects/explosion_effect.tscn" id="12_oikmp"]
@@ -633,6 +634,174 @@ tracks/1/keys = {
 }]
 }
 
+[sub_resource type="Animation" id="Animation_rukb4"]
+resource_name = "warrior_leap_slam_down"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8),
+"transitions": PackedFloat32Array(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5),
+"update": 1,
+"values": [Rect2(0, 1792, 64, 64), Rect2(64, 1792, 64, 64), Rect2(128, 1792, 64, 64), Rect2(192, 1792, 64, 64), Rect2(256, 1792, 64, 64), Rect2(192, 1792, 64, 64), Rect2(128, 1792, 64, 64), Rect2(64, 1792, 64, 64), Rect2(0, 1792, 64, 64)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.15, 0.39999998, 0.6666667),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"values": [{
+"args": [],
+"method": &"EnableMeleeHitbox"
+}, {
+"args": [],
+"method": &"StartDash"
+}, {
+"args": [],
+"method": &"DisableMeleeHitbox"
+}, {
+"args": [],
+"method": &"EndDash"
+}, {
+"args": [],
+"method": &"SpawnExplosionEffect"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_4no11"]
+resource_name = "warrior_leap_slam_left"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8),
+"transitions": PackedFloat32Array(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5),
+"update": 1,
+"values": [Rect2(0, 1728, 64, 64), Rect2(64, 1728, 64, 64), Rect2(128, 1728, 64, 64), Rect2(192, 1728, 64, 64), Rect2(256, 1728, 64, 64), Rect2(192, 1728, 64, 64), Rect2(128, 1728, 64, 64), Rect2(64, 1728, 64, 64), Rect2(0, 1728, 64, 64)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.15, 0.39999998, 0.6666667),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"values": [{
+"args": [],
+"method": &"EnableMeleeHitbox"
+}, {
+"args": [],
+"method": &"StartDash"
+}, {
+"args": [],
+"method": &"DisableMeleeHitbox"
+}, {
+"args": [],
+"method": &"EndDash"
+}, {
+"args": [],
+"method": &"SpawnExplosionEffect"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_2ahak"]
+resource_name = "warrior_leap_slam_right"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8),
+"transitions": PackedFloat32Array(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5),
+"update": 1,
+"values": [Rect2(0, 1856, 64, 64), Rect2(64, 1856, 64, 64), Rect2(128, 1856, 64, 64), Rect2(192, 1856, 64, 64), Rect2(256, 1856, 64, 64), Rect2(192, 1856, 64, 64), Rect2(128, 1856, 64, 64), Rect2(64, 1856, 64, 64), Rect2(0, 1856, 64, 64)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.15, 0.39999998, 0.6666667),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"values": [{
+"args": [],
+"method": &"EnableMeleeHitbox"
+}, {
+"args": [],
+"method": &"StartDash"
+}, {
+"args": [],
+"method": &"DisableMeleeHitbox"
+}, {
+"args": [],
+"method": &"EndDash"
+}, {
+"args": [],
+"method": &"SpawnExplosionEffect"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_fcwna"]
+resource_name = "warrior_leap_slam_up"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:region_rect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8),
+"transitions": PackedFloat32Array(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5),
+"update": 1,
+"values": [Rect2(0, 1664, 64, 64), Rect2(64, 1664, 64, 64), Rect2(128, 1664, 64, 64), Rect2(192, 1664, 64, 64), Rect2(256, 1664, 64, 64), Rect2(192, 1664, 64, 64), Rect2(128, 1664, 64, 64), Rect2(64, 1664, 64, 64), Rect2(0, 1664, 64, 64)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.15, 0.39999998, 0.6666667),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"values": [{
+"args": [],
+"method": &"EnableMeleeHitbox"
+}, {
+"args": [],
+"method": &"StartDash"
+}, {
+"args": [],
+"method": &"DisableMeleeHitbox"
+}, {
+"args": [],
+"method": &"EndDash"
+}, {
+"args": [],
+"method": &"SpawnExplosionEffect"
+}]
+}
+
 [sub_resource type="Animation" id="Animation_rcvs5"]
 resource_name = "warrior_whirlwind"
 length = 1.2
@@ -692,6 +861,10 @@ _data = {
 &"warrior_energy_wave_left": SubResource("Animation_eksi1"),
 &"warrior_energy_wave_right": SubResource("Animation_jincj"),
 &"warrior_energy_wave_up": SubResource("Animation_rqdc0"),
+&"warrior_leap_slam_down": SubResource("Animation_rukb4"),
+&"warrior_leap_slam_left": SubResource("Animation_4no11"),
+&"warrior_leap_slam_right": SubResource("Animation_2ahak"),
+&"warrior_leap_slam_up": SubResource("Animation_fcwna"),
 &"warrior_whirlwind": SubResource("Animation_rcvs5")
 }
 
@@ -708,7 +881,7 @@ script = ExtResource("1_xpcdj")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_0u5uq")
 region_enabled = true
-region_rect = Rect2(64, 1664, 64, 64)
+region_rect = Rect2(0, 1664, 64, 64)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
@@ -725,6 +898,7 @@ script = ExtResource("1_a3d8c")
 BasicAttackSkill = ExtResource("6_gk6dx")
 SpecialAttackSkill = ExtResource("5_jhyir")
 PrimarySkill = ExtResource("7_jhyir")
+SecondarySkill = ExtResource("8_dey5f")
 UtilitySkill = ExtResource("7_06tpx")
 metadata/_custom_type_script = "uid://bvjyaqpu6dell"
 

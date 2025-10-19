@@ -258,7 +258,7 @@ public partial class SkillAnimationController : Node
         Vector2 dashDirection = _player.GetAttackDirection();
 
         // Start code-driven movement (200 pixels, 0.3 seconds)
-        _player.StartDash(dashDirection, 200f, 0.3f);
+        _player.StartDash(dashDirection, _currentCastingSkill.Range, _currentCastingSkill.Duration);
 
         // Enable i-frames
         _statsManager.SetInvincible(true);

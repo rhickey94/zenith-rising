@@ -42,13 +42,13 @@ public partial class InputManager : Node
     {
         switch (keyEvent.Keycode)
         {
-            case Key.Q:
+            case Key.Key1:
                 EmitSignal(SignalName.SkillPressed, (int)SkillSlot.Primary);
                 break;
-            case Key.E:
+            case Key.Key2:
                 EmitSignal(SignalName.SkillPressed, (int)SkillSlot.Secondary);
                 break;
-            case Key.R:
+            case Key.Key3:
                 EmitSignal(SignalName.SkillPressed, (int)SkillSlot.Ultimate);
                 break;
             case Key.Space:
