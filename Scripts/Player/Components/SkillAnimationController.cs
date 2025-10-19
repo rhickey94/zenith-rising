@@ -70,6 +70,32 @@ public partial class SkillAnimationController : Node
         }
     }
 
+    public bool ExecuteInstantSkill(Skill skill)
+    {
+        SetCurrentSkill(skill);
+        return true;
+        // // Route based on skill type - will expand as we add more instant skills
+        // switch (skill.SkillId)
+        // {
+        //     case "warrior_combat_stim":
+        //         _statsManager.ApplyBuff("combat_stim",
+        //             attackSpeedBonus: 0.4f,
+        //             moveSpeedBonus: 0.2f,
+        //             duration: 6f);
+        //         return true;
+
+        //     case "warrior_fortify":
+        //         _statsManager.ApplyBuff("fortify",
+        //             damageReductionBonus: 0.5f,
+        //             duration: 4f);
+        //         return true;
+
+        //     default:
+        //         GD.PrintErr($"ExecuteInstantSkill: Unknown instant skill {skill.SkillId}");
+        //         return false;
+        // }
+    }
+
     public void SetCurrentSkill(Skill skill)
     {
         _currentCastingSkill = skill;

@@ -324,6 +324,18 @@ public partial class Player : CharacterBody2D
         return true;
     }
 
+    public bool TryInstantSkill(Skill skill)
+    {
+        if (_currentState == PlayerState.Dead)
+        {
+            return false;
+        }
+
+        // Instant skills don't change FSM state (non-interrupting)
+        // Delegate to SkillAnimationController for execution
+        return _skillAnimationController.ExecuteInstantSkill(skill);
+    }
+
     /// <summary>
     /// Starts a dash movement in the specified direction.
     /// Called by SkillAnimationController via animation callback.

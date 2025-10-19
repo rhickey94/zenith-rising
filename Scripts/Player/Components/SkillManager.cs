@@ -123,7 +123,7 @@ public partial class SkillManager : Node
         }
         else // CastBehavior.Instant
         {
-            bool success = skill.Execute(_player);
+            bool success = _player.TryInstantSkill(skill);
             if (success)
             {
                 cooldownRemaining = skill.Cooldown;

@@ -2,7 +2,6 @@ using Godot;
 using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.Skills.Balance;
-using ZenithRising.Scripts.Skills.Executors;
 
 namespace ZenithRising.Scripts.Skills.Base;
 
@@ -59,8 +58,6 @@ public partial class Skill : Resource
 
     private static readonly int[] _masteryThresholds = [100, 500, 2000, 10000];
 
-    private ISkillExecutor _executor;
-
     /// <summary>
     /// Loads skill balance data from GameBalance.SkillDatabase.
     /// Call this before first use (done automatically by SkillManager).
@@ -101,17 +98,6 @@ public partial class Skill : Resource
         _initialized = true;
     }
 
-    public bool Execute(Player player)
-    {
-        if (CastBehavior == CastBehavior.AnimationDriven)
-        {
-            GD.PrintErr($"{SkillName} is AnimationDriven - should not call Execute()!");
-            return false;
-        }
-        _executor ??= CreateExecutor();
-        return _executor?.ExecuteSkill(player, this) ?? false;
-    }
-
     /// <summary>
     /// Records a kill for this skill and checks for mastery tier upgrades.
     /// Called by skill effects when they kill an enemy.
@@ -150,24 +136,6 @@ public partial class Skill : Resource
         {
             CurrentTier = newTier;
         }
-    }
-
-    private ISkillExecutor CreateExecutor()
-    {
-        // Only used for EffectCollision damage source
-        if (DamageSource != DamageSource.EffectCollision)
-        {
-            return null; // PlayerHitbox and None don't use executors
-        }
-
-        // Route by BalanceType for effect-based skills
-        return BalanceType switch
-        {
-            SkillBalanceType.Projectile => new InstantProjectileExecutor(),
-            SkillBalanceType.PersistentZone => null, // Future implementation
-            SkillBalanceType.CastSpawn => null, // Future implementation
-            _ => null
-        };
     }
 
     private void LoadProjectileData(SkillBalanceEntry entry)
