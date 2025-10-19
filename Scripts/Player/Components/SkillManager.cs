@@ -13,11 +13,14 @@ public partial class SkillManager : Node
     [Export] public Skill SecondarySkill { get; set; }
     [Export] public Skill UltimateSkill { get; set; }
 
+    [Export] public Skill UtilitySkill { get; set; }
+
     private float _basicAttackCooldownTimer = 0.0f;
     private float _specialAttackCooldownTimer = 0.0f;
     private float _primarySkillCooldownTimer = 0.0f;
     private float _secondarySkillCooldownTimer = 0.0f;
     private float _ultimateSkillCooldownTimer = 0.0f;
+    private float _utilitySkillCooldownTimer = 0.0f;
 
     private Player _player;
 
@@ -63,6 +66,10 @@ public partial class SkillManager : Node
             _ultimateSkillCooldownTimer -= delta;
         }
 
+        if (_utilitySkillCooldownTimer > 0)
+        {
+            _utilitySkillCooldownTimer -= delta;
+        }
     }
 
     public void HandleInput(InputEvent @event)
@@ -93,6 +100,10 @@ public partial class SkillManager : Node
             {
                 UseSkill(UltimateSkill, ref _ultimateSkillCooldownTimer);
             }
+            else if (eventKey.Keycode == Key.Space && UtilitySkill != null)
+            {
+                UseSkill(UtilitySkill, ref _utilitySkillCooldownTimer);
+            }
         }
     }
 
@@ -122,6 +133,7 @@ public partial class SkillManager : Node
             if (_player.TryCastSkill(skill))
             {
                 cooldownRemaining = skill.Cooldown;
+                GD.Print($">>> COOLDOWN SET: {skill.SkillName} cooldown = {cooldownRemaining}s");
             }
         }
         else // CastBehavior.Instant

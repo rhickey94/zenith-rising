@@ -268,7 +268,8 @@ public enum SkillSlot
 
     Primary,    // Q key
     Secondary,  // E key
-    Ultimate    // R key
+    Ultimate,    // R key
+    Utility
 }
 
 public enum SkillMasteryTier

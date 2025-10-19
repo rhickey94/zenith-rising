@@ -4,5 +4,6 @@ public enum PlayerClass
 {
     Warrior,
     Mage,
-    Ranger
+    Ranger,
+    All
 }

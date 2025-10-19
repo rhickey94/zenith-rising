@@ -78,6 +78,7 @@ public partial class StatsManager : Node
     public float PickupRadius { get; private set; } = 80f;
     public float HealthRegenPerSecond { get; private set; } = 0f;
     public int ProjectilePierceCount { get; private set; } = 0;
+    public bool IsInvincible { get; private set; } = false;
 
     // ===== SIGNALS =====
     [Signal] public delegate void LeveledUpEventHandler();
@@ -155,6 +156,12 @@ public partial class StatsManager : Node
     // ===== PUBLIC API - Combat =====
     public void TakeDamage(float damage)
     {
+        if (IsInvincible)
+        {
+            GD.Print("Damage blocked - player is invincible!");
+            return; // Early exit, no damage taken
+        }
+
         CurrentHealth -= damage;
         if (CurrentHealth < 0)
         {
@@ -309,6 +316,24 @@ public partial class StatsManager : Node
     public float GetCooldownReduction()
     {
         return (1.0f - (1.0f / (1.0f + Intelligence * GameBalance.Instance.Config.CharacterProgression.IntelligenceCDRPerPoint))) * 100f;
+    }
+
+    // New method for skill control
+    public void SetInvincible(bool invincible)
+    {
+        IsInvincible = invincible;
+
+        if (invincible)
+        {
+            GD.Print("I-frames START");
+            // Trigger visual feedback (flash effect)
+            // _player?.EmitSignal("InvincibilityStarted");
+        }
+        else
+        {
+            GD.Print("I-frames END");
+            // _player?.EmitSignal("InvincibilityEnded");
+        }
     }
 
     // ===== PUBLIC API - Save/Load =====

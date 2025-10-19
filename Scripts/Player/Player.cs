@@ -46,6 +46,14 @@ public partial class Player : CharacterBody2D
     private bool _isCastingWhileMoving = false;
     private bool _movementControlledBySkill = false;
     private PlayerState _previousState = PlayerState.Idle;
+    private Tween _invincibilityTween;
+
+    // Dash state
+    private bool _isDashing = false;
+    private Vector2 _dashStartPos = Vector2.Zero;
+    private Vector2 _dashEndPos = Vector2.Zero;
+    private float _dashElapsed = 0f;
+    private float _dashDuration = 0f;
 
     public Vector2 GetLastDirection() => _lastDirection;
 
@@ -125,12 +133,55 @@ public partial class Player : CharacterBody2D
 
     public override void _PhysicsProcess(double delta)
     {
+        if (_statsManager != null && _sprite != null)
+        {
+            if (_statsManager.IsInvincible && _invincibilityTween == null)
+            {
+                // Start flashing
+                _invincibilityTween = CreateTween();
+                _invincibilityTween.SetLoops();
+                _invincibilityTween.TweenProperty(_sprite, "modulate:a", 0.5, 0.1);
+                _invincibilityTween.TweenProperty(_sprite, "modulate:a", 1.0, 0.1);
+            }
+            else if (!_statsManager.IsInvincible && _invincibilityTween != null)
+            {
+                // Stop flashing
+                _invincibilityTween.Kill();
+                _invincibilityTween = null;
+                _sprite.Modulate = new Color(1, 1, 1, 1); // Reset to full opacity
+            }
+        }
+
         Vector2 direction = Vector2.Zero;
 
-        // Skip manual movement if skill controls it (dash)
+        // Code-driven dash movement overrides normal movement
+        if (_isDashing)
+        {
+            _dashElapsed += (float)delta;
+            float t = Mathf.Clamp(_dashElapsed / _dashDuration, 0f, 1f);
+
+            // Ease-out curve for smooth deceleration
+            t = (float)Mathf.Ease(t, -2.0);
+
+            // Interpolate position
+            GlobalPosition = _dashStartPos.Lerp(_dashEndPos, t);
+
+            // Check if dash completed
+            if (t >= 1.0f)
+            {
+                _isDashing = false;
+                GD.Print("Dash movement complete");
+            }
+
+            // Skip normal movement logic
+            MoveAndSlide();
+            return;
+        }
+
+        // Skip manual movement if skill controls it (other forced movement skills)
         if (_movementControlledBySkill)
         {
-            // Animation position keyframes control movement
+            // For other skills that might need forced movement in the future
             MoveAndSlide();
             return;
         }
@@ -270,6 +321,34 @@ public partial class Player : CharacterBody2D
 
         GD.Print($"Playing skill animation: {animName} (Movement: {skill.MovementBehavior})");
         return true;
+    }
+
+    /// <summary>
+    /// Starts a dash movement in the specified direction.
+    /// Called by SkillAnimationController via animation callback.
+    /// </summary>
+    public void StartDash(Vector2 direction, float distance, float duration)
+    {
+        _isDashing = true;
+        _dashStartPos = GlobalPosition;
+        _dashEndPos = GlobalPosition + (direction.Normalized() * distance);
+        _dashDuration = duration;
+        _dashElapsed = 0f;
+
+        GD.Print($"Dash started: {_dashStartPos} → {_dashEndPos} (distance: {distance}, duration: {duration}s)");
+    }
+
+    /// <summary>
+    /// Forcibly ends the dash movement.
+    /// Called by SkillAnimationController via animation callback.
+    /// </summary>
+    public void EndDash()
+    {
+        if (_isDashing)
+        {
+            _isDashing = false;
+            GD.Print("Dash ended early via EndDash() call");
+        }
     }
 
     // ===== PRIVATE HELPERS - Event Handlers =====
@@ -420,6 +499,7 @@ public partial class Player : CharacterBody2D
 
     private void OnAnimationFinished(StringName animName)
     {
+        GD.Print($">>> ANIMATION FINISHED: {animName}, Current State: {_currentState}");
         // Clear casting flags
         bool wasCasting = _currentState == PlayerState.CastingSkill || _isCastingWhileMoving;
 

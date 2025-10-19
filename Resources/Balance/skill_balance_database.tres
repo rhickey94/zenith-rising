@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="SkillBalanceDatabase" load_steps=13 format=3 uid="uid://dbooxibogc7fp"]
+[gd_resource type="Resource" script_class="SkillBalanceDatabase" load_steps=14 format=3 uid="uid://dbooxibogc7fp"]
 
 [ext_resource type="Script" uid="uid://d25rerypcvb5f" path="res://Scripts/Skills/Balance/SkillBalanceDatabase.cs" id="1_c7wpi"]
 [ext_resource type="Script" uid="uid://bqtal0vugxig6" path="res://Scripts/Skills/Balance/SkillBalanceEntry.cs" id="1_lr0uj"]
@@ -75,7 +75,24 @@ MovementBehavior = 0
 BaseDamage = 30.0
 metadata/_custom_type_script = "uid://bqtal0vugxig6"
 
+[sub_resource type="Resource" id="Resource_rvwwg"]
+script = ExtResource("1_lr0uj")
+AnimationBaseName = "dash"
+SkillId = "universal_dash"
+SkillName = "Dash"
+BalanceType = 4
+CastBehavior = 1
+DamageSource = 2
+MovementBehavior = 2
+BaseDamage = 0.0
+Cooldown = 3.0
+BronzeDamageBonus = 0.0
+SilverDamageBonus = 0.0
+GoldDamageBonus = 0.0
+DiamondDamageBonus = 0.0
+metadata/_custom_type_script = "uid://bqtal0vugxig6"
+
 [resource]
 script = ExtResource("1_c7wpi")
-Skills = Array[Object]([SubResource("Resource_ytv5f"), SubResource("Resource_mfapk"), SubResource("Resource_lr0uj")])
+Skills = Array[Object]([SubResource("Resource_ytv5f"), SubResource("Resource_mfapk"), SubResource("Resource_lr0uj"), SubResource("Resource_rvwwg")])
 metadata/_custom_type_script = "uid://d25rerypcvb5f"

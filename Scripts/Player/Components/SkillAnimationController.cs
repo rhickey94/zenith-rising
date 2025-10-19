@@ -231,6 +231,51 @@ public partial class SkillAnimationController : Node
         GD.Print($"Spawned explosion at {spawnPosition} with radius {_currentCastingSkill.ExplosionRadius}");
     }
 
+    // ===== DASH CALLBACKS (Called from AnimationPlayer) =====
+
+    /// <summary>
+    /// Called at start of dash animation to initiate movement + i-frames.
+    /// </summary>
+    public void StartDash()
+    {
+        if (_statsManager == null || _player == null)
+        {
+            GD.PrintErr("StartDash: StatsManager or Player not found!");
+            return;
+        }
+
+        // Get dash direction from mouse
+        Vector2 dashDirection = _player.GetAttackDirection();
+
+        // Start code-driven movement (200 pixels, 0.3 seconds)
+        _player.StartDash(dashDirection, 200f, 0.3f);
+
+        // Enable i-frames
+        _statsManager.SetInvincible(true);
+
+        GD.Print($"Dash started: direction={dashDirection}, i-frames=ON");
+    }
+
+    /// <summary>
+    /// Called at end of dash animation to end movement + i-frames.
+    /// </summary>
+    public void EndDash()
+    {
+        if (_statsManager == null || _player == null)
+        {
+            GD.PrintErr("EndDash: StatsManager or Player not found!");
+            return;
+        }
+
+        // Stop code-driven movement (in case animation ends early)
+        _player.EndDash();
+
+        // Disable i-frames
+        _statsManager.SetInvincible(false);
+
+        GD.Print("Dash ended: i-frames=OFF");
+    }
+
     // ===== COLLISION HANDLERS =====
     private void UpdateMeleeHitboxPosition(Vector2 direction)
     {

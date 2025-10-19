@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://cfhxmf7mcmobn"]
+
+[ext_resource type="Script" uid="uid://dff1q4v5i7rpk" path="res://Scripts/Skills/Base/Skill.cs" id="1_4fmep"]
+
+[resource]
+script = ExtResource("1_4fmep")
+SkillId = "universal_dash"
+AllowedClass = 3
+Slot = 5
