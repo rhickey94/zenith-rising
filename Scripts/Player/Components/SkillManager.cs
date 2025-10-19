@@ -23,6 +23,7 @@ public partial class SkillManager : Node
     private float _utilitySkillCooldownTimer = 0.0f;
 
     private Player _player;
+    private StatsManager _statsManager;
 
     public override void _Ready()
     {
@@ -30,6 +31,12 @@ public partial class SkillManager : Node
         if (_player == null)
         {
             GD.PrintErr("SkillManager: Could not find Player parent!");
+        }
+
+        _statsManager = _player.GetNode<StatsManager>("StatsManager");
+        if (_statsManager == null)
+        {
+            GD.PrintErr("SkillManager: StatsManager not found!");
         }
 
         ValidateSkill(BasicAttackSkill, SkillSlot.BasicAttack);
@@ -99,7 +106,7 @@ public partial class SkillManager : Node
 
     private void UseSkill(Skill skill, ref float cooldownRemaining)
     {
-        if (skill == null)
+        if (skill == null || _statsManager == null)
         {
             return;
         }
@@ -109,8 +116,16 @@ public partial class SkillManager : Node
             return;
         }
 
-        // Initialize skill from database if not already done
+        // Initialize skill from database
         skill.Initialize();
+
+        // Calculate actual cooldown (if skill has one)
+        float actualCooldown = 0f;
+        if (skill.Cooldown > 0)
+        {
+            // Apply CDR to cooldown
+            actualCooldown = skill.Cooldown * (1 - _statsManager.CooldownReduction);
+        }
 
         // Route based on CastBehavior
         if (skill.CastBehavior == CastBehavior.AnimationDriven)
@@ -118,7 +133,20 @@ public partial class SkillManager : Node
             // Request player to play animation
             if (_player.TryCastSkill(skill))
             {
-                cooldownRemaining = skill.Cooldown;
+                // If skill has cooldown, apply it
+                if (actualCooldown > 0)
+                {
+                    cooldownRemaining = actualCooldown;
+                }
+                else
+                {
+                    // If no cooldown, limit by attack rate (for Attack category skills)
+                    if (skill.Category == SkillCategory.Attack)
+                    {
+                        cooldownRemaining = 1.0f / _statsManager.CurrentAttackRate;
+                    }
+                    // Spells with no cooldown don't have artificial delay
+                }
             }
         }
         else // CastBehavior.Instant
@@ -126,7 +154,8 @@ public partial class SkillManager : Node
             bool success = _player.TryInstantSkill(skill);
             if (success)
             {
-                cooldownRemaining = skill.Cooldown;
+                // Instant skills always use cooldown (if they have one)
+                cooldownRemaining = actualCooldown;
             }
         }
     }

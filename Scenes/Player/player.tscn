@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=3 uid="uid://jb1p3bafbe1"]
+[gd_scene load_steps=47 format=3 uid="uid://jb1p3bafbe1"]
 
 [ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="1_a3d8c"]
 [ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_xpcdj"]
@@ -14,6 +14,7 @@
 [ext_resource type="Resource" uid="uid://ce7pfefkpj56w" path="res://Resources/Skills/Warrior/LeapSlam.tres" id="8_dey5f"]
 [ext_resource type="Script" uid="uid://crelh1yuijku7" path="res://Scripts/Player/Components/SkillAnimationController.cs" id="9_gk6dx"]
 [ext_resource type="PackedScene" uid="uid://bvyx7q6quoo64" path="res://Scenes/SkillEffects/whirlwind_visual.tscn" id="11_74mp2"]
+[ext_resource type="Script" uid="uid://kvtmh2ghdjcb" path="res://Scripts/Player/Components/BuffManager.cs" id="11_r5xpd"]
 [ext_resource type="PackedScene" uid="uid://c132prycoiyp0" path="res://Scenes/SkillEffects/explosion_effect.tscn" id="12_oikmp"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
@@ -905,6 +906,9 @@ metadata/_custom_type_script = "uid://bvjyaqpu6dell"
 [node name="StatsManager" type="Node" parent="."]
 script = ExtResource("4_mtuoh")
 metadata/_custom_type_script = "uid://b3km77lyp5ba3"
+
+[node name="BuffManager" type="Node" parent="."]
+script = ExtResource("11_r5xpd")
 
 [node name="UpgradeManager" type="Node" parent="."]
 script = ExtResource("5_htcer")

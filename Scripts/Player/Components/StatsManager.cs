@@ -6,15 +6,25 @@ namespace ZenithRising.Scripts.PlayerScripts.Components;
 
 public struct StatModifiers
 {
-    public float MovementSpeedBonus; // Percentage increase (e.g., 0.1 for +10%)
-    public float AttackSpeedBonus;   // Percentage decrease in attack interval (e.g., 0.1 for -10%)
-    public float MaxHealthBonus;     // Flat increase in max health
-    public float BaseSpeedBonus;     // Flat increase in base speed
-    public float DamagePercentBonus;
-    public float CritChanceBonus;
-    public float PickupRadiusBonus;
-    public float HealthRegenBonus;
-    public int ProjectilePierceBonus;
+    // Flat bonuses
+    public float FlatHealth;
+    public float FlatSpeed;
+    public float FlatDamage;
+
+    // Percent bonuses (0.10 = +10%)
+    public float PercentHealth;
+    public float PercentSpeed;
+    public float PercentAttackSpeed;  // now uses same direction as other stats
+    public float PercentCastSpeed;  // now uses same direction as other stats
+    public float PercentDamage;
+    public float PercentCritChance;
+    public float PercentCritDamage;
+    public float PercentCooldownReduction;
+
+    // Special bonuses
+    public float PickupRadius;
+    public float HealthRegenPerSecond;
+    public int ProjectilePierceCount;
 }
 
 public enum StatType
@@ -66,6 +76,18 @@ public partial class StatsManager : Node
     public float CurrentMaxHealth { get; private set; } = 100.0f;
     public float CurrentHealth { get; private set; } = 100.0f;
     public float CurrentSpeed { get; private set; }
+    // Attack Speed System (NEW naming)
+    public float BaseAttackRate { get; set; } = 2.0f; // 2 attacks per second (0.5s between attacks)
+    public float CurrentAttackRate { get; private set; } = 2.0f; // Calculated
+
+    // Cast Speed System (NEW)
+    public float BaseCastSpeed { get; set; } = 1.0f; // 1.0x multiplier
+    public float CurrentCastSpeed { get; private set; } = 1.0f; // Calculated
+
+    // Cooldown Reduction System (NEW)
+    public float CooldownReduction { get; private set; } = 0f; // 0% - 40% cap
+
+    // DEPRECATED (will remove after refactor)
     public float CurrentFireRate { get; private set; }
     public float CurrentMeleeRate { get; private set; }
 
@@ -225,37 +247,82 @@ public partial class StatsManager : Node
         float healthPercentage = CurrentMaxHealth > 0 ? CurrentHealth / CurrentMaxHealth : 1f;
         var config = GameBalance.Instance.Config.CharacterProgression;
 
-        // Apply upgrade bonuses to base values
-        CurrentSpeed = (BaseSpeed + modifiers.BaseSpeedBonus) * (1 + modifiers.MovementSpeedBonus);
+        // ===== CALCULATE ATTRIBUTE BONUSES =====
 
-        // Attack speed: AGI bonus + upgrade bonuses
-        float agiSpeedBonus = Agility * config.AgilityAttackSpeedPerPoint;
-        float totalAttackSpeedBonus = modifiers.AttackSpeedBonus + agiSpeedBonus;
-        CurrentFireRate = BaseFireRate * (1 - totalAttackSpeedBonus);
-        CurrentMeleeRate = BaseMeleeRate * (1 - totalAttackSpeedBonus);
+        // STR bonuses
+        float strDamagePercent = Strength * config.StrengthDamagePerPoint;
+        float strHealthFlat = Strength * config.StrengthHealthPerPoint;
 
-        // Max Health: Base + Run level + Upgrades + Character stats (VIT + STR)
-        float characterHealthBonus = (Vitality * config.VitalityHealthPerPoint) + (Strength * config.StrengthHealthPerPoint);
-        CurrentMaxHealth = BaseMaxHealth + CalculateRunLevelHealthBonus() + modifiers.MaxHealthBonus + characterHealthBonus;
+        // INT bonuses
+        float intDamagePercent = Intelligence * config.IntelligenceDamagePerPoint;
+        float intCastSpeedPercent = Intelligence * config.IntelligenceCastSpeedPerPoint; // NEW
+        float intCDRPercent = Intelligence * config.IntelligenceCDRPerPoint; // NEW
 
-        // Damage: Upgrades + Character stats (STR/INT)
-        DamageMultiplier = 1.0f + modifiers.DamagePercentBonus;
-        PhysicalDamageMultiplier = 1.0f + (Strength * config.StrengthDamagePerPoint);
-        MagicalDamageMultiplier = 1.0f + (Intelligence * config.IntelligenceDamagePerPoint);
+        // AGI bonuses
+        float agiAttackSpeedPercent = Agility * config.AgilityAttackSpeedPerPoint;
+        float agiCritPercent = Agility * config.AgilityCritPerPoint;
 
-        // Crit: Upgrades + Character stats (AGI + FOR)
-        float characterCritChance = Mathf.Min(Agility * config.AgilityCritPerPoint, 0.5f); // Cap at 50%
-        CritChance = Mathf.Clamp(modifiers.CritChanceBonus + characterCritChance, 0f, 1f);
-        CritDamageMultiplier = 1.5f + (Fortune * config.FortuneCritDamagePerPoint); // Base 150% + FOR bonus
+        // VIT bonuses
+        float vitHealthFlat = Vitality * config.VitalityHealthPerPoint;
+        float vitRegenFlat = Vitality * config.VitalityRegenPerPoint;
 
-        // Regen: Upgrades + Character stats (VIT)
-        float characterRegen = Vitality * config.VitalityRegenPerPoint;
-        HealthRegenPerSecond = modifiers.HealthRegenBonus + characterRegen;
+        // FOR bonuses
+        float forCritDamagePercent = Fortune * config.FortuneCritDamagePerPoint;
 
-        PickupRadius = 80f + modifiers.PickupRadiusBonus;
-        ProjectilePierceCount = modifiers.ProjectilePierceBonus;
+        // ===== UNIFIED FORMULA: (CharacterStat + Flat) * (1 + Percent) =====
 
-        // Maintain health percentage
+        // HEALTH
+        float flatHealth = strHealthFlat + vitHealthFlat + CalculateRunLevelHealthBonus() + modifiers.FlatHealth;
+        float percentHealth = modifiers.PercentHealth;
+        CurrentMaxHealth = (BaseMaxHealth + flatHealth) * (1 + percentHealth);
+
+        // MOVEMENT SPEED
+        float flatSpeed = modifiers.FlatSpeed;
+        float percentSpeed = modifiers.PercentSpeed;
+        CurrentSpeed = (BaseSpeed + flatSpeed) * (1 + percentSpeed);
+
+        // ATTACK SPEED (attacks per second)
+        float percentAttackSpeed = agiAttackSpeedPercent + modifiers.PercentAttackSpeed;
+        CurrentAttackRate = BaseAttackRate * (1 + percentAttackSpeed);
+
+        // CAST SPEED (multiplier for cast times)
+        float percentCastSpeed = intCastSpeedPercent + modifiers.PercentCastSpeed;
+        CurrentCastSpeed = BaseCastSpeed * (1 + percentCastSpeed);
+
+        // COOLDOWN REDUCTION (percent reduction, capped at 40%)
+        float totalCDR = intCDRPercent + modifiers.PercentCooldownReduction;
+        CooldownReduction = Mathf.Clamp(totalCDR, 0f, 0.40f); // Cap at 40%
+
+        // DAMAGE (additive pool)
+        float percentPhysicalDamage = strDamagePercent + modifiers.PercentDamage;
+        PhysicalDamageMultiplier = 1.0f + percentPhysicalDamage;
+
+        float percentMagicalDamage = intDamagePercent + modifiers.PercentDamage;
+        MagicalDamageMultiplier = 1.0f + percentMagicalDamage;
+
+        DamageMultiplier = 1.0f + modifiers.PercentDamage;
+
+        // CRIT CHANCE
+        float percentCritChance = agiCritPercent + modifiers.PercentCritChance;
+        CritChance = Mathf.Clamp(percentCritChance, 0f, 0.75f); // Cap at 75%
+
+        // CRIT DAMAGE
+        float baseCritDamage = 0.5f; // Base crit = 150%
+        float percentCritDamage = forCritDamagePercent + modifiers.PercentCritDamage;
+        CritDamageMultiplier = 1.0f + baseCritDamage + percentCritDamage;
+
+        // HEALTH REGEN
+        float flatRegen = vitRegenFlat + modifiers.HealthRegenPerSecond;
+        HealthRegenPerSecond = flatRegen;
+
+        // PICKUP RADIUS
+        float basePickupRadius = 80f;
+        PickupRadius = basePickupRadius + modifiers.PickupRadius;
+
+        // PROJECTILE PIERCE
+        ProjectilePierceCount = modifiers.ProjectilePierceCount;
+
+        // ===== MAINTAIN HEALTH PERCENTAGE =====
         CurrentHealth = CurrentMaxHealth * healthPercentage;
         if (CurrentHealth > CurrentMaxHealth)
         {

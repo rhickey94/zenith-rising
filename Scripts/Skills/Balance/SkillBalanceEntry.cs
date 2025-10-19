@@ -23,12 +23,14 @@ public partial class SkillBalanceEntry : Resource
     [Export] public string SkillName { get; set; } = "";
     [Export] public SkillBalanceType BalanceType { get; set; }
     [Export] public CastBehavior CastBehavior { get; set; } = CastBehavior.Instant;
+    [Export] public SkillCategory Category { get; set; } = SkillCategory.Attack;
     [Export] public DamageSource DamageSource { get; set; } = DamageSource.EffectCollision;
     [Export] public MovementBehavior MovementBehavior { get; set; } = MovementBehavior.Allowed;
 
     [ExportGroup("Base Stats")]
     [Export] public float BaseDamage { get; set; } = 10f;
     [Export] public float Cooldown { get; set; } = 1.0f;
+    [Export] public float CastTime { get; set; } = 0f; // For spells only
     [Export] public DamageType DamageType { get; set; } = DamageType.Physical;
 
     [ExportGroup("Scaling")]

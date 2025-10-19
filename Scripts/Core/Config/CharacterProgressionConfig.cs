@@ -9,6 +9,7 @@ public partial class CharacterProgressionConfig : Resource
     [Export] public float StrengthDamagePerPoint { get; set; } = 0.03f;
     [Export] public float StrengthHealthPerPoint { get; set; } = 10f;
     [Export] public float IntelligenceDamagePerPoint { get; set; } = 0.03f;
+    [Export] public float IntelligenceCastSpeedPerPoint { get; set; } = 0.02f; // 2% per point
     [Export] public float IntelligenceCDRPerPoint { get; set; } = 0.02f;
     [Export] public float AgilityAttackSpeedPerPoint { get; set; } = 0.02f;
     [Export] public float AgilityCritPerPoint { get; set; } = 0.01f;

@@ -12,7 +12,7 @@ public partial class Skill : Resource
     [Export] public string SkillName { get; set; }
     [Export] public string Description { get; set; }
     [Export] public SkillType Type { get; set; }
-    [Export] public float Cooldown { get; set; } = 0f; // For active skills
+
     [Export] public DamageType DamageType { get; set; } = DamageType.Physical;
 
     [Export] public PlayerClass AllowedClass { get; set; }
@@ -27,6 +27,7 @@ public partial class Skill : Resource
     // Runtime properties (loaded from database)
     public string AnimationBaseName { get; private set; }
     public bool UsesDirectionalAnimation { get; private set; }
+    public SkillCategory Category { get; private set; } = SkillCategory.Attack;
 
     public float BaseDamage { get; private set; }
     public float Range { get; private set; }
@@ -53,6 +54,8 @@ public partial class Skill : Resource
     public int DiamondRotationBonus { get; private set; }
     public float ExplosionDamage { get; private set; }
     public float ExplosionRadius { get; private set; }
+    public float Cooldown { get; set; } = 0f; // For active skills
+    public float CastTime { get; set; } = 0f;
 
     private bool _initialized = false;
 
@@ -79,6 +82,7 @@ public partial class Skill : Resource
         // Load balance values
         AnimationBaseName = entry.AnimationBaseName;
         UsesDirectionalAnimation = entry.UsesDirectionalAnimation;
+        Category = entry.Category;
 
         SkillName = entry.SkillName;
         DamageType = entry.DamageType;
@@ -88,7 +92,10 @@ public partial class Skill : Resource
         MovementBehavior = entry.MovementBehavior;
 
         Cooldown = entry.Cooldown;
+        CastTime = entry.CastTime;
         BaseDamage = entry.BaseDamage;
+
+        Category = entry.Category;
 
         LoadProjectileData(entry);
         LoadMeleeData(entry);
@@ -229,6 +236,12 @@ public enum SkillType
 {
     Active,
     Passive
+}
+
+public enum SkillCategory
+{
+    Attack,
+    Spell
 }
 
 public enum SkillSlot

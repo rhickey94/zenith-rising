@@ -16,6 +16,7 @@ public partial class UpgradeManager : Node
 
     private Player _player;
     private StatsManager _statsManager;
+    private BuffManager _buffManager;
 
     public override void _Ready()
     {
@@ -31,27 +32,13 @@ public partial class UpgradeManager : Node
             GD.PrintErr("UpgradeManager: Could not find StatsManager on Player!");
         }
 
-        // Build upgrade list from config
-        if (GameBalance.Instance == null || GameBalance.Instance.Config == null)
+        _buffManager = _player.GetNode<BuffManager>("BuffManager");
+        if (_buffManager == null)
         {
-            GD.PrintErr("UpgradeManager: GameBalance not ready yet! Deferring upgrade list initialization.");
-            // Defer initialization - will be called when first needed
-            return;
+            GD.PrintErr("UpgradeManager: BuffManager not found!");
         }
 
-        var config = GameBalance.Instance.Config.UpgradeSystem;
-        _availableUpgrades.Clear();
-        _availableUpgrades.AddRange(
-        [
-        new Upgrade { UpgradeName = "Damage Boost", Description = $"+{config.DamageBoostPerStack * 100}% Damage", Type = UpgradeType.DamagePercent, Value = config.DamageBoostPerStack },
-        new Upgrade { UpgradeName = "Attack Speed", Description = $"+{config.AttackSpeedPerStack * 100}% Fire Rate", Type = UpgradeType.AttackSpeed, Value = config.AttackSpeedPerStack },
-        new Upgrade { UpgradeName = "Swift Feet", Description = $"+{config.MovementSpeedPerStack * 100}% Movement Speed", Type = UpgradeType.MovementSpeed, Value = config.MovementSpeedPerStack },
-        new Upgrade { UpgradeName = "Vitality", Description = $"+{config.MaxHealthPerStack} Max Health", Type = UpgradeType.MaxHealth, Value = config.MaxHealthPerStack },
-        new Upgrade { UpgradeName = "Magnet", Description = $"+{config.PickupRadiusPerStack} Pickup Radius", Type = UpgradeType.PickupRadius, Value = config.PickupRadiusPerStack },
-        new Upgrade { UpgradeName = "Piercing Shots", Description = $"Projectiles Pierce +{config.ProjectilePiercePerStack}", Type = UpgradeType.ProjectilePierce, Value = config.ProjectilePiercePerStack },
-        new Upgrade { UpgradeName = "Critical Hit", Description = $"+{config.CritChancePerStack * 100}% Crit Chance", Type = UpgradeType.CritChance, Value = config.CritChancePerStack },
-        new Upgrade { UpgradeName = "Regeneration", Description = $"+{config.HealthRegenPerStack} HP/sec", Type = UpgradeType.HealthRegen, Value = config.HealthRegenPerStack }
-    ]);
+        InitializeUpgradeList();
     }
 
     public void ApplyUpgrade(Upgrade upgrade)
@@ -123,32 +110,35 @@ public partial class UpgradeManager : Node
             return;
         }
 
-        // Get all current upgrade totals
+        // Collect UPGRADE modifiers
+        var upgradeModifiers = GetUpgradeModifiers();
 
-        float movementSpeedBonus = GetUpgradeValue(UpgradeType.MovementSpeed);
-        float attackSpeedBonus = GetUpgradeValue(UpgradeType.AttackSpeed);
-        float maxHealthBonus = GetUpgradeValue(UpgradeType.MaxHealth);
-        float baseSpeedBonus = GameBalance.Instance.Config.UpgradeSystem.BaseSpeedPerLevel * _statsManager.PowerLevel; // Level up bonus (+10 speed per level)
+        // Collect BUFF modifiers
+        var buffModifiers = _buffManager?.GetStatModifiers() ?? new StatModifiers();
 
-        float damagePercentBonus = GetUpgradeValue(UpgradeType.DamagePercent);
-        float critChanceBonus = GetUpgradeValue(UpgradeType.CritChance);
-        float pickupRadiusBonus = GetUpgradeValue(UpgradeType.PickupRadius);
-        float healthRegenBonus = GetUpgradeValue(UpgradeType.HealthRegen);
-        float projectilePierceBonus = GetUpgradeValue(UpgradeType.ProjectilePierce);
-
-        // Tell StatsManager to recalculate everything from scratch
-        _statsManager.RecalculateStats(new StatModifiers
+        // Combine them (additive)
+        var combined = new StatModifiers
         {
-            MovementSpeedBonus = movementSpeedBonus,
-            AttackSpeedBonus = attackSpeedBonus,
-            MaxHealthBonus = maxHealthBonus,
-            BaseSpeedBonus = baseSpeedBonus,
-            DamagePercentBonus = damagePercentBonus,
-            CritChanceBonus = critChanceBonus,
-            PickupRadiusBonus = pickupRadiusBonus,
-            HealthRegenBonus = healthRegenBonus,
-            ProjectilePierceBonus = (int)projectilePierceBonus
-        });
+            FlatHealth = upgradeModifiers.FlatHealth + buffModifiers.FlatHealth,
+            FlatSpeed = upgradeModifiers.FlatSpeed + buffModifiers.FlatSpeed,
+            FlatDamage = upgradeModifiers.FlatDamage + buffModifiers.FlatDamage,
+
+            PercentHealth = upgradeModifiers.PercentHealth + buffModifiers.PercentHealth,
+            PercentSpeed = upgradeModifiers.PercentSpeed + buffModifiers.PercentSpeed,
+            PercentAttackSpeed = upgradeModifiers.PercentAttackSpeed + buffModifiers.PercentAttackSpeed,
+            PercentCastSpeed = upgradeModifiers.PercentCastSpeed + buffModifiers.PercentCastSpeed,
+            PercentDamage = upgradeModifiers.PercentDamage + buffModifiers.PercentDamage,
+            PercentCritChance = upgradeModifiers.PercentCritChance + buffModifiers.PercentCritChance,
+            PercentCritDamage = upgradeModifiers.PercentCritDamage + buffModifiers.PercentCritDamage,
+            PercentCooldownReduction = upgradeModifiers.PercentCooldownReduction + buffModifiers.PercentCooldownReduction,
+
+            PickupRadius = upgradeModifiers.PickupRadius + buffModifiers.PickupRadius,
+            HealthRegenPerSecond = upgradeModifiers.HealthRegenPerSecond + buffModifiers.HealthRegenPerSecond,
+            ProjectilePierceCount = upgradeModifiers.ProjectilePierceCount + buffModifiers.ProjectilePierceCount
+        };
+
+        // Single call to StatsManager with combined modifiers
+        _statsManager.RecalculateStats(combined);
     }
 
     public Dictionary<UpgradeType, float> GetActiveUpgrades()
@@ -175,5 +165,38 @@ public partial class UpgradeManager : Node
     public void ClearUpgrades()
     {
         _activeUpgrades.Clear();
+    }
+
+    private StatModifiers GetUpgradeModifiers()
+    {
+        float movementSpeedPercent = GetUpgradeValue(UpgradeType.MovementSpeed);
+        float attackSpeedPercent = GetUpgradeValue(UpgradeType.AttackSpeed);
+        float healthFlat = GetUpgradeValue(UpgradeType.MaxHealth);
+        float speedFlat = GameBalance.Instance.Config.UpgradeSystem.BaseSpeedPerLevel * _statsManager.PowerLevel;
+        float damagePercent = GetUpgradeValue(UpgradeType.DamagePercent);
+        float critChancePercent = GetUpgradeValue(UpgradeType.CritChance);
+        float pickupRadiusFlat = GetUpgradeValue(UpgradeType.PickupRadius);
+        float healthRegenFlat = GetUpgradeValue(UpgradeType.HealthRegen);
+        float projectilePierceFlat = GetUpgradeValue(UpgradeType.ProjectilePierce);
+
+        return new StatModifiers
+        {
+            FlatHealth = healthFlat,
+            FlatSpeed = speedFlat,
+            FlatDamage = 0f,
+
+            PercentHealth = 0f,
+            PercentSpeed = movementSpeedPercent,
+            PercentAttackSpeed = attackSpeedPercent,
+            PercentCastSpeed = 0f, // Add upgrade if needed later
+            PercentDamage = damagePercent,
+            PercentCritChance = critChancePercent,
+            PercentCritDamage = 0f,
+            PercentCooldownReduction = 0f, // Add upgrade if needed later
+
+            PickupRadius = pickupRadiusFlat,
+            HealthRegenPerSecond = healthRegenFlat,
+            ProjectilePierceCount = (int)projectilePierceFlat
+        };
     }
 }

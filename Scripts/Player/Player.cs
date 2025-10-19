@@ -37,6 +37,7 @@ public partial class Player : CharacterBody2D
     private InputManager _inputManager;
     private SkillManager _skillManager;
     private StatsManager _statsManager;
+    private BuffManager _buffManager;
     private UpgradeManager _upgradeManager;
     private SkillAnimationController _skillAnimationController;
     private Sprite2D _sprite;
@@ -98,6 +99,12 @@ public partial class Player : CharacterBody2D
             GD.PrintErr("Player: UpgradeManager component not found!");
         }
 
+        _buffManager = GetNode<BuffManager>("BuffManager");
+        if (_buffManager == null)
+        {
+            GD.PrintErr("Player: BuffManager component not found!");
+        }
+
         _sprite = GetNode<Sprite2D>("Sprite2D");
         if (_sprite == null)
         {
@@ -122,7 +129,7 @@ public partial class Player : CharacterBody2D
         }
         else
         {
-            _skillAnimationController.Initialize(this, _statsManager, _animationPlayer);
+            _skillAnimationController.Initialize(this, _statsManager, _animationPlayer, _buffManager);
         }
 
         // Connect to LevelUpPanel
@@ -130,6 +137,13 @@ public partial class Player : CharacterBody2D
         {
             LevelUpPanel.UpgradeSelected += HandleUpgradeSelection;
         }
+
+        // Debug test: Apply buff after 2 seconds
+        GetTree().CreateTimer(2.0).Timeout += () =>
+        {
+            _buffManager?.ApplyBuff("test", 5f, attackSpeedBonus: 0.5f);
+            GD.Print("Test buff applied: +50% attack speed for 5 seconds");
+        };
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -317,9 +331,26 @@ public partial class Player : CharacterBody2D
             _movementControlledBySkill = true;
         }
 
-        // Play animation
+        // Play animation with speed scaling based on skill category
         string animName = GetSkillAnimationName(skill);
         _animationPlayer.Play(animName);
+
+        // Apply animation speed based on skill category
+        if (_statsManager != null)
+        {
+            if (skill.Category == SkillCategory.Attack)
+            {
+                // Attacks: scale with attack speed
+                float attackSpeedRatio = _statsManager.CurrentAttackRate / _statsManager.BaseAttackRate;
+                _animationPlayer.SpeedScale = attackSpeedRatio;
+            }
+            else // SkillCategory.Spell
+            {
+                // Spells: scale with cast speed
+                float castSpeedRatio = _statsManager.CurrentCastSpeed / _statsManager.BaseCastSpeed;
+                _animationPlayer.SpeedScale = castSpeedRatio;
+            }
+        }
 
         return true;
     }
@@ -523,6 +554,8 @@ public partial class Player : CharacterBody2D
                 ChangeState(_previousState);
             }
         }
+
+        _animationPlayer.SpeedScale = 1.0f;
     }
 
     private void OnSkillPressed(int skillSlot)

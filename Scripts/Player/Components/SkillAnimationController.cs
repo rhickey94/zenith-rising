@@ -15,6 +15,7 @@ public partial class SkillAnimationController : Node
     // Injected dependencies
     private Player _player;
     private StatsManager _statsManager;
+    private BuffManager _buffManager;
     private AnimationPlayer _animationPlayer;
 
     // Hitbox references
@@ -31,11 +32,12 @@ public partial class SkillAnimationController : Node
     [Export] public PackedScene WhirlwindVisualScene { get; set; }
     [Export] public PackedScene ExplosionEffectScene { get; set; }
 
-    public void Initialize(Player player, StatsManager statsManager, AnimationPlayer animationPlayer)
+    public void Initialize(Player player, StatsManager statsManager, AnimationPlayer animationPlayer, BuffManager buffManager)
     {
         _player = player;
         _statsManager = statsManager;
         _animationPlayer = animationPlayer;
+        _buffManager = buffManager;
     }
 
     public override void _Ready()
@@ -73,27 +75,21 @@ public partial class SkillAnimationController : Node
     public bool ExecuteInstantSkill(Skill skill)
     {
         SetCurrentSkill(skill);
-        return true;
-        // // Route based on skill type - will expand as we add more instant skills
-        // switch (skill.SkillId)
-        // {
-        //     case "warrior_combat_stim":
-        //         _statsManager.ApplyBuff("combat_stim",
-        //             attackSpeedBonus: 0.4f,
-        //             moveSpeedBonus: 0.2f,
-        //             duration: 6f);
-        //         return true;
 
-        //     case "warrior_fortify":
-        //         _statsManager.ApplyBuff("fortify",
-        //             damageReductionBonus: 0.5f,
-        //             duration: 4f);
-        //         return true;
+        switch (skill.SkillId)
+        {
+            case "warrior_combat_stim":
+                _buffManager?.ApplyBuff("combat_stim",
+                    duration: 6f,
+                    attackSpeedBonus: 0.4f,
+                    moveSpeedBonus: 0.2f,
+                    damageBonus: 0.3f);
+                return true;
 
-        //     default:
-        //         GD.PrintErr($"ExecuteInstantSkill: Unknown instant skill {skill.SkillId}");
-        //         return false;
-        // }
+            default:
+                GD.PrintErr($"ExecuteInstantSkill: Unknown instant skill {skill.SkillId}");
+                return false;
+        }
     }
 
     public void SetCurrentSkill(Skill skill)
