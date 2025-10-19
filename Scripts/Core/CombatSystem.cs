@@ -32,10 +32,10 @@ public static class CombatSystem
         float damage = baseDamage * attackerStats.DamageMultiplier * damageTypeMultiplier;
 
         // Crit calculation (now uses Fortune stat for crit damage)
-        bool isCrit = forceCrit || (GD.Randf() < attackerStats.CritChance);
+        bool isCrit = forceCrit || (GD.Randf() < attackerStats.CurrentCritChance);
         if (isCrit)
         {
-            damage *= attackerStats.CritDamageMultiplier;
+            damage *= attackerStats.CurrentCritMultiplier;
         }
 
         return damage;

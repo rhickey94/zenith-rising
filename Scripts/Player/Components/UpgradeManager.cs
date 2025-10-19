@@ -172,7 +172,7 @@ public partial class UpgradeManager : Node
         float movementSpeedPercent = GetUpgradeValue(UpgradeType.MovementSpeed);
         float attackSpeedPercent = GetUpgradeValue(UpgradeType.AttackSpeed);
         float healthFlat = GetUpgradeValue(UpgradeType.MaxHealth);
-        float speedFlat = GameBalance.Instance.Config.UpgradeSystem.BaseSpeedPerLevel * _statsManager.PowerLevel;
+        float speedFlat = GameBalance.Instance.Config.UpgradeSystem.BaseSpeedPerLevel * (_statsManager?.PowerLevel ?? 1);
         float damagePercent = GetUpgradeValue(UpgradeType.DamagePercent);
         float critChancePercent = GetUpgradeValue(UpgradeType.CritChance);
         float pickupRadiusFlat = GetUpgradeValue(UpgradeType.PickupRadius);

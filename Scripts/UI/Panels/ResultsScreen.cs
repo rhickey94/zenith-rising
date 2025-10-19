@@ -72,16 +72,16 @@ public partial class ResultsScreen : Control
         _characterLevelLabel.Text = $"Character Level {statsManager.CharacterLevel}";
 
         // XP Progress Bar
-        _xpProgressBar.MaxValue = statsManager.CharacterExperienceToNextLevel;
+        _xpProgressBar.MaxValue = statsManager.CharacterExperienceRequired;
         _xpProgressBar.Value = statsManager.CharacterExperience;
 
-        float percentToNext = statsManager.CharacterExperience / (float)statsManager.CharacterExperienceToNextLevel * 100f;
-        _xpProgressLabel.Text = $"{statsManager.CharacterExperience} / {statsManager.CharacterExperienceToNextLevel} XP({percentToNext:F0}% to Level {statsManager.CharacterLevel + 1})";
+        float percentToNext = statsManager.CharacterExperience / (float)statsManager.CharacterExperienceRequired * 100f;
+        _xpProgressLabel.Text = $"{statsManager.CharacterExperience} / {statsManager.CharacterExperienceRequired} XP({percentToNext:F0}% to Level {statsManager.CharacterLevel + 1})";
 
         // Show level up notification if player has unspent points
-        if (statsManager.UnallocatedStatPoints > 0)
+        if (statsManager.AvailableStatPoints > 0)
         {
-            _levelUpNotification.Text = $"⭐ LEVEL UP! You have {statsManager.UnallocatedStatPoints} unspent stat point(s)!";
+            _levelUpNotification.Text = $"⭐ LEVEL UP! You have {statsManager.AvailableStatPoints} unspent stat point(s)!";
             _levelUpNotification.Visible = true;
             _allocateStatsButton.Disabled = false;
         }

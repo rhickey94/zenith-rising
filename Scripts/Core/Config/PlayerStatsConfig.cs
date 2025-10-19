@@ -11,4 +11,7 @@ public partial class PlayerStatsConfig : Resource
     [Export] public float BaseFireRate { get; set; } = 0.2f;
     [Export] public float BaseMeleeRate { get; set; } = 0.5f;
     [Export] public float BasePickupRadius { get; set; } = 80f;
+    [Export] public float BaseAttackRate { get; set; } = 300.0f;
+    [Export] public float BaseCastSpeed { get; set; } = 0.2f;
+    [Export] public float BaseDamage { get; set; } = 80f;
 }

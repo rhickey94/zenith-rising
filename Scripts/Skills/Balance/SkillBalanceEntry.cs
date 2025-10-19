@@ -26,6 +26,7 @@ public partial class SkillBalanceEntry : Resource
     [Export] public SkillCategory Category { get; set; } = SkillCategory.Attack;
     [Export] public DamageSource DamageSource { get; set; } = DamageSource.EffectCollision;
     [Export] public MovementBehavior MovementBehavior { get; set; } = MovementBehavior.Allowed;
+    [Export] public SkillType SkillType { get; set; } = SkillType.Active;
 
     [ExportGroup("Base Stats")]
     [Export] public float BaseDamage { get; set; } = 10f;
@@ -42,5 +43,8 @@ public partial class SkillBalanceEntry : Resource
     [Export] public float SilverDamageBonus { get; set; } = 0.10f; // +10%
     [Export] public float GoldDamageBonus { get; set; } = 0.15f; // +15%
     [Export] public float DiamondDamageBonus { get; set; } = 0.25f; // +25%
+
+    [ExportGroup("Description")]
+    [Export(PropertyHint.MultilineText)] public string Description { get; set; } = "";
 
 }

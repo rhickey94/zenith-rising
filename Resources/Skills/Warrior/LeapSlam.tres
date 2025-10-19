@@ -5,7 +5,5 @@
 [resource]
 script = ExtResource("1_7piws")
 SkillId = "warrior_leap_slam"
-SkillName = "Leap Slam"
-Description = "Leaps to target location, creating a shockwave upon landing."
 Slot = 3
 metadata/_custom_type_script = "uid://dff1q4v5i7rpk"

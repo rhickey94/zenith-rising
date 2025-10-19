@@ -47,7 +47,7 @@ public partial class ExperienceShard : Area2D
         }
 
         // Move toward player if close enough
-        float pickupRadius = _statsManager?.PickupRadius ?? 80.0f;
+        float pickupRadius = _statsManager?.CurrentPickupRadius ?? 80.0f;
 
         float distance = GlobalPosition.DistanceTo(_player.GlobalPosition);
         if (distance < pickupRadius)

@@ -82,7 +82,7 @@ public partial class StatAllocationPanel : Control
             return;
         }
 
-        _unallocatedLabel.Text = $"Unallocated Points: {_statsManager.UnallocatedStatPoints}";
+        _unallocatedLabel.Text = $"Unallocated Points: {_statsManager.AvailableStatPoints}";
 
         _statValueLabels[StatType.Strength].Text = $"Strength (STR): {_statsManager.Strength}";
         _statValueLabels[StatType.Intelligence].Text = $"Intelligence (INT): {_statsManager.Intelligence}";
@@ -118,7 +118,7 @@ public partial class StatAllocationPanel : Control
     private string FormatIntelligenceBonus(StatsManager stats)
     {
         float magDmg = (stats.MagicalDamageMultiplier - 1.0f) * 100f;
-        return $"Magical Dmg +{magDmg:F0}%, CDR +{stats.GetCooldownReduction():F0}%";
+        return $"Magical Dmg +{magDmg:F0}%, CDR +{stats.CooldownReduction * 100f:F0}%";
     }
 
     private string FormatAgilityBonus(StatsManager stats)
@@ -152,7 +152,7 @@ public partial class StatAllocationPanel : Control
             return "Loading...";
         }
 
-        float critDmg = (stats.CritDamageMultiplier - 1.5f) * 100f;
+        float critDmg = (stats.CurrentCritMultiplier - 1.5f) * 100f;
         float dropRate = stats.Fortune * GameBalance.Instance.Config.CharacterProgression.FortuneDropRatePerPoint * 100f;
         return $"Crit Dmg +{critDmg:F0}%, Drop Rate +{dropRate:F0}%";
     }

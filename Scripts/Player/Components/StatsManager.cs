@@ -39,68 +39,81 @@ public enum StatType
 [GlobalClass]
 public partial class StatsManager : Node
 {
-    // ===== PRIVATE BACKING FIELDS =====
+    // ═══════════════════════════════════════════════════════════════
+    // CHARACTER STATS (Loaded from Config - Not Exported)
+    // ═══════════════════════════════════════════════════════════════
+    // Core Stats
+    public float BaseMaxHealth { get; set; } = 100f;
+    public float BaseSpeed { get; set; } = 300f;
+    public float BasePickupRadius { get; private set; } = 80f;
+
+    // Combat Stats
+    public float BaseAttackRate { get; set; } = 2.0f; // 2 attacks per second (0.5s between attacks)
+    public float BaseCastSpeed { get; set; } = 1.0f; // 1.0x multiplier
+    public float BaseDamage { get; private set; } = 10f;
+
+    // ═══════════════════════════════════════════════════════════════
+    // ATTRIBUTE STATS (Exported for Debug Visibility Only)
+    // ═══════════════════════════════════════════════════════════════
+    [ExportGroup("Attribute Stats (Debug Visibility)")]
+    [Export] public int Strength { get => _strength; private set => _strength = Mathf.Max(0, value); }       // STR: +3% Physical Dmg, +10 HP
+    [Export] public int Intelligence { get => _intelligence; private set => _intelligence = Mathf.Max(0, value); }   // INT: +3% Magical Dmg, +2% CDR
+    [Export] public int Agility { get => _agility; private set => _agility = Mathf.Max(0, value); }        // AGI: +2% Attack Speed, +1% Crit
+    [Export] public int Vitality { get => _vitality; private set => _vitality = Mathf.Max(0, value); }       // VIT: +25 HP, +0.5 HP/sec
+    [Export] public int Fortune { get => _fortune; private set => _fortune = Mathf.Max(0, value); }        // FOR: +2% Crit Dmg, +1% Drop Rate
+
+    [ExportGroup("Character Progression")]
+    [Export] public int CharacterLevel { get; private set; } = 1;
+    [Export] public int CharacterExperience { get; private set; } = 0;
+    [Export] public int AvailableStatPoints { get; private set; } = 15;
+
+    [ExportGroup("Power Progression (Per-Run)")]
+    [Export] public int PowerLevel { get; set; } = 1;
+    [Export] public int PowerExperience { get; set; } = 0;
+
+    [ExportGroup("Highest Floor")]
+    [Export] public int HighestFloor { get; private set; } = 1;
+
+    // ═══════════════════════════════════════════════════════════════
+    // CALCULATED STATS (Runtime Only - Not Exported)
+    // ═══════════════════════════════════════════════════════════════
+    // Experience Requirements (calculated from formulas)
+    public int CharacterExperienceRequired { get; private set; } = 100;
+    public int PowerExperienceRequired { get; private set; } = 100;
+
+    // Current Stats (after all modifiers)
+    public float CurrentMaxHealth { get; private set; }
+    public float CurrentHealth { get; private set; }
+    public float CurrentSpeed { get; private set; }
+    public float CurrentDamage { get; private set; }
+    public float CurrentPickupRadius { get; private set; }
+    public float CurrentCritChance { get; private set; }
+    public float CurrentCritMultiplier { get; private set; }
+
+    // New Combat Stats
+    public float CurrentAttackRate { get; private set; }  // Final attacks per second
+    public float CurrentCastSpeed { get; private set; }   // Final cast speed multiplier
+    public float CooldownReduction { get; private set; } = 0f; // 0% - 40% cap
+
+    // Damage Multipliers (used by CombatSystem)
+    public float DamageMultiplier { get; private set; } = 1.0f;
+    public float PhysicalDamageMultiplier { get; private set; } = 1.0f;
+    public float MagicalDamageMultiplier { get; private set; } = 1.0f;
+
+    // Special Stats
+    public float HealthRegenPerSecond { get; private set; } = 0f;
+    public int ProjectilePierceCount { get; private set; } = 0;
+    public bool IsInvincible { get; private set; } = false;
+
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE FIELDS
+    // ═══════════════════════════════════════════════════════════════
     private Player _player;
     private int _strength = 0;
     private int _intelligence = 0;
     private int _agility = 0;
     private int _vitality = 0;
     private int _fortune = 0;
-
-    // ===== EXPORT PROPERTIES - Base Stats =====
-    [Export] public float BaseMaxHealth { get; set; } = 100f;
-    [Export] public float BaseSpeed { get; set; } = 300f;
-    [Export] public float BaseFireRate { get; set; } = 0.2f;
-    [Export] public float BaseMeleeRate { get; set; }
-
-    // ===== EXPORT PROPERTIES - Character Progression =====
-    [ExportGroup("Character Progression")]
-    [Export] public int CharacterLevel { get; private set; } = 1;
-    [Export] public int CharacterExperience { get; private set; } = 0;
-    [Export] public int CharacterExperienceToNextLevel { get; private set; } = 500;
-    [Export] public int UnallocatedStatPoints { get; private set; } = 15;
-    [Export] public int Strength { get => _strength; private set => _strength = Mathf.Max(0, value); }       // STR: +3% Physical Dmg, +10 HP
-    [Export] public int Intelligence { get => _intelligence; private set => _intelligence = Mathf.Max(0, value); }   // INT: +3% Magical Dmg, +2% CDR
-    [Export] public int Agility { get => _agility; private set => _agility = Mathf.Max(0, value); }        // AGI: +2% Attack Speed, +1% Crit
-    [Export] public int Vitality { get => _vitality; private set => _vitality = Mathf.Max(0, value); }       // VIT: +25 HP, +0.5 HP/sec
-    [Export] public int Fortune { get => _fortune; private set => _fortune = Mathf.Max(0, value); }        // FOR: +2% Crit Dmg, +1% Drop Rate
-    [Export] public int HighestFloorReached { get; private set; } = 0;
-
-    // ===== EXPORT PROPERTIES - Run Progression =====
-    [ExportGroup("Run Progression")]
-    [Export] public int PowerLevel { get; set; } = 1;
-    [Export] public int PowerExperience { get; set; } = 0;
-    [Export] public int PowerExperienceToNextLevel { get; private set; } = 100;
-
-    // ===== PUBLIC PROPERTIES - Calculated Stats =====
-    public float CurrentMaxHealth { get; private set; } = 100.0f;
-    public float CurrentHealth { get; private set; } = 100.0f;
-    public float CurrentSpeed { get; private set; }
-    // Attack Speed System (NEW naming)
-    public float BaseAttackRate { get; set; } = 2.0f; // 2 attacks per second (0.5s between attacks)
-    public float CurrentAttackRate { get; private set; } = 2.0f; // Calculated
-
-    // Cast Speed System (NEW)
-    public float BaseCastSpeed { get; set; } = 1.0f; // 1.0x multiplier
-    public float CurrentCastSpeed { get; private set; } = 1.0f; // Calculated
-
-    // Cooldown Reduction System (NEW)
-    public float CooldownReduction { get; private set; } = 0f; // 0% - 40% cap
-
-    // DEPRECATED (will remove after refactor)
-    public float CurrentFireRate { get; private set; }
-    public float CurrentMeleeRate { get; private set; }
-
-    // ===== PUBLIC PROPERTIES - Combat Stats =====
-    public float DamageMultiplier { get; private set; } = 1.0f;
-    public float PhysicalDamageMultiplier { get; private set; } = 1.0f;
-    public float MagicalDamageMultiplier { get; private set; } = 1.0f;
-    public float CritDamageMultiplier { get; private set; } = 1.5f;
-    public float CritChance { get; private set; } = 0f;
-    public float PickupRadius { get; private set; } = 80f;
-    public float HealthRegenPerSecond { get; private set; } = 0f;
-    public int ProjectilePierceCount { get; private set; } = 0;
-    public bool IsInvincible { get; private set; } = false;
 
     // ===== SIGNALS =====
     [Signal] public delegate void LeveledUpEventHandler();
@@ -116,36 +129,7 @@ public partial class StatsManager : Node
             GD.PrintErr("StatsManager: Could not find Player parent!");
         }
 
-        // Initialize base stats from config (allows inspector overrides if non-zero)
-        if (GameBalance.Instance != null && GameBalance.Instance.Config != null)
-        {
-            var config = GameBalance.Instance.Config.PlayerStats;
-
-            // Only override if not set in inspector (check against defaults)
-            if (BaseMaxHealth == 100.0f)
-            {
-                BaseMaxHealth = config.BaseMaxHealth;
-            }
-
-            if (BaseSpeed == 300.0f)
-            {
-                BaseSpeed = config.BaseSpeed;
-            }
-
-            if (BaseFireRate == 0.2f)
-            {
-                BaseFireRate = config.BaseFireRate;
-            }
-
-            if (BaseMeleeRate == 0.5f)
-            {
-                BaseMeleeRate = config.BaseMeleeRate;
-            }
-        }
-        else
-        {
-            GD.PrintErr("StatsManager: GameBalance not initialized! Using default values.");
-        }
+        LoadCharacterStatsFromConfig();
 
         CurrentMaxHealth = BaseMaxHealth;
         CurrentHealth = CurrentMaxHealth;
@@ -202,7 +186,7 @@ public partial class StatsManager : Node
     {
         PowerExperience += amount;
 
-        while (PowerExperience >= PowerExperienceToNextLevel)
+        while (PowerExperience >= PowerExperienceRequired)
         {
             PowerLevelUp();
         }
@@ -215,7 +199,7 @@ public partial class StatsManager : Node
         CharacterExperience += amount;
 
         // Handle level ups (support multiple levels in one award)
-        while (CharacterExperience >= CharacterExperienceToNextLevel)
+        while (CharacterExperience >= CharacterExperienceRequired)
         {
             AddCharacterLevel(1);
         }
@@ -223,20 +207,20 @@ public partial class StatsManager : Node
 
     public void AddCharacterLevel(int levels = 1)
     {
-        CharacterExperience -= CharacterExperienceToNextLevel;
+        CharacterExperience -= CharacterExperienceRequired;
         CharacterLevel += levels;
-        UnallocatedStatPoints += levels;
+        AvailableStatPoints += levels;
 
-        CharacterExperienceToNextLevel = CalculateCharacterXPForNextLevel();
+        CalculateExperienceRequirements();
 
         EmitSignal(SignalName.CharacterLeveledUp);
     }
 
     public void UpdateHighestFloor(int floor)
     {
-        if (floor > HighestFloorReached)
+        if (floor > HighestFloor)
         {
-            HighestFloorReached = floor;
+            HighestFloor = floor;
         }
     }
 
@@ -247,8 +231,9 @@ public partial class StatsManager : Node
         float healthPercentage = CurrentMaxHealth > 0 ? CurrentHealth / CurrentMaxHealth : 1f;
         var config = GameBalance.Instance.Config.CharacterProgression;
 
-        // ===== CALCULATE ATTRIBUTE BONUSES =====
-
+        // ═══════════════════════════════════════════════════════════════
+        // STEP 1: Calculate Attribute Bonuses
+        // ═══════════════════════════════════════════════════════════════
         // STR bonuses
         float strDamagePercent = Strength * config.StrengthDamagePerPoint;
         float strHealthFlat = Strength * config.StrengthHealthPerPoint;
@@ -269,8 +254,9 @@ public partial class StatsManager : Node
         // FOR bonuses
         float forCritDamagePercent = Fortune * config.FortuneCritDamagePerPoint;
 
-        // ===== UNIFIED FORMULA: (CharacterStat + Flat) * (1 + Percent) =====
-
+        // ═══════════════════════════════════════════════════════════════
+        // STEP 2: Apply Unified Formula (CharacterStat + Flat) * (1 + Percent)
+        // ═══════════════════════════════════════════════════════════════
         // HEALTH
         float flatHealth = strHealthFlat + vitHealthFlat + CalculateRunLevelHealthBonus() + modifiers.FlatHealth;
         float percentHealth = modifiers.PercentHealth;
@@ -291,9 +277,9 @@ public partial class StatsManager : Node
 
         // COOLDOWN REDUCTION (percent reduction, capped at 40%)
         float totalCDR = intCDRPercent + modifiers.PercentCooldownReduction;
-        CooldownReduction = Mathf.Clamp(totalCDR, 0f, 0.40f); // Cap at 40%
+        CooldownReduction = Mathf.Clamp(totalCDR, 0f, 0.40f);
 
-        // DAMAGE (additive pool)
+        // DAMAGE MULTIPLIERS (used by CombatSystem)
         float percentPhysicalDamage = strDamagePercent + modifiers.PercentDamage;
         PhysicalDamageMultiplier = 1.0f + percentPhysicalDamage;
 
@@ -304,25 +290,33 @@ public partial class StatsManager : Node
 
         // CRIT CHANCE
         float percentCritChance = agiCritPercent + modifiers.PercentCritChance;
-        CritChance = Mathf.Clamp(percentCritChance, 0f, 0.75f); // Cap at 75%
+        CurrentCritChance = Mathf.Clamp(percentCritChance, 0f, 0.75f);
 
         // CRIT DAMAGE
         float baseCritDamage = 0.5f; // Base crit = 150%
         float percentCritDamage = forCritDamagePercent + modifiers.PercentCritDamage;
-        CritDamageMultiplier = 1.0f + baseCritDamage + percentCritDamage;
+        CurrentCritMultiplier = 1.0f + baseCritDamage + percentCritDamage;
 
         // HEALTH REGEN
         float flatRegen = vitRegenFlat + modifiers.HealthRegenPerSecond;
         HealthRegenPerSecond = flatRegen;
 
         // PICKUP RADIUS
-        float basePickupRadius = 80f;
-        PickupRadius = basePickupRadius + modifiers.PickupRadius;
+        CurrentPickupRadius = BasePickupRadius + modifiers.PickupRadius;
 
         // PROJECTILE PIERCE
         ProjectilePierceCount = modifiers.ProjectilePierceCount;
 
-        // ===== MAINTAIN HEALTH PERCENTAGE =====
+        // ═══════════════════════════════════════════════════════════════
+        // STEP 3: Calculate Experience Requirements
+        // ═══════════════════════════════════════════════════════════════
+
+        CalculateExperienceRequirements();
+
+        // ═══════════════════════════════════════════════════════════════
+        // STEP 4: Maintain Health Percentage
+        // ═══════════════════════════════════════════════════════════════
+
         CurrentHealth = CurrentMaxHealth * healthPercentage;
         if (CurrentHealth > CurrentMaxHealth)
         {
@@ -334,7 +328,7 @@ public partial class StatsManager : Node
 
     public bool CanAllocateStat()
     {
-        return UnallocatedStatPoints > 0;
+        return AvailableStatPoints > 0;
     }
 
     public void AllocateStat(StatType statType, int amount = 1)
@@ -345,9 +339,9 @@ public partial class StatsManager : Node
             return;
         }
 
-        if (amount > UnallocatedStatPoints)
+        if (amount > AvailableStatPoints)
         {
-            GD.PrintErr($"StatsManager: Trying to allocate {amount} points but only {UnallocatedStatPoints} available!");
+            GD.PrintErr($"StatsManager: Trying to allocate {amount} points but only {AvailableStatPoints} available!");
             return;
         }
 
@@ -370,14 +364,9 @@ public partial class StatsManager : Node
                 break;
         }
 
-        UnallocatedStatPoints -= amount;
+        AvailableStatPoints -= amount;
 
         EmitSignal(SignalName.StatAllocated, (int)statType);
-    }
-
-    public float GetCooldownReduction()
-    {
-        return (1.0f - (1.0f / (1.0f + Intelligence * GameBalance.Instance.Config.CharacterProgression.IntelligenceCDRPerPoint))) * 100f;
     }
 
     // New method for skill control
@@ -414,8 +403,8 @@ public partial class StatsManager : Node
             // Character progression (StatsManager owns this)
             CharacterLevel = CharacterLevel,
             CharacterExperience = CharacterExperience,
-            UnallocatedStatPoints = UnallocatedStatPoints,
-            HighestFloorReached = HighestFloorReached,
+            UnallocatedStatPoints = AvailableStatPoints,
+            HighestFloorReached = HighestFloor,
 
             // Run state (StatsManager owns PowerLevel)
             PowerLevel = PowerLevel,
@@ -426,7 +415,6 @@ public partial class StatsManager : Node
             ActiveUpgrades = null  // Game.cs sets this
         };
     }
-
 
     public void LoadSaveData(SaveData data)
     {
@@ -440,27 +428,20 @@ public partial class StatsManager : Node
         // Restore character progression
         CharacterLevel = data.CharacterLevel;
         CharacterExperience = data.CharacterExperience;
-        CharacterExperienceToNextLevel = CalculateCharacterXPForNextLevel();
-        UnallocatedStatPoints = data.UnallocatedStatPoints;
-        HighestFloorReached = data.HighestFloorReached;
+        CalculateExperienceRequirements();
+        AvailableStatPoints = data.UnallocatedStatPoints;
+        HighestFloor = data.HighestFloorReached;
 
         // Restore run state (PowerLevel only - StatsManager owns this)
         PowerLevel = data.PowerLevel;
         PowerExperience = 0;
-        PowerExperienceToNextLevel = (int)(100 * Mathf.Pow(1.5f, PowerLevel - 1));
+        PowerExperienceRequired = (int)(100 * Mathf.Pow(1.5f, PowerLevel - 1));
 
         // Recalculate base stats (upgrades will be applied separately by Game.cs)
         RecalculateStats(new StatModifiers());
     }
 
-
     // ===== PRIVATE HELPERS - Calculations =====
-    private int CalculateCharacterXPForNextLevel()
-    {
-        var config = GameBalance.Instance.Config.CharacterProgression;
-        return (int)(config.CharacterXPBase * Mathf.Pow(config.CharacterXPGrowth, CharacterLevel - 1));
-    }
-
     private float CalculateRunLevelHealthBonus()
     {
         return GameBalance.Instance.Config.CharacterProgression.PowerLevelHealthBonus * (PowerLevel - 1);
@@ -470,9 +451,9 @@ public partial class StatsManager : Node
     private void PowerLevelUp()
     {
         var config = GameBalance.Instance.Config.CharacterProgression;
-        PowerExperience -= PowerExperienceToNextLevel;
+        PowerExperience -= PowerExperienceRequired;
         PowerLevel++;
-        PowerExperienceToNextLevel = (int)(PowerExperienceToNextLevel * 1.5);
+        CalculateExperienceRequirements();
 
         // Recalculate MaxHealth with new run level (UpgradeManager will call RecalculateStats, but update now for heal)
         float characterHealthBonus = (Vitality * config.VitalityHealthPerPoint) + (Strength * config.StrengthHealthPerPoint);
@@ -508,6 +489,45 @@ public partial class StatsManager : Node
 
     private void EmitExperienceUpdate()
     {
-        _player?.EmitSignal(Player.SignalName.ExperienceChanged, PowerExperience, PowerExperienceToNextLevel, PowerLevel);
+        _player?.EmitSignal(Player.SignalName.ExperienceChanged, PowerExperience, PowerExperienceRequired, PowerLevel);
+    }
+
+    private void CalculateExperienceRequirements()
+    {
+        if (GameBalance.Instance?.Config?.CharacterProgression == null)
+        {
+            CharacterExperienceRequired = 100;
+            PowerExperienceRequired = 100;
+            return;
+        }
+
+        var config = GameBalance.Instance.Config.CharacterProgression;
+
+        // Character XP formula (inline calculation)
+        CharacterExperienceRequired = (int)(config.CharacterXPBase * Mathf.Pow(config.CharacterXPGrowth, CharacterLevel - 1));
+
+        // Power XP formula
+        PowerExperienceRequired = (int)(100 * Mathf.Pow(1.5f, PowerLevel - 1));
+    }
+
+    private void LoadCharacterStatsFromConfig()
+    {
+        if (GameBalance.Instance?.Config?.PlayerStats == null)
+        {
+            GD.PrintErr("StatsManager: GameBalance config not available, using defaults");
+            return;
+        }
+
+        var config = GameBalance.Instance.Config.PlayerStats;
+
+        // Load all character stats from config
+        BaseMaxHealth = config.BaseMaxHealth;
+        BaseSpeed = config.BaseSpeed;
+        BasePickupRadius = config.BasePickupRadius;
+        BaseAttackRate = config.BaseAttackRate;
+        BaseCastSpeed = config.BaseCastSpeed;
+        BaseDamage = config.BaseDamage;
+
+        GD.Print($"StatsManager: Loaded character stats from config (BaseMaxHealth={BaseMaxHealth}, BaseSpeed={BaseSpeed})");
     }
 }

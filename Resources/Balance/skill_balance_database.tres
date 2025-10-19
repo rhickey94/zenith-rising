@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="SkillBalanceDatabase" load_steps=20 format=3 uid="uid://dbooxibogc7fp"]
+[gd_resource type="Resource" script_class="SkillBalanceDatabase" load_steps=21 format=3 uid="uid://dbooxibogc7fp"]
 
 [ext_resource type="Script" uid="uid://d25rerypcvb5f" path="res://Scripts/Skills/Balance/SkillBalanceDatabase.cs" id="1_c7wpi"]
 [ext_resource type="Script" uid="uid://bqtal0vugxig6" path="res://Scripts/Skills/Balance/SkillBalanceEntry.cs" id="1_lr0uj"]
@@ -107,6 +107,11 @@ GoldDamageBonus = 0.0
 DiamondDamageBonus = 0.0
 metadata/_custom_type_script = "uid://bqtal0vugxig6"
 
+[sub_resource type="Resource" id="Resource_dee1y"]
+script = ExtResource("3_37tpb")
+Duration = 0.8
+metadata/_custom_type_script = "uid://cc24cwmf7qnpn"
+
 [sub_resource type="Resource" id="Resource_36pqe"]
 script = ExtResource("5_37tpb")
 ExplosionDamage = 100.0
@@ -123,6 +128,7 @@ metadata/_custom_type_script = "uid://bcoj0h1njugjh"
 [sub_resource type="Resource" id="Resource_b7ssx"]
 script = ExtResource("1_lr0uj")
 Melee = SubResource("Resource_6yx83")
+AOE = SubResource("Resource_dee1y")
 Explosion = SubResource("Resource_36pqe")
 AnimationBaseName = "warrior_leap_slam"
 SkillId = "warrior_leap_slam"

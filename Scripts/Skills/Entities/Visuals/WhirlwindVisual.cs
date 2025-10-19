@@ -20,9 +20,10 @@ public partial class WhirlwindVisual : Node2D
     {
         _duration = sourceSkill.Duration;
         _radius = sourceSkill.Radius;
-        _rotationCount = sourceSkill.WhirlwindRotations;
+        _rotationCount = sourceSkill.RotationCount;
         _rotationSpeed = Mathf.Pi * 2 * _rotationCount / _duration;
         _alpha = Mathf.Clamp(0.4f + (_rotationCount * 0.1f), 0.4f, 0.8f);
+        GD.Print($"WhirlwindVisual initialized: Duration={_duration}, Radius={_radius}, Rotations={_rotationCount}, RotationSpeed={_rotationSpeed}, Alpha={_alpha}");
     }
 
     public override void _Ready()

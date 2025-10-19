@@ -5,7 +5,5 @@
 [resource]
 script = ExtResource("1_mt7j2")
 SkillId = "warrior_whirlwind"
-SkillName = "Whirlwind"
-Description = "Spin around dealing damage to all enemies within the radius."
 Slot = 2
 metadata/_custom_type_script = "uid://dff1q4v5i7rpk"
