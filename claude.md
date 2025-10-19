@@ -986,3 +986,381 @@ For complete stat formulas and progression details, see [`Docs/01-GAME-DESIGN/sy
 
 _Last updated: Session 13 - Energy Wave & Mouse-Aimed Combat complete, Session 14 planned!_
 _🎉 PHASES 1, 2, 3, & 3.5-A COMPLETE - 3 warrior skills working, hybrid pattern validated! 🎉_
+
+temp storage
+Phase 1: Complete Executor Pattern Architecture - Detailed Implementation Plan
+🎯 Strategic Goal
+Validate the skill system architecture by implementing the complete executor pattern foundation, enabling rapid addition of 18+ planned skills with minimal code changes per skill.
+📋 Memory & Cleanup Complete
+✅ Committed to memory:
+Executor Pattern Architecture Decision (complete pattern, not remove)
+Skill System Three-Layer Architecture (Executor → Effect → Systems)
+18 Planned Skills Validation (all feasible with extensions)
+✅ Memory pruned:
+Removed outdated "executor pattern half-implemented" issue (now superseded by decision to complete it)
+🏗️ Implementation Phases
+Phase 1A: Foundation & Refactoring (2-3 hours)
+Task 1.1: Update CastBehavior Enum
+File: Scripts/Skills/Base/Skill.cs Add new CastBehavior types:
+public enum CastBehavior
+{
+    Instant,           // Non-interrupting (can use while doing other actions)
+    AnimationDriven,   // Interrupting (locks FSM to CastingSkill state)
+    Channeled,         // Hold button for continuous effect
+    Charged,           // Hold to power up, release to fire
+    Combo,             // Input sequence with timing windows
+    Toggle             // On/off state (Overwatch precision mode)
+}
+Validation: Enum compiles, existing skills still work
+Task 1.2: Create AnimationDrivenExecutor
+New File: Scripts/Skills/Executors/AnimationDrivenExecutor.cs Extract AnimationDriven logic from Player.TryCastSkill():
+public class AnimationDrivenExecutor : ISkillExecutor
+{
+    public bool ExecuteSkill(Player player, Skill skill)
+    {
+        // Set current skill for animation callbacks
+        player.SkillAnimationController.SetCurrentSkill(skill);
+        
+        // Get directional animation name
+        string animName = player.GetSkillAnimationName(skill);
+        
+        // Play animation (triggers Call Method tracks)
+        player.AnimationPlayer.Play(animName);
+        
+        // Transition FSM to CastingSkill state
+        player.SetState(PlayerState.CastingSkill);
+        
+        return true;
+    }
+}
+Requirement: Player.cs must expose:
+AnimationPlayer property (public getter)
+SetState(PlayerState) public method
+GetSkillAnimationName(Skill) public method
+SkillAnimationController property (already public)
+Validation: Whirlwind, Energy Wave, Basic Attack still work via executor
+Task 1.3: Refactor InstantProjectileExecutor → InstantExecutor
+File: Scripts/Skills/Executors/InstantProjectileExecutor.cs (rename to InstantExecutor.cs) Generalize for ANY instant effect (not just projectiles):
+public class InstantExecutor : ISkillExecutor
+{
+    public bool ExecuteSkill(Player player, Skill skill)
+    {
+        // Set current skill (for tracking, even though instant)
+        player.SkillAnimationController.SetCurrentSkill(skill);
+        
+        // Spawn effect immediately if skill has one
+        if (skill.SkillEffectScene != null)
+        {
+            Vector2 direction = player.GetAttackDirection();
+            var effect = skill.SkillEffectScene.Instantiate<DamageEntityBase>();
+            
+            // Initialize BEFORE adding to tree
+            effect.Initialize(skill, player, direction);
+            
+            // Add to world
+            player.GetTree().Root.AddChild(effect);
+            effect.GlobalPosition = player.GlobalPosition;
+        }
+        
+        // Optional: Play cosmetic animation (doesn't control timing)
+        if (skill.HasPlayerAnimation)
+        {
+            string animName = player.GetSkillAnimationName(skill);
+            player.AnimationPlayer.Play(animName);
+        }
+        
+        // DO NOT change FSM state (non-interrupting behavior)
+        
+        return true;
+    }
+}
+Validation: Skills can be used without interrupting current action
+Task 1.4: Refactor Player.TryCastSkill()
+File: Scripts/Player/Player.cs Replace inline logic with executor routing:
+public bool TryCastSkill(Skill skill)
+{
+    if (skill == null) return false;
+    
+    // Route to appropriate executor based on CastBehavior
+    ISkillExecutor executor = skill.CastBehavior switch
+    {
+        CastBehavior.Instant => new InstantExecutor(),
+        CastBehavior.AnimationDriven => new AnimationDrivenExecutor(),
+        CastBehavior.Channeled => new ChanneledExecutor(),
+        CastBehavior.Charged => new ChargedExecutor(),
+        CastBehavior.Combo => new ComboExecutor(),
+        CastBehavior.Toggle => new ToggleExecutor(),
+        _ => null
+    };
+    
+    if (executor == null)
+    {
+        GD.PrintErr($"No executor for CastBehavior: {skill.CastBehavior}");
+        return false;
+    }
+    
+    return executor.ExecuteSkill(this, skill);
+}
+Validation:
+Existing 3 skills (Basic Attack, Whirlwind, Energy Wave) work
+Dash skill works
+No console errors
+Task 1.5: Expose Required Player Properties
+File: Scripts/Player/Player.cs Add public accessors needed by executors:
+// Already exists: public SkillAnimationController SkillAnimationController { get; private set; }
+
+public AnimationPlayer AnimationPlayer => _animationPlayer;
+public SkillManager SkillManager => _skillManager;
+
+public void SetState(PlayerState newState)
+{
+    if (!CanTransitionTo(newState)) return;
+    _state = newState;
+}
+Validation: Executors can access needed Player internals
+Phase 1B: Channeled Skills (3-4 hours)
+Task 2.1: Create ChannelState Class
+New File: Scripts/Skills/States/ChannelState.cs
+public class ChannelState
+{
+    public Skill Skill { get; set; }
+    public float Elapsed { get; set; } = 0f;
+    public float NextTickTime { get; set; } = 0f;
+    public bool IsActive { get; set; } = false;
+    
+    public void Reset()
+    {
+        Elapsed = 0f;
+        NextTickTime = 0f;
+        IsActive = false;
+    }
+}
+Task 2.2: Add Channel State to SkillManager
+File: Scripts/Player/Components/SkillManager.cs Add state management:
+private ChannelState _currentChannel = null;
+
+public void StartChannel(Skill skill)
+{
+    _currentChannel = new ChannelState 
+    { 
+        Skill = skill, 
+        IsActive = true 
+    };
+    
+    // Play channeling animation if any
+    if (skill.HasPlayerAnimation)
+    {
+        string animName = _player.GetSkillAnimationName(skill);
+        _player.AnimationPlayer.Play(animName);
+        _player.AnimationPlayer.SetLoopMode(Animation.LoopMode.Loop);
+    }
+    
+    _player.SetState(PlayerState.CastingSkill);
+}
+
+public void StopChannel()
+{
+    if (_currentChannel != null)
+    {
+        _currentChannel.Reset();
+        _currentChannel = null;
+        _player.AnimationPlayer.Stop();
+        _player.SetState(PlayerState.Idle);
+    }
+}
+
+public override void _Process(double delta)
+{
+    base._Process(delta);
+    
+    UpdateCooldowns((float)delta);
+    
+    if (_currentChannel?.IsActive == true)
+    {
+        UpdateChannel((float)delta);
+    }
+}
+
+private void UpdateChannel(float delta)
+{
+    _currentChannel.Elapsed += delta;
+    _currentChannel.NextTickTime -= delta;
+    
+    // Apply tick damage/effect
+    if (_currentChannel.NextTickTime <= 0f)
+    {
+        ApplyChannelTick(_currentChannel.Skill);
+        _currentChannel.NextTickTime = _currentChannel.Skill.ChannelTickRate;
+    }
+    
+    // Check for button release or max duration
+    if (!Input.IsActionPressed(_currentChannel.Skill.InputAction) || 
+        _currentChannel.Elapsed >= _currentChannel.Skill.ChannelMaxDuration)
+    {
+        StopChannel();
+    }
+}
+
+private void ApplyChannelTick(Skill skill)
+{
+    // Spawn tick effect or apply damage in radius
+    // Implementation depends on skill type
+}
+Task 2.3: Create ChanneledExecutor
+New File: Scripts/Skills/Executors/ChanneledExecutor.cs
+public class ChanneledExecutor : ISkillExecutor
+{
+    public bool ExecuteSkill(Player player, Skill skill)
+    {
+        // Delegate to SkillManager for state tracking
+        player.SkillManager.StartChannel(skill);
+        return true;
+    }
+}
+Task 2.4: Add Channel Properties to SkillBalanceEntry
+File: Scripts/Skills/Balance/SkillBalanceEntry.cs Add ChannelData sub-resource:
+[Export] public ChannelData Channel { get; set; }
+New File: Scripts/Skills/Balance/Data/ChannelData.cs
+[GlobalClass]
+public partial class ChannelData : Resource
+{
+    [Export] public float TickRate { get; set; } = 0.5f;
+    [Export] public float TickDamage { get; set; } = 10f;
+    [Export] public float MaxDuration { get; set; } = 5f;
+    [Export] public float ResourceCostPerSecond { get; set; } = 10f;
+}
+Task 2.5: Create Test Channeled Skill
+Example: "Laser Beam" for Warrior
+Create warrior_laser_beam database entry with Channel sub-resource
+Create looping beam animation (optional for testing)
+Test: Hold button → continuous damage ticks → release stops
+Validate: Animation loops, damage applies every tick, stops on release
+Phase 1C: Charged Skills (3-4 hours)
+Task 3.1-3.5: Similar structure to Phase 1B
+Create:
+ChargeState.cs (tracks charge level 0.0-1.0)
+ChargedExecutor.cs (starts charge)
+SkillManager.StartCharge() / UpdateCharge() / ReleaseCharge()
+ChargeData.cs sub-resource (ChargeRate, MinCharge, MaxCharge, DamageScaling)
+Test skill: "Charged Shot" for Ranger
+Key Mechanic: Hold button → charge builds → release fires scaled projectile
+Phase 1D: Combo Skills (4-5 hours)
+Task 4.1-4.5: Similar structure to Phases 1B/1C
+Create:
+ComboState.cs (tracks sequence step, timing windows)
+ComboExecutor.cs (advances or starts combo)
+SkillManager.StartCombo() / AdvanceCombo() / ResetCombo()
+ComboData.cs sub-resource (sequence steps, timing windows, damage per step)
+Test skill: "Three-Strike Combo" for Warrior
+Key Mechanic: Press button → first attack → press again within window → second attack → etc.
+Phase 1E: Toggle Skills (2-3 hours)
+Task 5.1-5.5: Similar structure
+Create:
+ToggleState.cs (tracks on/off state)
+ToggleExecutor.cs (toggles on/off)
+SkillManager.ToggleSkill() / UpdateToggle()
+ToggleData.cs sub-resource (buffs while active, resource drain if any)
+Test skill: "Overwatch" precision mode for Ranger
+Key Mechanic: Press button → buff activates → press again → buff deactivates
+Phase 1F: Validation & Testing (2-3 hours)
+Task 6.1: Create One Test Skill Per CastBehavior
+Instant: "Combat Stim" (buff, non-interrupting)
+Database: CastBehavior.Instant, DamageSource.None
+Apply speed boost without interrupting current action
+Test: Can cast while attacking/dashing
+AnimationDriven: "Fireball" (refactor with cast animation)
+Database: CastBehavior.AnimationDriven, DamageSource.EffectCollision
+Add warrior_fireball_cast animation with wind-up
+Call Method track spawns projectile at apex
+Test: Animation plays, projectile spawns mid-animation
+Channeled: "Laser Beam"
+Already created in Phase 1B
+Test: Hold for continuous damage, stops on release
+Charged: "Charged Shot"
+Already created in Phase 1C
+Test: Hold to charge, damage scales with charge level
+Combo: "Three-Strike"
+Already created in Phase 1D
+Test: Sequence tracking, timing windows work
+Toggle: "Overwatch"
+Already created in Phase 1E
+Test: On/off toggle, buff applies while active
+Task 6.2: Playtest All Types
+For each skill:
+✅ Activates correctly (input responsiveness)
+✅ FSM state transitions properly (interrupting vs non-interrupting)
+✅ Effects spawn/apply correctly
+✅ Cooldowns work
+✅ No console errors
+✅ Animations play (if applicable)
+Edge Cases:
+Interrupt channeled skill mid-cast
+Release charged skill at 0% charge
+Break combo timing window
+Toggle skill on/off rapidly
+Cast instant skill while channeling
+Die during skill cast
+Task 6.3: Document Patterns
+Create Docs/02-IMPLEMENTATION/executor-pattern.md: Contents:
+Overview of 6 CastBehavior types
+How to add new skill (step-by-step)
+Templates for each executor type
+Common pitfalls and solutions
+Example skill implementations
+✅ Success Criteria
+After implementation:
+✅ 6 CastBehavior types working: Instant, AnimationDriven, Channeled, Charged, Combo, Toggle
+✅ 6 test skills functional: One per type, all tested in-game
+✅ Player.TryCastSkill() clean: ~15 lines, pure routing logic
+✅ SkillManager owns state: Channeling, charging, comboing tracked centrally
+✅ Executors are stateless: Pure logic classes, no persistent fields
+✅ Add new skill = .tres file: No Player.cs or executor edits needed
+✅ Architecture validated: Ready to scale to 18+ skills
+⏱️ Time Estimates
+Phase 1A (Foundation): 2-3 hours
+Phase 1B (Channeled): 3-4 hours
+Phase 1C (Charged): 3-4 hours
+Phase 1D (Combo): 4-5 hours
+Phase 1E (Toggle): 2-3 hours
+Phase 1F (Validation): 2-3 hours
+Total: 16-22 hours over 3-5 sessions
+📝 Implementation Order
+Session 1: Phase 1A (Foundation - get AnimationDrivenExecutor working) Session 2: Phase 1B (Channeled skills) Session 3: Phase 1C (Charged skills) Session 4: Phase 1D + 1E (Combo + Toggle skills) Session 5: Phase 1F (Validation & documentation)
+🚧 Risks & Mitigations
+Risk 1: Executors need too much Player exposure
+Mitigation: Only expose what's needed (AnimationPlayer, SetState, GetSkillAnimationName)
+Risk 2: State management gets complex
+Mitigation: Keep state classes simple (ChannelState, ChargeState, ComboState)
+Risk 3: Input handling for hold/release detection
+Mitigation: SkillManager._Process() polls Input.IsActionPressed()
+Risk 4: Animation loop modes conflict
+Mitigation: ChanneledExecutor sets loop mode, AnimationFinished resets it
+🔄 After This Plan
+Once executor architecture validated: Phase 2: Implement remaining Warrior skills using executors
+Fusion Cutter (AnimationDriven + hit counter)
+Breaching Charge (AnimationDriven + dash + stun)
+Crowd Suppression (AnimationDriven + AOE)
+Fortify (Instant + damage reduction buff)
+Combat Stim (Instant + speed buff)
+Last Stand (Instant + invulnerability buff)
+Phase 3: Add Effect Layer extensions as needed
+Hitscan (Precision Rifle)
+Cone hitbox (Psionic Wave)
+Chain/bounce (Arc Lightning)
+Gravity/pull (Singularity)
+Autonomous turret (Killzone)
+Phase 4: Add Systems Layer extensions
+Hit counter (Fusion Cutter)
+Debuff system (Psionic Pulse)
+Lifesteal (Void Rift)
+Knockback (Breaching Charge)
+🤔 Open Questions Before Starting
+Resource System: Do skills consume mana/energy? If yes, Channeled needs resource drain logic.
+If no: Can implement later without affecting executor architecture
+Combo Input: Should combos use same button (repeated presses) or different buttons (light vs heavy)?
+Suggestion: Same button for simplicity (Three-Strike = Q → Q → Q)
+UI Feedback: Do we need charge bar UI? Combo sequence indicator?
+Suggestion: Defer UI, validate mechanics first
+Animation Looping: How to handle loop mode changes for channeled skills?
+Proposal: ChanneledExecutor sets loop=true, StopChannel() sets loop=false
+Ready to begin Phase 1A: Foundation & Refactoring?

@@ -34,6 +34,7 @@ public partial class Player : CharacterBody2D
     [Signal] public delegate void WaveInfoChangedEventHandler(int waveNumber, int enemiesRemaining);
 
     // ===== PRIVATE FIELDS - Components =====
+    private InputManager _inputManager;
     private SkillManager _skillManager;
     private StatsManager _statsManager;
     private UpgradeManager _upgradeManager;
@@ -63,6 +64,17 @@ public partial class Player : CharacterBody2D
         AddToGroup("player");
 
         // Get components
+        _inputManager = GetNode<InputManager>("InputManager");
+        if (_inputManager == null)
+        {
+            GD.PrintErr("Player: InputManager component not found!");
+        }
+        else
+        {
+            _inputManager.SkillPressed += OnSkillPressed;
+            _inputManager.StatPanelPressed += OnStatPanelPressed;
+        }
+
         _skillManager = GetNode<SkillManager>("SkillManager");
         if (_skillManager == null)
         {
@@ -122,13 +134,7 @@ public partial class Player : CharacterBody2D
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        _skillManager?.HandleInput(@event);
-
-        // Open stat allocation panel with 'C' key
-        if (@event.IsActionPressed("open_stats"))
-        {
-            StatAllocationPanel?.ShowPanel(_statsManager, _upgradeManager);
-        }
+        _inputManager?.HandleInputEvent(@event);
     }
 
     public override void _PhysicsProcess(double delta)
@@ -190,7 +196,7 @@ public partial class Player : CharacterBody2D
             _currentState == PlayerState.Running ||
             _isCastingWhileMoving)
         {
-            direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
+            direction = _inputManager?.GetMovementInput() ?? Vector2.Zero;
         }
         else if (_currentState == PlayerState.CastingSkill)
         {
@@ -505,5 +511,15 @@ public partial class Player : CharacterBody2D
                 ChangeState(_previousState);
             }
         }
+    }
+
+    private void OnSkillPressed(int skillSlot)
+    {
+        _skillManager?.UseSkill((SkillSlot)skillSlot);
+    }
+
+    private void OnStatPanelPressed()
+    {
+        StatAllocationPanel?.ShowPanel(_statsManager, _upgradeManager);
     }
 }

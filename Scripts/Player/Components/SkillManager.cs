@@ -72,38 +72,28 @@ public partial class SkillManager : Node
         }
     }
 
-    public void HandleInput(InputEvent @event)
+    public void UseSkill(SkillSlot slot)
     {
-        if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
+        switch (slot)
         {
-            if (mouseEvent.ButtonIndex == MouseButton.Left && BasicAttackSkill != null)
-            {
+            case SkillSlot.BasicAttack:
                 UseSkill(BasicAttackSkill, ref _basicAttackCooldownTimer);
-            }
-            else if (mouseEvent.ButtonIndex == MouseButton.Right && SpecialAttackSkill != null)
-            {
+                break;
+            case SkillSlot.SpecialAttack:
                 UseSkill(SpecialAttackSkill, ref _specialAttackCooldownTimer);
-            }
-        }
-
-        if (@event is InputEventKey eventKey && eventKey.Pressed)
-        {
-            if (eventKey.Keycode == Key.Q && PrimarySkill != null)
-            {
+                break;
+            case SkillSlot.Primary:
                 UseSkill(PrimarySkill, ref _primarySkillCooldownTimer);
-            }
-            else if (eventKey.Keycode == Key.E && SecondarySkill != null)
-            {
+                break;
+            case SkillSlot.Secondary:
                 UseSkill(SecondarySkill, ref _secondarySkillCooldownTimer);
-            }
-            else if (eventKey.Keycode == Key.R && UltimateSkill != null)
-            {
+                break;
+            case SkillSlot.Ultimate:
                 UseSkill(UltimateSkill, ref _ultimateSkillCooldownTimer);
-            }
-            else if (eventKey.Keycode == Key.Space && UtilitySkill != null)
-            {
+                break;
+            case SkillSlot.Utility:
                 UseSkill(UtilitySkill, ref _utilitySkillCooldownTimer);
-            }
+                break;
         }
     }
 

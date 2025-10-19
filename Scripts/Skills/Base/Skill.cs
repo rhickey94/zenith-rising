@@ -57,7 +57,7 @@ public partial class Skill : Resource
 
     private bool _initialized = false;
 
-    private static readonly int[] _masteryThresholds = { 100, 500, 2000, 10000 };
+    private static readonly int[] _masteryThresholds = [100, 500, 2000, 10000];
 
     private ISkillExecutor _executor;
 
@@ -242,15 +242,19 @@ public enum MovementBehavior
 
 public enum CastBehavior
 {
-    Instant,           // Execute immediately on input
-    AnimationDriven    // Requires animation playback
+    Instant,           // Non-interrupting (can use while doing other actions)
+    AnimationDriven,   // Interrupting (locks FSM to CastingSkill state)
+    Channeled,         // Hold button for continuous effect
+    Charged,           // Hold to power up, release to fire
+    Combo,             // Input sequence with timing windows
+    Toggle             // On/off state (Overwatch precision mode)
 }
 
 public enum DamageSource
 {
-    PlayerHitbox,      // Damage from player-attached Area2D
-    EffectCollision,   // Damage from spawned effect's collision
-    None              // No damage (buffs/utility)
+    PlayerHitbox,       // Damage from player-attached Area2D
+    EffectCollision,    // Damage from spawned effect's collision
+    None                // No damage (buffs/utility)
 }
 
 public enum SkillType
@@ -261,13 +265,14 @@ public enum SkillType
 
 public enum SkillSlot
 {
-    BasicAttack,
-    SpecialAttack,
+    BasicAttack,    // Left click
+    SpecialAttack,  // Right click
 
-    Primary,    // Q key
-    Secondary,  // E key
-    Ultimate,    // R key
-    Utility
+    Primary,        // Q key / 1
+    Secondary,      // E key / 2
+    Tertiary,       // W key / 3
+    Ultimate,       // R key / 4
+    Utility         // Space
 }
 
 public enum SkillMasteryTier
