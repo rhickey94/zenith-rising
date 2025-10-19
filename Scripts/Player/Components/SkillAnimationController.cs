@@ -97,7 +97,6 @@ public partial class SkillAnimationController : Node
         UpdateMeleeHitboxPosition(_currentAttackDirection);
 
         _meleeHitbox.Monitoring = true;
-        GD.Print("Melee hitbox enabled");
     }
 
     public void DisableMeleeHitbox()
@@ -109,7 +108,6 @@ public partial class SkillAnimationController : Node
         }
 
         _meleeHitbox.Monitoring = false;
-        GD.Print("Melee hitbox disabled");
     }
 
     public void EnableAOEHitbox()
@@ -121,7 +119,6 @@ public partial class SkillAnimationController : Node
         }
         _hitEnemiesThisCast.Clear();
         _aoeHitbox.Monitoring = true;
-        GD.Print("AOE hitbox enabled");
     }
 
     public void DisableAOEHitbox()
@@ -133,27 +130,21 @@ public partial class SkillAnimationController : Node
         }
 
         _aoeHitbox.Monitoring = false;
-        GD.Print("AOE hitbox disabled");
     }
 
     public void SpawnWaveProjectiles()
     {
-        GD.Print(">>> SpawnWaveProjectiles() CALLED");
-
         if (_currentCastingSkill == null || _player == null)
         {
             GD.PrintErr($"SpawnWaveProjectiles: Missing references! Skill={_currentCastingSkill != null}, Player={_player != null}");
             return;
         }
 
-        GD.Print($">>> Skill: {_currentCastingSkill.SkillName}, ProjectileCount: {_currentCastingSkill.ProjectileCount}");
-
         if (_currentCastingSkill.ProjectileCount <= 0)
         {
             GD.PrintErr($"SpawnWaveProjectiles: ProjectileCount is {_currentCastingSkill.ProjectileCount}, aborting!");
             return;
         }
-
 
         if (ProjectileScene == null)
         {
@@ -169,11 +160,9 @@ public partial class SkillAnimationController : Node
         int projectileCount = _currentCastingSkill.ProjectileCount;
         float spreadAngle = _currentCastingSkill.ProjectileSpreadAngle;
 
-        GD.Print($">>> Spawning {projectileCount} projectiles with {spreadAngle}° spread");
         for (int i = 0; i < projectileCount; i++)
         {
             SpawnSingleProjectile(spawnPos, baseAngle, i, projectileCount, spreadAngle);
-            GD.Print($">>> Spawned projectile {i + 1}/{projectileCount}");
         }
     }
 
@@ -191,7 +180,6 @@ public partial class SkillAnimationController : Node
         if (visual is WhirlwindVisual whirlwindVisual)
         {
             whirlwindVisual.Initialize(_currentCastingSkill);
-            GD.Print($"Whirlwind visual initialized - Duration: {_currentCastingSkill.Duration}, Radius: {_currentCastingSkill.Radius}");
         }
         else
         {
@@ -201,8 +189,6 @@ public partial class SkillAnimationController : Node
         // NOW add to scene tree (triggers _Ready with initialized values)
         _player.GetParent().AddChild(visual);
         visual.GlobalPosition = _player.GlobalPosition;
-
-        GD.Print("Whirlwind visual spawned");
     }
 
     // Called from animation tracks for explosion effects (Leap Slam, Breaching Charge, etc.)
@@ -227,8 +213,6 @@ public partial class SkillAnimationController : Node
 
         // Add to world (not as child of player)
         _player.GetParent().AddChild(explosion);
-
-        GD.Print($"Spawned explosion at {spawnPosition} with radius {_currentCastingSkill.ExplosionRadius}");
     }
 
     // ===== DASH CALLBACKS (Called from AnimationPlayer) =====
@@ -252,8 +236,6 @@ public partial class SkillAnimationController : Node
 
         // Enable i-frames
         _statsManager.SetInvincible(true);
-
-        GD.Print($"Dash started: direction={dashDirection}, i-frames=ON");
     }
 
     /// <summary>
@@ -272,8 +254,6 @@ public partial class SkillAnimationController : Node
 
         // Disable i-frames
         _statsManager.SetInvincible(false);
-
-        GD.Print("Dash ended: i-frames=OFF");
     }
 
     // ===== COLLISION HANDLERS =====
@@ -336,7 +316,6 @@ public partial class SkillAnimationController : Node
 
         float healthBefore = enemy.Health;
         enemy.TakeDamage(damage);
-        GD.Print($"{_currentCastingSkill.SkillName} hit {enemy.Name} for {damage} damage");
 
         if (healthBefore > 0 && enemy.Health <= 0)
         {
@@ -363,7 +342,6 @@ public partial class SkillAnimationController : Node
         if (projectile is DamageEntityBase entity)
         {
             entity.Initialize(_currentCastingSkill, _player, direction);
-            GD.Print($">>> Projectile initialized! Angle: {Mathf.RadToDeg(finalAngle)}°, Speed: {_currentCastingSkill.ProjectileSpeed}");
         }
         else
         {

@@ -69,8 +69,6 @@ public partial class FloorTransitionPanel : Control
         // Show panel and pause game
         Visible = true;
         GetTree().Paused = true;
-
-        GD.Print($"Floor transition panel shown: Floor {currentFloor} → {nextFloor}");
     }
 
     /// <summary>
@@ -80,20 +78,16 @@ public partial class FloorTransitionPanel : Control
     {
         Visible = false;
         GetTree().Paused = false;
-
-        GD.Print("Floor transition panel hidden");
     }
 
     private void OnContinuePressed()
     {
-        GD.Print("Continue button pressed");
         HidePanel();
         EmitSignal(SignalName.ContinueButtonPressed);
     }
 
     private void OnEndRunPressed()
     {
-        GD.Print("End Run button pressed");
         HidePanel();
         EmitSignal(SignalName.EndRunButtonPressed);
     }

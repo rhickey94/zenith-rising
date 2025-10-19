@@ -68,8 +68,5 @@ public partial class GameBalance : Node
         {
             GD.PrintErr("GameBalance: SkillBalanceDatabase not assigned!");
         }
-
-        GD.Print("GameBalance initialized successfully");
-        GD.Print($"Loading {PlayerStatsResource.GetType().Name} with BaseMaxHealth: {PlayerStatsResource.BaseMaxHealth}");
     }
 }

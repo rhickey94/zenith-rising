@@ -61,7 +61,6 @@ public abstract partial class DamageEntityBase : Area2D
         if (_sourceSkill != null)
         {
             _sourceSkill.RecordKill();
-            GD.Print($"{_sourceSkill.SkillName} kill count: {_sourceSkill.KillCount}");
         }
     }
 }

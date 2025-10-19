@@ -105,7 +105,6 @@ public partial class Dungeon : Node
         if (statsManager != null)
         {
             statsManager.AddCharacterExperience(_lastCharacterXPAwarded);
-            GD.Print($"Awarded {_lastCharacterXPAwarded} character XP!");
 
             // Reset run state BEFORE saving (death ends run)
             var upgradeManager = Player?.GetNode<UpgradeManager>("UpgradeManager");
@@ -133,7 +132,6 @@ public partial class Dungeon : Node
         if (statsManager != null)
         {
             statsManager.AddCharacterExperience(_lastCharacterXPAwarded);
-            GD.Print($"Awarded {_lastCharacterXPAwarded} character XP!");
 
             // Reset run state BEFORE saving (victory ends run)
             var upgradeManager = Player?.GetNode<UpgradeManager>("UpgradeManager");
@@ -210,8 +208,6 @@ public partial class Dungeon : Node
             return;
         }
 
-        GD.Print($"BOSS SPAWNED - Floor {_currentFloor}!");
-
         var angle = GD.Randf() * Mathf.Tau;
         var spawnPosition = Player.Position + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * SpawnDistance;
 
@@ -247,7 +243,6 @@ public partial class Dungeon : Node
         if (_waitingForBossDefeat && _enemyCount <= 0)
         {
             _waitingForBossDefeat = false;
-            GD.Print($"Boss defeated! Enemy count: {_enemyCount}");
             OnBossDefeated();
         }
     }
@@ -261,7 +256,6 @@ public partial class Dungeon : Node
         if (newWave != _currentWave)
         {
             _currentWave = newWave;
-            GD.Print($"Wave {_currentWave} started!");
             UpdateHUD();
         }
     }
@@ -278,7 +272,6 @@ public partial class Dungeon : Node
         _floorsCleared = _currentFloor - 1;
 
         UpdateHUD();
-        GD.Print($"Advanced to Floor {_currentFloor}!");
     }
 
     private void OnBossDefeated()
@@ -310,14 +303,11 @@ public partial class Dungeon : Node
     // ===== SIGNAL HANDLERS - Floor Transition =====
     private void OnContinueToNextFloor()
     {
-        GD.Print("Player chose to continue to next floor");
         AdvanceToNextFloor();
     }
 
     private void OnEndRun()
     {
-        GD.Print("Player chose to end run - returning to hub");
-
         SaveCharacterProgress();
 
         // Return to hub
@@ -380,9 +370,6 @@ public partial class Dungeon : Node
         // if (_totalGameTime < 900f) xp += 100; // Speed clear bonus (< 15 min)
         // if (player never died) xp += 150; // No death bonus
 
-        // Log breakdown for debugging
-        GD.Print($"Character XP Calculation: Base=50, Floors={_floorsCleared}x100={_floorsCleared * 100}, Bosses={_bossesKilled}x150={_bossesKilled * 150}, Victory={(_finalBossDefeated ? 500 : 0)} → Total={xp}");
-
         return xp;
     }
 
@@ -392,8 +379,6 @@ public partial class Dungeon : Node
         // Just connect signals - panel already exists in scene
         FloorTransitionPanel.ContinueButtonPressed += OnContinueToNextFloor;
         FloorTransitionPanel.EndRunButtonPressed += OnEndRun;
-
-        GD.Print("Floor transition panel setup complete");
     }
 
     private void SetupResultsScreen()
@@ -507,7 +492,5 @@ public partial class Dungeon : Node
         saveData.HasActiveRun = saveData.PowerLevel > 1 || saveData.ActiveUpgrades.Count > 0;
 
         SaveManager.Instance?.SaveGame(saveData);
-
-        GD.Print($"Game saved! Floor {saveData.CurrentFloor}, Power Level {saveData.PowerLevel}, Character Level{saveData.CharacterLevel}");
     }
 }

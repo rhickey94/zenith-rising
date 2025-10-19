@@ -19,13 +19,10 @@ public partial class Hub : Node2D
 
         // Initialize player (loads save if exists)
         CallDeferred(MethodName.InitializePlayer);
-
-        GD.Print("Hub loaded - safe zone");
     }
 
     private void InitializePlayer()
     {
         Player.Initialize();
-        GD.Print($"Player initialized - CurrentSpeed: {Player.GetNode<StatsManager>("StatsManager").CurrentSpeed}");
     }
 }

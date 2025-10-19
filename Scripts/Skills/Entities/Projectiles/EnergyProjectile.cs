@@ -63,7 +63,6 @@ public partial class EnergyProjectile : DamageEntityBase
         BodyEntered += OnBodyEntered;
 
         GetTree().CreateTimer(_lifetime).Timeout += QueueFree;
-        GD.Print($">>> EnergyProjectile _Ready: Position={GlobalPosition}, Speed={_speed}, Lifetime={_lifetime}, Direction={_direction}");
     }
 
     public override void _PhysicsProcess(double delta)
@@ -78,7 +77,6 @@ public partial class EnergyProjectile : DamageEntityBase
             float healthBefore = enemy.Health;
             float damage = CalculateDamage(_totalDamage);
             enemy.TakeDamage(damage);
-            GD.Print($"Basic projectile hit enemy for {damage} damage");
 
             // Track kill if enemy died
             if (healthBefore > 0 && enemy.Health <= 0)

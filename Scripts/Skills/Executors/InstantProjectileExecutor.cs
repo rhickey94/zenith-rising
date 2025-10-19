@@ -28,7 +28,6 @@ public class InstantProjectileExecutor : ISkillExecutor
         // Add to scene tree
         player.GetTree().Root.AddChild(effect);
 
-        GD.Print($"{skill.SkillName} launched!");
         return true;
     }
 }

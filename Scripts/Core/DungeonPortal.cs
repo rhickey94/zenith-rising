@@ -38,7 +38,6 @@ public partial class DungeonPortal : Area2D
         {
             _playerInRange = true;
             _promptLabel.Visible = true;
-            GD.Print("Player near dungeon portal - press E to enter");
         }
     }
 
@@ -53,7 +52,6 @@ public partial class DungeonPortal : Area2D
 
     private void EnterDungeon()
     {
-        GD.Print("Entering dungeon...");
         GetTree().ChangeSceneToFile(DungeonScenePath);
     }
 }

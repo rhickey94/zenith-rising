@@ -60,7 +60,6 @@ public abstract partial class SkillEntityBase : Node2D
         if (_sourceSkill != null)
         {
             _sourceSkill.RecordKill();
-            GD.Print($"{_sourceSkill.SkillName} kill count: {_sourceSkill.KillCount}");
         }
     }
 }

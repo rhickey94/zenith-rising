@@ -158,7 +158,6 @@ public partial class StatsManager : Node
     {
         if (IsInvincible)
         {
-            GD.Print("Damage blocked - player is invincible!");
             return; // Early exit, no damage taken
         }
 
@@ -206,7 +205,6 @@ public partial class StatsManager : Node
         CharacterLevel += levels;
         UnallocatedStatPoints += levels;
 
-        GD.Print($"Character leveled up to {CharacterLevel}! Gained {levels} stat point(s).");
         CharacterExperienceToNextLevel = CalculateCharacterXPForNextLevel();
 
         EmitSignal(SignalName.CharacterLeveledUp);
@@ -217,7 +215,6 @@ public partial class StatsManager : Node
         if (floor > HighestFloorReached)
         {
             HighestFloorReached = floor;
-            GD.Print($"New highest floor reached: {HighestFloorReached}");
         }
     }
 
@@ -308,8 +305,6 @@ public partial class StatsManager : Node
 
         UnallocatedStatPoints -= amount;
 
-        GD.Print($"Allocated {amount} point(s) to {statType}. {UnallocatedStatPoints} points remaining.");
-
         EmitSignal(SignalName.StatAllocated, (int)statType);
     }
 
@@ -325,13 +320,11 @@ public partial class StatsManager : Node
 
         if (invincible)
         {
-            GD.Print("I-frames START");
             // Trigger visual feedback (flash effect)
             // _player?.EmitSignal("InvincibilityStarted");
         }
         else
         {
-            GD.Print("I-frames END");
             // _player?.EmitSignal("InvincibilityEnded");
         }
     }
@@ -389,9 +382,6 @@ public partial class StatsManager : Node
         PowerExperience = 0;
         PowerExperienceToNextLevel = (int)(100 * Mathf.Pow(1.5f, PowerLevel - 1));
 
-        GD.Print($"Loaded character: Level {CharacterLevel}, STR {Strength}, INT {Intelligence}, AGI {Agility}, VIT{Vitality}, FOR {Fortune}");
-        GD.Print($"Run state: Power Level {PowerLevel}");
-
         // Recalculate base stats (upgrades will be applied separately by Game.cs)
         RecalculateStats(new StatModifiers());
     }
@@ -422,8 +412,6 @@ public partial class StatsManager : Node
         CurrentMaxHealth = BaseMaxHealth + CalculateRunLevelHealthBonus() + characterHealthBonus;
         CurrentHealth = CurrentMaxHealth;  // Full heal on level up
 
-        GD.Print($"Run leveled up to {PowerLevel}!");
-
         EmitHealthUpdate();
         EmitExperienceUpdate();
 
@@ -432,8 +420,6 @@ public partial class StatsManager : Node
 
     private void Die()
     {
-        GD.Print("Player died!");
-
         // Find Dungeon node and notify it
         var dungeon = GetTree().Root.GetNode<Dungeon>("Dungeon");
         if (dungeon != null)

@@ -111,20 +111,16 @@ public partial class SkillManager : Node
     {
         if (skill == null)
         {
-            GD.Print("No skill equipped!");
             return;
         }
 
         if (cooldownRemaining > 0)
         {
-            GD.Print($"{skill.SkillName} on cooldown: {cooldownRemaining:F1}s remaining");
             return;
         }
 
         // Initialize skill from database if not already done
         skill.Initialize();
-
-        GD.Print($"Using {skill.SkillName}! (CastBehavior: {skill.CastBehavior}, DamageSource: {skill.DamageSource})");
 
         // Route based on CastBehavior
         if (skill.CastBehavior == CastBehavior.AnimationDriven)
@@ -133,7 +129,6 @@ public partial class SkillManager : Node
             if (_player.TryCastSkill(skill))
             {
                 cooldownRemaining = skill.Cooldown;
-                GD.Print($">>> COOLDOWN SET: {skill.SkillName} cooldown = {cooldownRemaining}s");
             }
         }
         else // CastBehavior.Instant

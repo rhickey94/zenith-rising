@@ -66,9 +66,6 @@ public partial class UpgradeManager : Node
             _activeUpgrades[upgrade.Type] = upgrade.Value;
         }
 
-        GD.Print($"Selected: {upgrade.UpgradeName}");
-        GD.Print($"New Total: {_activeUpgrades[upgrade.Type]}");
-
         // Recalculate all stats from base + all upgrades
         RecalculateAllStats();
     }
@@ -106,8 +103,6 @@ public partial class UpgradeManager : Node
         new Upgrade { UpgradeName = "Critical Hit", Description = $"+{config.CritChancePerStack * 100}% Crit Chance", Type = UpgradeType.CritChance, Value = config.CritChancePerStack },
         new Upgrade { UpgradeName = "Regeneration", Description = $"+{config.HealthRegenPerStack} HP/sec", Type = UpgradeType.HealthRegen, Value = config.HealthRegenPerStack }
     ]);
-
-        GD.Print($"UpgradeManager: Initialized {_availableUpgrades.Count} upgrades");
     }
 
     public float GetUpgradeValue(UpgradeType type)
@@ -172,8 +167,6 @@ public partial class UpgradeManager : Node
                 _activeUpgrades[kvp.Key] = kvp.Value;
             }
 
-            GD.Print($"Loaded {_activeUpgrades.Count} active upgrades");
-
             // Recalculate stats with loaded upgrades
             RecalculateAllStats();
         }
@@ -182,6 +175,5 @@ public partial class UpgradeManager : Node
     public void ClearUpgrades()
     {
         _activeUpgrades.Clear();
-        GD.Print("Cleared all active upgrades");
     }
 }

@@ -99,7 +99,6 @@ public partial class Skill : Resource
         LoadExplosionData(entry);
 
         _initialized = true;
-        GD.Print($"Skill '{SkillName}' ({SkillId}) initialized from database");
     }
 
     public bool Execute(Player player)
@@ -150,7 +149,6 @@ public partial class Skill : Resource
         if (newTier != CurrentTier)
         {
             CurrentTier = newTier;
-            GD.Print($"{SkillName} advanced to {CurrentTier} tier! ({KillCount} kills)");
         }
     }
 

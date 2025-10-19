@@ -50,7 +50,5 @@ public partial class SkillBalanceDatabase : Resource
 
             _skillLookup[skill.SkillId] = skill;
         }
-
-        GD.Print($"SkillBalanceDatabase: Loaded {_skillLookup.Count} skill entries");
     }
 }

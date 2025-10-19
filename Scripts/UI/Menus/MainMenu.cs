@@ -57,8 +57,6 @@ public partial class MainMenu : Control
     {
         bool saveExists = SaveManager.Instance?.SaveExists() ?? false;
         _continueButton.Visible = saveExists;
-
-        GD.Print($"Save file exists: {saveExists}");
     }
     private void UpdateProgressDisplay()
     {
@@ -83,8 +81,6 @@ public partial class MainMenu : Control
     // ===== BUTTON HANDLERS =====
     private void OnStartPressed()
     {
-        GD.Print("Starting new game...");
-
         // Delete existing save for fresh start
         SaveManager.Instance?.DeleteSave();
 
@@ -93,24 +89,17 @@ public partial class MainMenu : Control
 
     private void OnContinuePressed()
     {
-        GD.Print("Continuing saved game...");
-
         // Load will happen in Hub._Ready() via Player.Initialize()
         GetTree().ChangeSceneToFile(HubScenePath);
     }
 
     private void OnSettingsPressed()
     {
-        GD.Print("Opening settings...");
-
         // TODO: Phase 2 - Open settings menu
-        // For now, just log
-        GD.Print("Settings menu not implemented yet");
     }
 
     private void OnQuitPressed()
     {
-        GD.Print("Quitting game...");
         GetTree().Quit();
     }
 

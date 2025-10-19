@@ -23,8 +23,6 @@ public partial class WhirlwindVisual : Node2D
         _rotationCount = sourceSkill.WhirlwindRotations;
         _rotationSpeed = Mathf.Pi * 2 * _rotationCount / _duration;
         _alpha = Mathf.Clamp(0.4f + (_rotationCount * 0.1f), 0.4f, 0.8f);
-
-        GD.Print($">>> WhirlwindVisual.Initialize(): Duration={_duration}, Radius={_radius}, Rotations={_rotationCount}");
     }
 
     public override void _Ready()
@@ -39,7 +37,6 @@ public partial class WhirlwindVisual : Node2D
             _rotationSpeed = Mathf.Pi * 2 / _duration;
         }
 
-        GD.Print($">>> WhirlwindVisual._Ready(): Duration={_duration}, Radius={_radius}");
         GetTree().CreateTimer(_duration).Timeout += QueueFree;
     }
 
@@ -66,8 +63,6 @@ public partial class WhirlwindVisual : Node2D
 
     public override void _Draw()
     {
-        GD.Print($">>> WhirlwindVisual._Draw() called: Radius={_radius}, Segments={8 * _rotationCount}, Alpha={_alpha}");
-
         if (_radius <= 0)
         {
             GD.PrintErr($"WhirlwindVisual: Cannot draw with radius {_radius}!");

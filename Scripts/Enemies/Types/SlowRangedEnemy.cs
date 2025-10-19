@@ -30,8 +30,6 @@ public partial class SlowRangedEnemy : Enemy
 
     protected override void Attack(Player player)
     {
-        GD.Print("SlowRangedEnemy attacking!");
-
         // Shoot projectile
         if (ProjectileScene != null)
         {
@@ -42,10 +40,6 @@ public partial class SlowRangedEnemy : Enemy
             GetTree().Root.CallDeferred(Node.MethodName.AddChild, projectile);
 
             _timeSinceLastAttack = 0f;
-        }
-        else
-        {
-            GD.Print("ProjectileScene is null!");  // ← Add this too
         }
     }
 

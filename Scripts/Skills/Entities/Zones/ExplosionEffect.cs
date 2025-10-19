@@ -36,14 +36,6 @@ public partial class ExplosionEffect : DamageEntityBase
             animationPlayer.Play("explode");
         }
 
-        // DEBUG: Print all color info
-        var sprite = GetNode<Sprite2D>("Sprite2D");
-        GD.Print($"=== ExplosionEffect Color Debug ===");
-        GD.Print($"Root Modulate: {Modulate}");
-        GD.Print($"Root SelfModulate: {SelfModulate}");
-        GD.Print($"Sprite Modulate: {sprite.Modulate}");
-        GD.Print($"Sprite SelfModulate: {sprite.SelfModulate}");
-
         // Visual effect duration, then cleanup
         GetTree().CreateTimer(0.5f).Timeout += QueueFree;
     }
@@ -55,7 +47,6 @@ public partial class ExplosionEffect : DamageEntityBase
             float healthBefore = enemy.Health;
             float damage = CalculateDamage(_explosionDamage);
             enemy.TakeDamage(damage);
-            GD.Print($"Explosion hit enemy for {damage} damage");
 
             // Track kill if enemy died
             if (healthBefore > 0 && enemy.Health <= 0)

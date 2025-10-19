@@ -36,7 +36,6 @@ public static class CombatSystem
         if (isCrit)
         {
             damage *= attackerStats.CritDamageMultiplier;
-            GD.Print($"CRIT! Damage: {damage:F1} (Multiplier: {attackerStats.CritDamageMultiplier:F2}x)");
         }
 
         return damage;

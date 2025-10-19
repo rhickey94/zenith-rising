@@ -170,7 +170,6 @@ public partial class Player : CharacterBody2D
             if (t >= 1.0f)
             {
                 _isDashing = false;
-                GD.Print("Dash movement complete");
             }
 
             // Skip normal movement logic
@@ -249,15 +248,12 @@ public partial class Player : CharacterBody2D
                     var upgradeManager = GetNode<UpgradeManager>("UpgradeManager");
                     upgradeManager?.LoadActiveUpgrades(saveData.Value.ActiveUpgrades);
                 }
-
-                GD.Print("Save data loaded successfully!");
             }
         }
         else
         {
             // New game - initialize fresh stats
             _statsManager?.Initialize();
-            GD.Print("Initialized fresh character stats");
         }
 
         EmitResourcesUpdate(0, 0, 0, 0);
@@ -319,7 +315,6 @@ public partial class Player : CharacterBody2D
         string animName = GetSkillAnimationName(skill);
         _animationPlayer.Play(animName);
 
-        GD.Print($"Playing skill animation: {animName} (Movement: {skill.MovementBehavior})");
         return true;
     }
 
@@ -334,8 +329,6 @@ public partial class Player : CharacterBody2D
         _dashEndPos = GlobalPosition + (direction.Normalized() * distance);
         _dashDuration = duration;
         _dashElapsed = 0f;
-
-        GD.Print($"Dash started: {_dashStartPos} → {_dashEndPos} (distance: {distance}, duration: {duration}s)");
     }
 
     /// <summary>
@@ -347,7 +340,6 @@ public partial class Player : CharacterBody2D
         if (_isDashing)
         {
             _isDashing = false;
-            GD.Print("Dash ended early via EndDash() call");
         }
     }
 
@@ -489,17 +481,14 @@ public partial class Player : CharacterBody2D
     {
         if (!CanTransitionTo(newState))
         {
-            GD.Print($"Cannot transition from {_currentState} to {newState}");
             return;
         }
 
-        GD.Print($"State: {_currentState} → {newState}");
         _currentState = newState;
     }
 
     private void OnAnimationFinished(StringName animName)
     {
-        GD.Print($">>> ANIMATION FINISHED: {animName}, Current State: {_currentState}");
         // Clear casting flags
         bool wasCasting = _currentState == PlayerState.CastingSkill || _isCastingWhileMoving;
 

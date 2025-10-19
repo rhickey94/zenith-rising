@@ -39,7 +39,6 @@ public partial class SaveManager : Node
             }
 
             file.StoreString(jsonString);
-            GD.Print($"Game saved successfully to {SaveFilePath}");
         }
         catch (Exception ex)
         {
@@ -55,7 +54,6 @@ public partial class SaveManager : Node
             // Check if file exists
             if (!FileAccess.FileExists(SaveFilePath))
             {
-                GD.Print("No save file found");
                 return null;
             }
 
@@ -79,7 +77,6 @@ public partial class SaveManager : Node
                 return null;
             }
 
-            GD.Print($"Game loaded successfully from {SaveFilePath}");
             return data;
         }
         catch (Exception ex)
@@ -97,11 +94,6 @@ public partial class SaveManager : Node
             if (FileAccess.FileExists(SaveFilePath))
             {
                 DirAccess.RemoveAbsolute(SaveFilePath);
-                GD.Print($"Save file deleted: {SaveFilePath}");
-            }
-            else
-            {
-                GD.Print("No save file to delete");
             }
         }
         catch (Exception ex)
