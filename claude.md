@@ -52,7 +52,7 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 
 ## Current Status: Be Honest
 
-**Phase:** Warrior Skill Implementation (Phase 3.5-B+) - ⏳ **IN PROGRESS**
+**Phase:** Warrior Skills Implementation (Phase 3.5-B) - ⏳ **IN PROGRESS**
 
 **🎉 PHASES 1, 2, 3, & 3.5-A COMPLETE! 🎉**
 
@@ -64,21 +64,18 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 ### ✅ Actually Working
 
 **Core Combat (Phase 1):**
-- Player movement (WASD) and rotation
+- Player movement (WASD) with mouse-aimed combat (twin-stick controls)
 - Enemy AI (chase player, contact damage)
 - Health/damage system with crits
 - XP shards drop and level-up flow
 - Level-up panel with 3 upgrade choices
-- Component architecture (StatsManager, SkillManager, UpgradeManager)
-- Type-based skill executor pattern
-- **3 working skills:** Whirlwind, Fireball, Basic attacks
+- Component architecture (StatsManager, SkillManager, UpgradeManager, BuffManager)
 - **8 working upgrades:** All functional with proper stacking
 - **CombatSystem.cs** - Centralized damage calculation with null safety
 - **3 enemy types:** Basic melee, FastMelee, SlowRanged (with projectiles)
 - **Enemy scaling system** - HP/damage multipliers per wave/floor
 - **Wave/floor system** - 10 waves + boss per floor, 5 floors total
 - **Boss spawning** - At 5:00 mark with 5x HP, 2x damage
-- **Boss defeat detection** - TreeExited signal tracking, enemy count management
 - **Main menu** - Functional with styled buttons, scene transitions
 - **Floor transition UI** - Continue/End Run panel with hover effects, pause/unpause
 - **HUD integration** - Floor/wave display wired to Dungeon.cs
@@ -87,10 +84,12 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 
 **Character Progression (Phase 2):**
 - **Character stat system** - STR/INT/AGI/VIT/FOR with proper scaling
+- **Derived stats** - Attack damage, cast speed, attack rate, CDR, max health, damage reduction
 - **Stat allocation panel** - UI for spending stat points (press C in-game)
 - **Save/load system** - JSON-based save with character + run state
 - **Character leveling** - XP awards from runs, persistent character progression
 - **Highest floor tracking** - Checkpoint system for floor completion
+- **Skill mastery system** - Kill tracking, 4 tiers (Bronze/Silver/Gold/Diamond)
 
 **Hub World (Phase 3):**
 - **Hub scene** - Safe zone with player spawn
@@ -100,35 +99,36 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 - **Save integration** - Hub correctly loads/saves character state
 
 **Animation System (Warrior):**
-- **Sprite2D + AnimationPlayer** - Custom FSM pattern chosen
+- **Sprite2D + AnimationPlayer** - Custom FSM pattern (5 states: Idle, Running, CastingSkill, Hurt, Dead)
 - **Locomotion animations** - Walk/idle in all 4 directions complete
-- **PlayerState enum** - FSM with transition validation working
-- **Combat animations** - warrior_attack_[dir], warrior_whirlwind created
-- **Phases 1-4 complete** - Foundation, locomotion, FSM, combat animations
+- **Combat animations** - warrior_attack_[dir], warrior_whirlwind, warrior_energy_wave_[dir]
+- **Call Method tracks** - Frame-perfect hitbox timing and effect spawning
 
 **Balance Systems (Phase 3.5-A):**
 - **GameBalance singleton** - Autoload with centralized config access
 - **5 config Resources** - Player stats, progression, combat, enemies, upgrades (separate files)
 - **Inspector-based tuning** - Edit balance values without recompilation
-- **Hybrid architecture** - Individual .tres files + C# wrapper for clean access
-- **Lazy initialization** - Null guards prevent timing issues during startup
-- **Warrior combat working** - Basic attack and Whirlwind deal damage via hitboxes
-- **SkillBalanceDatabase** - Centralized skill parameter storage
+- **SkillBalanceDatabase** - Centralized skill parameter storage with composition pattern
+- **Sub-Resources** - ProjectileData, MeleeData, AOEData, ExplosionData, BuffData
+- **Data-driven design** - Zero hardcoded skill parameters
 
-### ⏳ In Progress
+**Buff System:**
+- **BuffManager component** - Tracks active buffs, recalculates stats on change
+- **Buff stacking** - Duration refresh, stat bonuses accumulate
+- **Supported bonuses** - Attack speed, move speed, cast speed, damage, CDR, damage reduction
 
-**Warrior Skills Implementation:**
-- ✅ Basic Attack (Fusion Cutter) - Melee Pattern (functional)
-- ✅ Whirlwind - Instant AOE Pattern (functional + visual effect)
-- ✅ Energy Wave - Hybrid Pattern (melee + 3 projectiles, functional)
-- 📝 Leap Slam - Database entry added (not implemented)
-- 📝 Combat Stim - Planned (Buff Pattern)
-- 📝 Breaching Charge - Planned (Cast-Spawn Pattern)
+**Warrior Skills (4 + Dash Working):**
+- ✅ **Fusion Cutter** (Basic Attack / Left Click) - Melee Pattern, animation-driven hitbox
+- ✅ **Whirlwind** (Special / Right Click) - AOE Pattern with procedural visual effect
+- ✅ **Energy Wave** (Secondary / E) - Hybrid Pattern (melee swing + 3 projectiles)
+- ✅ **Combat Stim** (Buff / F) - Instant Pattern (5s duration, +40% attack speed, +100% move speed, +30% damage)
+- ✅ **Dash** (Utility / Space) - Animation-driven with invincibility frames
 
-**Combat Polish:**
-- 📝 Animation timing refinement
-- 📝 Hitbox frame tuning for better feel
-- 📝 Visual effects for attacks
+### ⏳ Remaining Warrior Skills
+
+- 📝 **Leap Slam** - Database entry exists, needs animation + implementation
+- 📝 **Breaching Charge** - Planned dash + explosion skill
+- 📝 **Combat polish** - Animation timing, VFX improvements, balance tuning
 
 ### 📝 Not Started (Phase 4+)
 
@@ -141,141 +141,37 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 
 ## Current Phase Focus
 
-**Phase 3.5: Warrior Combat Implementation** ⏳ **IN PROGRESS**
-**Sub-Phase A: Balance Systems Foundation** ⏳ **CURRENT PRIORITY**
+**Phase 3.5-B: Warrior Skills Implementation** ⏳ **IN PROGRESS**
 
-### Phase A: Balance Systems Foundation (4-6 hours)
+### Next Tasks
 
-**Why This Phase Comes First:**
-Before implementing 5 warrior skills (and eventually 18 total skills), we need centralized balance infrastructure. This prevents:
-- Hardcoded magic numbers scattered across skill files
-- Manual recompilation for every balance tweak  
-- Inconsistent formulas between similar skills
-- Difficulty comparing and tuning related values
+**Remaining Warrior Skills:**
+- **Leap Slam** - Jump attack with takeoff/landing hitboxes (database entry exists)
+- **Breaching Charge** - Dash + explosion skill
 
-**Investment Pays Off:**
-- 4-6 hours setup → saves 10+ hours during Phases B-F
-- Enables rapid iteration during playtesting
-- Creates sustainable architecture for 18+ skills
+**Combat Polish:**
+- Animation timing refinement (hitbox frames, attack feel)
+- Visual effects improvements (particles, impact effects)
+- Balance tuning via inspector (damage, cooldowns, ranges)
 
-**Current Tasks (Step-by-Step Guide):**
+**Code Quality:**
+- Address deferred issues from Session 14 code review
+- Remove GetCooldownReduction() method (use CooldownReduction property)
+- Make Skill property setters private (currently public)
 
-**STEP 1: Create BalanceConfig System (2 hours)**
-1. Create `Scripts/Core/BalanceConfig.cs` with nested config classes:
-   - PlayerStatsConfig (BaseMaxHealth, BaseSpeed, BaseDamage)
-   - CharacterProgressionConfig (stat scaling formulas)
-   - CombatSystemConfig (crit damage, damage type multipliers)
-   - EnemyConfig (scaling formulas, aggro ranges, spawn rates)
-   - UpgradeSystemConfig (upgrade values per stack)
-2. Create `Scripts/Core/GameBalance.cs` singleton autoload
-3. Create folder `Resources/Balance/`
-4. Create resource `Resources/Balance/balance_config.tres`
-5. Add GameBalance to Project Settings → Autoload
-6. Assign balance_config.tres to GameBalance.Config export in editor
+### Architecture Notes
 
-**STEP 2: Create SkillBalanceDatabase (2 hours)**
-1. Create `Scripts/Skills/Balance/` folder
-2. Create `SkillBalanceType.cs` enum (Projectile, InstantAOE, Melee, etc.)
-3. Create `SkillBalanceEntry.cs` data structure (all skill parameters)
-4. Create `SkillBalanceDatabase.cs` container with GetSkillBalance() lookup
-5. Create resource `Resources/Balance/skill_balance_database.tres`
-6. Assign to GameBalance.SkillDatabase export in editor
-7. Add entries for existing skills:
-   - warrior_basic_attack
-   - whirlwind  
-   - fireball
+**Skill Implementation Pattern (Current):**
+- **AnimationDriven skills:** Player.TryCastSkill() → Animation plays → Call Method tracks control hitboxes/spawning
+- **Instant skills:** Player.TryInstantSkill() → Data-driven checks (BuffDuration, etc.) → Apply effects
+- **Database-driven:** All skill parameters loaded from SkillBalanceDatabase (zero hardcoding)
+- **Composition pattern:** Skills use sub-resources (ProjectileData, MeleeData, AOEData, BuffData, ExplosionData)
 
-**STEP 3: Refactor Existing Systems (1-2 hours)**
-1. **StatsManager.cs**: Replace ALL constants with Config reads:
-   - STR_DAMAGE_PER_POINT → GameBalance.Instance.Config.CharacterProgression.StrengthDamagePerPoint
-   - VIT_HEALTH_PER_POINT → GameBalance.Instance.Config.CharacterProgression.VitalityHealthPerPoint
-   - (Do this for ALL stat scaling constants)
-2. **UpgradeManager.cs**: Replace hardcoded upgrade values:
-   - DamageBoostPerStack → GameBalance.Instance.Config.UpgradeSystem.DamageBoostPerStack
-   - (Do this for ALL upgrade types)
-3. **Dungeon.cs**: Replace enemy spawn/scaling hardcoded values
-4. **Enemy.cs**: Replace aggro/leash range constants
+**After Warrior Complete:**
+- Return to Phase 4 (Gear & Loot)
+- Validate skill patterns work for other classes (Ranger, Psion)
 
-**STEP 4: Update Skill Loading Pattern (1 hour)**  
-1. Add `Initialize()` method to Skill.cs that loads from database
-2. Change Skill.cs to use runtime properties (not exports) for balance values
-3. Only SkillId remains as export on skill resources
-4. Update SkillManager to call skill.Initialize() before first use
-5. Simplify existing .tres files (WarriorBasicAttack, Whirlwind, Fireball)
-
-**Testing & Validation:**
-- Run game, verify player stats still work correctly
-- Change BaseMaxHealth in balance_config.tres, verify change takes effect
-- Verify Whirlwind/Fireball load damage from database
-- No errors in console
-
-**Success Criteria for Phase A:**
-- ✅ GameBalance singleton accessible via GameBalance.Instance
-- ✅ balance_config.tres holds all game-wide tuning values
-- ✅ skill_balance_database.tres holds all skill-specific values
-- ✅ StatsManager has ZERO hardcoded constants (all read from config)
-- ✅ UpgradeManager reads from config
-- ✅ Skills load damage/cooldown from database
-- ✅ Can tune balance in Godot inspector without recompiling
-
-**Documentation:**
-- Create `Docs/02-IMPLEMENTATION/balance-systems-architecture.md` when complete
-- Update CLAUDE.md Session Progress Log
-- Mark Phase A as ✅ COMPLETE in this section
-
----
-
-### Phases B-F: Skill Implementation (AFTER Phase A)
-
-**Phase B: Skill System Standardization** (2-3 hours) 📝 NEXT
-- Add CastBehavior and DamageSource enums to Skill.cs
-- Update SkillManager.UseSkill() to route based on CastBehavior  
-- Add hitbox control methods to Player.cs
-- Create hitbox Area2D nodes in player.tscn
-
-**Phase C: Fusion Cutter** (1-2 hours) 📝 PLANNED
-- Prove Melee Pattern works
-- Skill loads from database
-- Animation-driven hitbox damage
-
-**Phase D: Whirlwind** (1-2 hours) 📝 PLANNED  
-- Prove Instant AOE Pattern works
-- Refactor WhirlwindEffect → WhirlwindVisual
-- AOE hitbox damage
-
-**Phase E: Remaining Warrior Skills** (3-4 hours) 📝 PLANNED
-- Crowd Suppression, Combat Stim, Breaching Charge
-- Each loads from database
-
-**Phase F: Polish** (1-2 hours) 📝 PLANNED
-- Tune all values in inspector
-- Visual effects polish
-
-**Architecture completed:**
-- ✅ Custom FSM + AnimationPlayer pattern chosen
-- ✅ Sprite2D with atlas-based animation
-- ✅ PlayerState enum with transition validation
-- ✅ Locomotion animations (walk/idle, all directions)
-- ✅ Combat animations created (attack, whirlwind)
-- ✅ 6 skill implementation patterns designed
-- ✅ All 18 skills mapped to patterns
-
-**See:** [`Docs/02-IMPLEMENTATION/animation-architecture.md`](Docs/02-IMPLEMENTATION/animation-architecture.md) and [`Docs/02-IMPLEMENTATION/skill-standardization.md`](Docs/02-IMPLEMENTATION/skill-standardization.md)
-
----
-
-**After Warrior Complete: Return to Phase 4 (Gear & Loot)**
-
-**Implementation Strategy:**
-Phase A (Balance Systems) is prioritized BEFORE Phase B (Skill Standardization) because:
-1. Skills in Phases C-F will immediately use the database for their parameters
-2. Prevents creating skills with hardcoded values that need refactoring later  
-3. StatsManager refactor validates the pattern before applying to skills
-4. Creates inspector-based workflow that accelerates all remaining warrior work
-
-**The 4-6 hour investment in Phase A saves 10+ hours in Phases B-F.**
-
-**See [`Docs/02-IMPLEMENTATION/phase-plan.md`](Docs/02-IMPLEMENTATION/phase-plan.md) for full phase details.**
+**See:** [`Docs/02-IMPLEMENTATION/phase-plan.md`](Docs/02-IMPLEMENTATION/phase-plan.md) for full phase details.
 
 ---
 
@@ -704,6 +600,142 @@ After Session 12 cleanup, implemented Energy Wave (hybrid melee + projectile ski
 - Polish existing skills (timing, VFX, balance tuning)
 - Consider energy/resource system for skills
 
+### Session 14 - Stat System Cleanup & Combat Stim Visual Effect 🧹
+
+**Context:**
+Session continued from previous context that ran out. After initial stat system cleanup discussion, performed comprehensive code review and implemented visual particle effect for Combat Stim instant skill.
+
+**Completed:**
+
+**Code Review Findings:**
+- ✅ Identified GetCooldownReduction() formula discrepancy:
+  - GetCooldownReduction() uses diminishing returns formula (WRONG)
+  - CooldownReduction property uses linear formula (CORRECT)
+  - Bug: UI (StatAllocationPanel) shows different CDR than actual gameplay
+  - Example: 20 INT shows 16.67% CDR in UI vs 20% actual
+- ✅ Found rotation property duplication (WhirlwindRotations vs RotationCount)
+- ✅ Found public setters on database-loaded Skill properties (should be private)
+- ✅ Identified hardcoded mastery thresholds in Skill.cs
+
+**Architecture Discussion:**
+- ✅ Clarified SkillAnimationController architectural concern:
+  - User identified smell: "SkillAnimationController shouldn't care about instant skill types"
+  - Confirmed: Instant skills should be data-driven in Player.TryInstantSkill()
+  - SkillAnimationController should only handle animation-driven skills
+- ✅ Clarified CastBehavior.Instant vs CastTime:
+  - Orthogonal concepts: HOW skill executes vs WHEN it finishes
+  - CastBehavior.Instant = Non-interrupting (can use while doing other actions)
+  - CastTime = 0 means immediate effect (but may still interrupt)
+- ✅ Confirmed SkillEffectScene property purpose:
+  - Optional per-skill visual override
+  - Currently centralized (ProjectileScene, WhirlwindVisualScene, etc.)
+  - Keep for future per-skill customization
+
+**Combat Stim Visual Effect Implementation:**
+- ✅ Modified Player.TryInstantSkill() to spawn visual effects:
+  - Checks if skill has BuffDuration > 0 (data-driven!)
+  - Spawns SkillEffectScene if present
+  - Added debug logging to trace execution
+- ✅ Created buff_activation_effect.tscn:
+  - Node2D root with CPUParticles2D child (correct structure)
+  - CPUParticles2D configured for one-shot burst:
+    - emitting = true (critical!)
+    - one_shot = true
+    - 25 particles, 0.6s lifetime
+    - Radial emission (50 pixel radius)
+    - Bright orange color for visibility
+    - gravity = Vector2(0, 0) to prevent falling
+  - Timer for self-destruct (1.0s wait, auto-start)
+  - Signal: Timer.timeout → root.queue_free()
+- ✅ Loaded buff_activation_effect.tscn in WarriorCombatStim.tres
+- ✅ Debugging process:
+  - Confirmed skill loads correctly (BuffDuration = 5)
+  - Confirmed TryInstantSkill() called
+  - Confirmed effect spawning at correct path
+  - Fixed scene structure (CPUParticles2D as child, not root)
+  - Fixed missing critical properties (emitting, one_shot, gravity)
+  - Fixed color (dark green → bright orange)
+  - Explained Godot one-shot behavior (emitting auto-unchecks)
+  - Explained F6 timing issue (particles too fast to see)
+
+**Critical Bug Fixes:**
+1. **Scene Structure:** CPUParticles2D was root (should be child of Node2D)
+2. **Missing Properties:** Scene missing emitting=true, one_shot=true
+3. **Visibility:** Dark green color hard to see, changed to orange
+4. **Physics:** Missing gravity=(0,0) caused particles to fall
+
+**Godot Learnings:**
+- ✅ CPUParticles2D one-shot behavior:
+  - With one_shot=true, emitting auto-unchecks after firing (CORRECT behavior)
+  - Particles emit once instantly when scene loads
+  - In Scene tab: See frozen particles in viewport
+  - In F6 test: Particles finish (0.6s) before window opens
+- ✅ Timer signal connection:
+  - Connect to root node's queue_free(), not CPUParticles2D
+  - Timer destroys entire effect scene
+- ✅ Scene structure for particle effects:
+  - Node2D root (for position/lifetime management)
+  - CPUParticles2D child (for visual effect)
+
+**Testing Results:**
+- ✅ Combat Stim loads BuffDuration correctly (5 seconds)
+- ✅ TryInstantSkill() executes when F key pressed
+- ✅ Particle effect spawns at player position
+- ✅ Particles visible in Scene tab and in-game
+- ✅ Effect self-destructs after 1 second
+- ✅ User confirmed: "okay its kinda working"
+
+**Achievements:**
+
+- 🎯 **Data-Driven Instant Skills!** BuffDuration check eliminates hardcoded switch statements
+- 🎨 **Visual Feedback for Buffs!** Particle effects show skill activation clearly
+- 🐛 **Deep Debugging Skills!** Systematic approach found 4 separate issues
+- 📚 **Godot Mastery!** Understanding one-shot particle timing and scene structure
+- 🏗️ **Architecture Clarity!** Instant skill handling pattern established
+
+**Known Issues (Deferred):**
+1. GetCooldownReduction() method needs removal (use CooldownReduction property)
+2. Public setters on Skill properties should be private
+3. Rotation property duplication needs cleanup
+4. Mastery thresholds should load from config
+5. Combat Stim full refactor needed:
+   - Create BuffData.cs sub-resource
+   - Add BuffData to SkillBalanceEntry
+   - Remove ExecuteInstantSkill() from SkillAnimationController
+
+**Lessons Learned:**
+
+- Code reviews catch subtle bugs (CDR formula mismatch, property exposure)
+- User intuition about architecture often correct ("SkillAnimationController shouldn't care")
+- Data-driven design simplifies logic (check BuffDuration > 0 vs switch statements)
+- Godot one-shot particles require understanding timing behavior
+- Scene structure matters (root vs child affects lifetime management)
+- Systematic debugging (logs → scene inspection → property fixes) works
+- Visual feedback dramatically improves player experience
+
+**Architecture Insights:**
+
+- **Instant Skills Should Be Data-Driven:**
+  - Check skill properties (BuffDuration, DashDistance, etc.)
+  - Not switch on SkillId
+  - SkillAnimationController only for animation-driven skills
+- **Visual Effect Pattern:**
+  - Node2D root for position/lifetime
+  - Effect nodes as children
+  - Timer for self-destruct
+  - Initialize() pattern for upgrade scaling
+- **CastBehavior Design:**
+  - Instant = non-interrupting (can use while moving/attacking)
+  - AnimationDriven = interrupting (locks FSM state)
+  - Orthogonal to CastTime (when effect applies)
+
+**Next Session:**
+
+- Consider full Combat Stim refactor (BuffData sub-resource)
+- Address code review findings (GetCooldownReduction, property setters)
+- Implement remaining warrior skills (Leap Slam, Dash, Breaching Charge)
+- Polish particle effects (size, timing, colors)
+
 ### Session 8 - Victory & Death Screens - PHASE 1 COMPLETE! 🎉
 
 **Completed:**
@@ -783,63 +815,29 @@ After Session 12 cleanup, implemented Energy Wave (hybrid melee + projectile ski
 - Complete victory/death screens → Phase 1 DONE
 - Begin Phase 2: Character stats + save system
 
-### Session 6 - Documentation Reorganization
+### Sessions 1-6 - Phase 1 Foundation (Brief Summary)
 
-**Completed:**
-
-- ✅ Created organized `Docs/` folder structure (4 categories)
-- ✅ Consolidated 4 versions of tower_idle_design → 3 focused files
-- ✅ Moved existing docs to organized folders
-- ✅ Created new docs: phase-plan, godot-patterns, asset-requirements, enemy-design
-- ✅ Added 00-START-HERE.md navigation hub
-- ✅ Cross-referenced all documentation
-- ✅ Updated CLAUDE.md with doc links
-- ✅ Trimmed CLAUDE.md to focus on daily tracking
-
-### Session 5 - Main Menu & Combat Validation
-
-- ✅ Main menu scene with styled buttons
-- ✅ Scene transitions working
-- 🎉 **Phase 1 hypothesis PROVEN** - Combat is fun!
-
-### Session 4 - Wave/Floor System
-
-- ✅ Wave/floor tracking (10 waves per floor)
-- ✅ 30-second wave timer with auto-progression
-- ✅ Spawn rate escalation (2.0s → 0.8s)
-- ✅ Enemy scaling multipliers (+10% HP, +5% damage per wave)
-- ✅ Boss spawning at 5:00 mark
-- ✅ AdvanceToNextFloor() method
-
-### Session 3 - Enemy Variety & Combat Polish
-
-- ✅ CombatSystem.cs for centralized damage
-- ✅ Fixed all 5 broken upgrades
-- ✅ FastMeleeEnemy (speed variant)
-- ✅ SlowRangedEnemy (kiting + projectiles)
-- ✅ Enemy inheritance with virtual methods
-- ✅ Enemy scaling system
-
-### Session 2 - Stats Consolidation
-
-- ✅ Stats consolidation refactor
-- ✅ Fixed upgrade stacking math
-- ✅ Fixed MaxHealth level-up bug
-- ✅ Architecture decisions: Components for Phase 1
-
-### Session 1 - Core Combat MVP
-
-- ✅ Player movement and basic attacks
-- ✅ Enemy AI and health system
-- ✅ XP/level-up system
-- ✅ 8 upgrade types (initially broken)
+- **Session 1:** Core combat MVP (player movement, enemy AI, XP/level-up, 8 upgrades)
+- **Session 2:** Stats consolidation, fixed upgrade stacking bugs
+- **Session 3:** Enemy variety (3 types), CombatSystem.cs, fixed all upgrades
+- **Session 4:** Wave/floor system (10 waves per floor, boss spawning, enemy scaling)
+- **Session 5:** Main menu implementation, **Phase 1 hypothesis PROVEN** (combat is fun!)
+- **Session 6:** Documentation reorganization (created Docs/ structure, navigation hub)
 
 ---
 
 ## Known Issues
 
-- Main menu needs background texture (polish, non-critical)
-- Signal connection patterns inconsistent across project (editor vs code)
+**Code Quality (From Session 14 Review):**
+- GetCooldownReduction() method uses wrong formula (should use CooldownReduction property)
+- Skill property setters are public (should be private for database-loaded properties)
+- Property duplication: WhirlwindRotations vs RotationCount needs cleanup
+- Mastery thresholds hardcoded in Skill.cs (should load from config)
+
+**Polish:**
+- Main menu needs background texture (non-critical)
+- Combat animations could use timing refinement
+- Visual effects could be more polished (particles, impact effects)
 
 ---
 
@@ -858,36 +856,52 @@ After Session 12 cleanup, implemented Energy Wave (hybrid melee + projectile ski
 ### Current File Structure
 
 ```
-SpaceTower/
+zenith-rising/
 ├── Scenes/
 │   ├── Core/
 │   │   ├── hub.tscn (Safe zone with portal)
-│   │   └── dungeon.tscn (Combat zone, formerly game.tscn)
+│   │   ├── dungeon.tscn (Combat zone)
+│   │   └── game_balance.tscn (Balance singleton autoload)
 │   ├── Player/player.tscn
 │   ├── Enemies/ (enemy.tscn, fast_melee_enemy.tscn, slow_ranged_enemy.tscn, boss.tscn)
 │   ├── Items/experience_shard.tscn
-│   ├── SkillEffects/ (fireball_projectile.tscn, whirlwind_effect.tscn)
+│   ├── SkillEffects/
+│   │   ├── energy_projectile.tscn
+│   │   ├── whirlwind_visual.tscn
+│   │   └── buff_activation_effect.tscn
 │   └── UI/
 │       ├── Menus/ (main_menu.tscn, floor_transition_panel.tscn)
-│       ├── Panels/ (level_up_panel.tscn, victory_screen.tscn, death_screen.tscn, stat_allocation_panel.tscn, results_screen.tscn)
+│       ├── Panels/ (level_up_panel.tscn, victory_screen.tscn, death_screen.tscn, stat_allocation_panel.tscn)
 │       └── hud.tscn
 ├── Scripts/
 │   ├── Core/
-│   │   ├── Hub.cs (Safe zone management)
-│   │   ├── Dungeon.cs (Combat/spawning, formerly Game.cs)
-│   │   ├── DungeonPortal.cs (Interaction system)
+│   │   ├── Hub.cs, Dungeon.cs, DungeonPortal.cs
+│   │   ├── GameBalance.cs (Singleton autoload)
 │   │   ├── CombatSystem.cs
-│   │   ├── SaveManager.cs
-│   │   └── SaveData.cs
+│   │   ├── SaveManager.cs, SaveData.cs
+│   │   └── Config/ (5 config Resource classes)
 │   ├── Player/
-│   │   ├── Player.cs
-│   │   └── Components/ (StatsManager.cs, SkillManager.cs, UpgradeManager.cs)
-│   ├── Skills/ (Skill.cs, executors, effects)
-│   ├── UI/
-│   │   ├── Panels/ (VictoryScreen.cs, DeathScreen.cs, FloorTransitionPanel.cs, LevelUpPanel.cs, StatAllocationPanel.cs, ResultsScreen.cs)
-│   │   └── HUD/ (Hud.cs)
+│   │   ├── Player.cs (FSM with 5 states)
+│   │   └── Components/
+│   │       ├── StatsManager.cs (5 core stats, mastery tracking)
+│   │       ├── SkillManager.cs (cooldowns, skill routing)
+│   │       ├── UpgradeManager.cs (8 upgrade types)
+│   │       ├── BuffManager.cs (active buff management)
+│   │       └── SkillAnimationController.cs (hitboxes, effects, Call Method handlers)
+│   ├── Skills/
+│   │   ├── Base/Skill.cs (CastBehavior, DamageSource enums)
+│   │   ├── Balance/
+│   │   │   ├── SkillBalanceDatabase.cs
+│   │   │   ├── SkillBalanceEntry.cs
+│   │   │   └── Data/ (5 sub-resource types: ProjectileData, MeleeData, AOEData, BuffData, ExplosionData)
+│   │   └── Effects/ (DamageEntityBase.cs, EnergyProjectile.cs, WhirlwindVisual.cs)
+│   ├── UI/ (Panels/, HUD/)
 │   └── Enemies/Base/Enemy.cs
-└── Resources/Skills/ (Fireball.tres, Whirlwind.tres, MageBasicAttack.tres)
+└── Resources/
+    ├── Balance/
+    │   ├── skill_balance_database.tres (6 skill entries)
+    │   └── (5 config .tres files)
+    └── Skills/Warrior/ (5 warrior skill .tres files)
 ```
 
 ### Enemy Scaling Formula
@@ -951,416 +965,5 @@ For complete stat formulas and progression details, see [`Docs/01-GAME-DESIGN/sy
 
 ---
 
-### Session 14 - Planned: Composition Refactor + Leap Slam 📋
-
-**Status:** Ready for next session
-
-**Part 1: Composition Pattern Refactor (1-2 hours)**
-- Create sub-Resource classes: ProjectileData, MeleeData, AOEData, ExplosionData
-- Refactor SkillBalanceEntry to use composition (remove skill-type-specific properties)
-- Update Skill.Initialize() with helper methods for loading sub-Resources
-- Update existing .tres files (warrior_basic_attack, warrior_whirlwind, warrior_energy_wave)
-- Validate all 3 existing warrior skills still work
-
-**Part 2: Leap Slam Implementation (1-2 hours)**
-- Create leap_slam database entry using new composition architecture
-- Create warrior_leap_slam_[dir] animations with jump sprite frames
-- Add Call Method tracks for takeoff/apex/landing hitbox
-- Create Resources/Skills/Warrior/LeapSlam.tres
-- Wire to Q key, test in all 4 directions
-
-**Why Refactor Now:**
-- SkillBalanceEntry already showing bloat (whirlwind-specific rotation properties)
-- Composition pattern scales to 30+ skills without class bloat
-- Inspector will only show relevant properties per skill type
-- Memory efficient (skills only load properties they use)
-
-**Architecture Decision:**
-- Composition + Strategy Pattern recommended (deferred Strategy to later)
-- Sub-Resources map to 6 skill patterns (Projectile, Melee, AOE, Explosion, Buff, Zone)
-- Data-driven approach maintains current philosophy
-
-**See Session 13 conversation for full scalability analysis and technique comparison.**
-
----
-
-_Last updated: Session 13 - Energy Wave & Mouse-Aimed Combat complete, Session 14 planned!_
-_🎉 PHASES 1, 2, 3, & 3.5-A COMPLETE - 3 warrior skills working, hybrid pattern validated! 🎉_
-
-temp storage
-Phase 1: Complete Executor Pattern Architecture - Detailed Implementation Plan
-🎯 Strategic Goal
-Validate the skill system architecture by implementing the complete executor pattern foundation, enabling rapid addition of 18+ planned skills with minimal code changes per skill.
-📋 Memory & Cleanup Complete
-✅ Committed to memory:
-Executor Pattern Architecture Decision (complete pattern, not remove)
-Skill System Three-Layer Architecture (Executor → Effect → Systems)
-18 Planned Skills Validation (all feasible with extensions)
-✅ Memory pruned:
-Removed outdated "executor pattern half-implemented" issue (now superseded by decision to complete it)
-🏗️ Implementation Phases
-Phase 1A: Foundation & Refactoring (2-3 hours)
-Task 1.1: Update CastBehavior Enum
-File: Scripts/Skills/Base/Skill.cs Add new CastBehavior types:
-public enum CastBehavior
-{
-    Instant,           // Non-interrupting (can use while doing other actions)
-    AnimationDriven,   // Interrupting (locks FSM to CastingSkill state)
-    Channeled,         // Hold button for continuous effect
-    Charged,           // Hold to power up, release to fire
-    Combo,             // Input sequence with timing windows
-    Toggle             // On/off state (Overwatch precision mode)
-}
-Validation: Enum compiles, existing skills still work
-Task 1.2: Create AnimationDrivenExecutor
-New File: Scripts/Skills/Executors/AnimationDrivenExecutor.cs Extract AnimationDriven logic from Player.TryCastSkill():
-public class AnimationDrivenExecutor : ISkillExecutor
-{
-    public bool ExecuteSkill(Player player, Skill skill)
-    {
-        // Set current skill for animation callbacks
-        player.SkillAnimationController.SetCurrentSkill(skill);
-        
-        // Get directional animation name
-        string animName = player.GetSkillAnimationName(skill);
-        
-        // Play animation (triggers Call Method tracks)
-        player.AnimationPlayer.Play(animName);
-        
-        // Transition FSM to CastingSkill state
-        player.SetState(PlayerState.CastingSkill);
-        
-        return true;
-    }
-}
-Requirement: Player.cs must expose:
-AnimationPlayer property (public getter)
-SetState(PlayerState) public method
-GetSkillAnimationName(Skill) public method
-SkillAnimationController property (already public)
-Validation: Whirlwind, Energy Wave, Basic Attack still work via executor
-Task 1.3: Refactor InstantProjectileExecutor → InstantExecutor
-File: Scripts/Skills/Executors/InstantProjectileExecutor.cs (rename to InstantExecutor.cs) Generalize for ANY instant effect (not just projectiles):
-public class InstantExecutor : ISkillExecutor
-{
-    public bool ExecuteSkill(Player player, Skill skill)
-    {
-        // Set current skill (for tracking, even though instant)
-        player.SkillAnimationController.SetCurrentSkill(skill);
-        
-        // Spawn effect immediately if skill has one
-        if (skill.SkillEffectScene != null)
-        {
-            Vector2 direction = player.GetAttackDirection();
-            var effect = skill.SkillEffectScene.Instantiate<DamageEntityBase>();
-            
-            // Initialize BEFORE adding to tree
-            effect.Initialize(skill, player, direction);
-            
-            // Add to world
-            player.GetTree().Root.AddChild(effect);
-            effect.GlobalPosition = player.GlobalPosition;
-        }
-        
-        // Optional: Play cosmetic animation (doesn't control timing)
-        if (skill.HasPlayerAnimation)
-        {
-            string animName = player.GetSkillAnimationName(skill);
-            player.AnimationPlayer.Play(animName);
-        }
-        
-        // DO NOT change FSM state (non-interrupting behavior)
-        
-        return true;
-    }
-}
-Validation: Skills can be used without interrupting current action
-Task 1.4: Refactor Player.TryCastSkill()
-File: Scripts/Player/Player.cs Replace inline logic with executor routing:
-public bool TryCastSkill(Skill skill)
-{
-    if (skill == null) return false;
-    
-    // Route to appropriate executor based on CastBehavior
-    ISkillExecutor executor = skill.CastBehavior switch
-    {
-        CastBehavior.Instant => new InstantExecutor(),
-        CastBehavior.AnimationDriven => new AnimationDrivenExecutor(),
-        CastBehavior.Channeled => new ChanneledExecutor(),
-        CastBehavior.Charged => new ChargedExecutor(),
-        CastBehavior.Combo => new ComboExecutor(),
-        CastBehavior.Toggle => new ToggleExecutor(),
-        _ => null
-    };
-    
-    if (executor == null)
-    {
-        GD.PrintErr($"No executor for CastBehavior: {skill.CastBehavior}");
-        return false;
-    }
-    
-    return executor.ExecuteSkill(this, skill);
-}
-Validation:
-Existing 3 skills (Basic Attack, Whirlwind, Energy Wave) work
-Dash skill works
-No console errors
-Task 1.5: Expose Required Player Properties
-File: Scripts/Player/Player.cs Add public accessors needed by executors:
-// Already exists: public SkillAnimationController SkillAnimationController { get; private set; }
-
-public AnimationPlayer AnimationPlayer => _animationPlayer;
-public SkillManager SkillManager => _skillManager;
-
-public void SetState(PlayerState newState)
-{
-    if (!CanTransitionTo(newState)) return;
-    _state = newState;
-}
-Validation: Executors can access needed Player internals
-Phase 1B: Channeled Skills (3-4 hours)
-Task 2.1: Create ChannelState Class
-New File: Scripts/Skills/States/ChannelState.cs
-public class ChannelState
-{
-    public Skill Skill { get; set; }
-    public float Elapsed { get; set; } = 0f;
-    public float NextTickTime { get; set; } = 0f;
-    public bool IsActive { get; set; } = false;
-    
-    public void Reset()
-    {
-        Elapsed = 0f;
-        NextTickTime = 0f;
-        IsActive = false;
-    }
-}
-Task 2.2: Add Channel State to SkillManager
-File: Scripts/Player/Components/SkillManager.cs Add state management:
-private ChannelState _currentChannel = null;
-
-public void StartChannel(Skill skill)
-{
-    _currentChannel = new ChannelState 
-    { 
-        Skill = skill, 
-        IsActive = true 
-    };
-    
-    // Play channeling animation if any
-    if (skill.HasPlayerAnimation)
-    {
-        string animName = _player.GetSkillAnimationName(skill);
-        _player.AnimationPlayer.Play(animName);
-        _player.AnimationPlayer.SetLoopMode(Animation.LoopMode.Loop);
-    }
-    
-    _player.SetState(PlayerState.CastingSkill);
-}
-
-public void StopChannel()
-{
-    if (_currentChannel != null)
-    {
-        _currentChannel.Reset();
-        _currentChannel = null;
-        _player.AnimationPlayer.Stop();
-        _player.SetState(PlayerState.Idle);
-    }
-}
-
-public override void _Process(double delta)
-{
-    base._Process(delta);
-    
-    UpdateCooldowns((float)delta);
-    
-    if (_currentChannel?.IsActive == true)
-    {
-        UpdateChannel((float)delta);
-    }
-}
-
-private void UpdateChannel(float delta)
-{
-    _currentChannel.Elapsed += delta;
-    _currentChannel.NextTickTime -= delta;
-    
-    // Apply tick damage/effect
-    if (_currentChannel.NextTickTime <= 0f)
-    {
-        ApplyChannelTick(_currentChannel.Skill);
-        _currentChannel.NextTickTime = _currentChannel.Skill.ChannelTickRate;
-    }
-    
-    // Check for button release or max duration
-    if (!Input.IsActionPressed(_currentChannel.Skill.InputAction) || 
-        _currentChannel.Elapsed >= _currentChannel.Skill.ChannelMaxDuration)
-    {
-        StopChannel();
-    }
-}
-
-private void ApplyChannelTick(Skill skill)
-{
-    // Spawn tick effect or apply damage in radius
-    // Implementation depends on skill type
-}
-Task 2.3: Create ChanneledExecutor
-New File: Scripts/Skills/Executors/ChanneledExecutor.cs
-public class ChanneledExecutor : ISkillExecutor
-{
-    public bool ExecuteSkill(Player player, Skill skill)
-    {
-        // Delegate to SkillManager for state tracking
-        player.SkillManager.StartChannel(skill);
-        return true;
-    }
-}
-Task 2.4: Add Channel Properties to SkillBalanceEntry
-File: Scripts/Skills/Balance/SkillBalanceEntry.cs Add ChannelData sub-resource:
-[Export] public ChannelData Channel { get; set; }
-New File: Scripts/Skills/Balance/Data/ChannelData.cs
-[GlobalClass]
-public partial class ChannelData : Resource
-{
-    [Export] public float TickRate { get; set; } = 0.5f;
-    [Export] public float TickDamage { get; set; } = 10f;
-    [Export] public float MaxDuration { get; set; } = 5f;
-    [Export] public float ResourceCostPerSecond { get; set; } = 10f;
-}
-Task 2.5: Create Test Channeled Skill
-Example: "Laser Beam" for Warrior
-Create warrior_laser_beam database entry with Channel sub-resource
-Create looping beam animation (optional for testing)
-Test: Hold button → continuous damage ticks → release stops
-Validate: Animation loops, damage applies every tick, stops on release
-Phase 1C: Charged Skills (3-4 hours)
-Task 3.1-3.5: Similar structure to Phase 1B
-Create:
-ChargeState.cs (tracks charge level 0.0-1.0)
-ChargedExecutor.cs (starts charge)
-SkillManager.StartCharge() / UpdateCharge() / ReleaseCharge()
-ChargeData.cs sub-resource (ChargeRate, MinCharge, MaxCharge, DamageScaling)
-Test skill: "Charged Shot" for Ranger
-Key Mechanic: Hold button → charge builds → release fires scaled projectile
-Phase 1D: Combo Skills (4-5 hours)
-Task 4.1-4.5: Similar structure to Phases 1B/1C
-Create:
-ComboState.cs (tracks sequence step, timing windows)
-ComboExecutor.cs (advances or starts combo)
-SkillManager.StartCombo() / AdvanceCombo() / ResetCombo()
-ComboData.cs sub-resource (sequence steps, timing windows, damage per step)
-Test skill: "Three-Strike Combo" for Warrior
-Key Mechanic: Press button → first attack → press again within window → second attack → etc.
-Phase 1E: Toggle Skills (2-3 hours)
-Task 5.1-5.5: Similar structure
-Create:
-ToggleState.cs (tracks on/off state)
-ToggleExecutor.cs (toggles on/off)
-SkillManager.ToggleSkill() / UpdateToggle()
-ToggleData.cs sub-resource (buffs while active, resource drain if any)
-Test skill: "Overwatch" precision mode for Ranger
-Key Mechanic: Press button → buff activates → press again → buff deactivates
-Phase 1F: Validation & Testing (2-3 hours)
-Task 6.1: Create One Test Skill Per CastBehavior
-Instant: "Combat Stim" (buff, non-interrupting)
-Database: CastBehavior.Instant, DamageSource.None
-Apply speed boost without interrupting current action
-Test: Can cast while attacking/dashing
-AnimationDriven: "Fireball" (refactor with cast animation)
-Database: CastBehavior.AnimationDriven, DamageSource.EffectCollision
-Add warrior_fireball_cast animation with wind-up
-Call Method track spawns projectile at apex
-Test: Animation plays, projectile spawns mid-animation
-Channeled: "Laser Beam"
-Already created in Phase 1B
-Test: Hold for continuous damage, stops on release
-Charged: "Charged Shot"
-Already created in Phase 1C
-Test: Hold to charge, damage scales with charge level
-Combo: "Three-Strike"
-Already created in Phase 1D
-Test: Sequence tracking, timing windows work
-Toggle: "Overwatch"
-Already created in Phase 1E
-Test: On/off toggle, buff applies while active
-Task 6.2: Playtest All Types
-For each skill:
-✅ Activates correctly (input responsiveness)
-✅ FSM state transitions properly (interrupting vs non-interrupting)
-✅ Effects spawn/apply correctly
-✅ Cooldowns work
-✅ No console errors
-✅ Animations play (if applicable)
-Edge Cases:
-Interrupt channeled skill mid-cast
-Release charged skill at 0% charge
-Break combo timing window
-Toggle skill on/off rapidly
-Cast instant skill while channeling
-Die during skill cast
-Task 6.3: Document Patterns
-Create Docs/02-IMPLEMENTATION/executor-pattern.md: Contents:
-Overview of 6 CastBehavior types
-How to add new skill (step-by-step)
-Templates for each executor type
-Common pitfalls and solutions
-Example skill implementations
-✅ Success Criteria
-After implementation:
-✅ 6 CastBehavior types working: Instant, AnimationDriven, Channeled, Charged, Combo, Toggle
-✅ 6 test skills functional: One per type, all tested in-game
-✅ Player.TryCastSkill() clean: ~15 lines, pure routing logic
-✅ SkillManager owns state: Channeling, charging, comboing tracked centrally
-✅ Executors are stateless: Pure logic classes, no persistent fields
-✅ Add new skill = .tres file: No Player.cs or executor edits needed
-✅ Architecture validated: Ready to scale to 18+ skills
-⏱️ Time Estimates
-Phase 1A (Foundation): 2-3 hours
-Phase 1B (Channeled): 3-4 hours
-Phase 1C (Charged): 3-4 hours
-Phase 1D (Combo): 4-5 hours
-Phase 1E (Toggle): 2-3 hours
-Phase 1F (Validation): 2-3 hours
-Total: 16-22 hours over 3-5 sessions
-📝 Implementation Order
-Session 1: Phase 1A (Foundation - get AnimationDrivenExecutor working) Session 2: Phase 1B (Channeled skills) Session 3: Phase 1C (Charged skills) Session 4: Phase 1D + 1E (Combo + Toggle skills) Session 5: Phase 1F (Validation & documentation)
-🚧 Risks & Mitigations
-Risk 1: Executors need too much Player exposure
-Mitigation: Only expose what's needed (AnimationPlayer, SetState, GetSkillAnimationName)
-Risk 2: State management gets complex
-Mitigation: Keep state classes simple (ChannelState, ChargeState, ComboState)
-Risk 3: Input handling for hold/release detection
-Mitigation: SkillManager._Process() polls Input.IsActionPressed()
-Risk 4: Animation loop modes conflict
-Mitigation: ChanneledExecutor sets loop mode, AnimationFinished resets it
-🔄 After This Plan
-Once executor architecture validated: Phase 2: Implement remaining Warrior skills using executors
-Fusion Cutter (AnimationDriven + hit counter)
-Breaching Charge (AnimationDriven + dash + stun)
-Crowd Suppression (AnimationDriven + AOE)
-Fortify (Instant + damage reduction buff)
-Combat Stim (Instant + speed buff)
-Last Stand (Instant + invulnerability buff)
-Phase 3: Add Effect Layer extensions as needed
-Hitscan (Precision Rifle)
-Cone hitbox (Psionic Wave)
-Chain/bounce (Arc Lightning)
-Gravity/pull (Singularity)
-Autonomous turret (Killzone)
-Phase 4: Add Systems Layer extensions
-Hit counter (Fusion Cutter)
-Debuff system (Psionic Pulse)
-Lifesteal (Void Rift)
-Knockback (Breaching Charge)
-🤔 Open Questions Before Starting
-Resource System: Do skills consume mana/energy? If yes, Channeled needs resource drain logic.
-If no: Can implement later without affecting executor architecture
-Combo Input: Should combos use same button (repeated presses) or different buttons (light vs heavy)?
-Suggestion: Same button for simplicity (Three-Strike = Q → Q → Q)
-UI Feedback: Do we need charge bar UI? Combo sequence indicator?
-Suggestion: Defer UI, validate mechanics first
-Animation Looping: How to handle loop mode changes for channeled skills?
-Proposal: ChanneledExecutor sets loop=true, StopChannel() sets loop=false
-Ready to begin Phase 1A: Foundation & Refactoring?
+_Last updated: Session 15 - Documentation Cleanup & Technical Documentation complete!_
+_🎉 PHASES 1, 2, 3, & 3.5-A COMPLETE - 4 warrior skills working, buff system & mastery implemented! 🎉_
