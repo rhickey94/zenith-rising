@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://ug5n202v2dk8"]
+
+[ext_resource type="Script" uid="uid://dff1q4v5i7rpk" path="res://Scripts/Skills/Base/Skill.cs" id="1_6gpy7"]
+[ext_resource type="PackedScene" uid="uid://bwgtqo714tpt3" path="res://Scenes/SkillEffects/buff_activation_effect.tscn" id="1_bcbrk"]
+
+[resource]
+script = ExtResource("1_6gpy7")
+SkillId = "warrior_combat_stim"
+Slot = 5
+SkillEffectScene = ExtResource("1_bcbrk")
+metadata/_custom_type_script = "uid://dff1q4v5i7rpk"

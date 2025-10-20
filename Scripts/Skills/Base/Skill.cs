@@ -69,6 +69,15 @@ public partial class Skill : Resource
     public float ExplosionRadius { get; private set; }
     public float ExplosionKnockback { get; private set; }
 
+    // Buff Properties (loaded from BuffData)
+    public float BuffDuration { get; private set; }
+    public float BuffAttackSpeed { get; private set; }
+    public float BuffMoveSpeed { get; private set; }
+    public float BuffCastSpeed { get; private set; }
+    public float BuffDamage { get; private set; }
+    public float BuffCDR { get; private set; }
+    public float BuffDamageReduction { get; private set; }
+
     // Mastery Bonuses
     public float BronzeDamageBonus { get; private set; }
     public float SilverDamageBonus { get; private set; }
@@ -132,6 +141,7 @@ public partial class Skill : Resource
         LoadMeleeData(entry);
         LoadAOEData(entry);
         LoadExplosionData(entry);
+        LoadBuffData(entry);
         _initialized = true;
     }
 
@@ -224,6 +234,26 @@ public partial class Skill : Resource
                 _ => 0
             };
         }
+    }
+
+    private void LoadBuffData(SkillBalanceEntry entry)
+    {
+        if (entry.Buff == null)
+        {
+            GD.Print($"[DEBUG] Skill {SkillId}: No BuffData found");  // ← Add this
+
+            return;
+        }
+
+        BuffDuration = entry.Buff.Duration;
+        GD.Print($"[DEBUG] Skill {SkillId}: Loaded BuffDuration = {BuffDuration}");  // ← Add this
+
+        BuffAttackSpeed = entry.Buff.AttackSpeedBonus;
+        BuffMoveSpeed = entry.Buff.MoveSpeedBonus;
+        BuffCastSpeed = entry.Buff.CastSpeedBonus;
+        BuffDamage = entry.Buff.DamageBonus;
+        BuffCDR = entry.Buff.CooldownReductionBonus;
+        BuffDamageReduction = entry.Buff.DamageReductionBonus;
     }
 
     private void LoadExplosionData(SkillBalanceEntry entry)

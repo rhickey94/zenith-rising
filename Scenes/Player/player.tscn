@@ -1,4 +1,4 @@
-[gd_scene load_steps=47 format=3 uid="uid://jb1p3bafbe1"]
+[gd_scene load_steps=48 format=3 uid="uid://jb1p3bafbe1"]
 
 [ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="1_a3d8c"]
 [ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_xpcdj"]
@@ -13,6 +13,7 @@
 [ext_resource type="Resource" uid="uid://5g8accyxr8hh" path="res://Resources/Skills/Warrior/Whirlwind.tres" id="7_jhyir"]
 [ext_resource type="Resource" uid="uid://ce7pfefkpj56w" path="res://Resources/Skills/Warrior/LeapSlam.tres" id="8_dey5f"]
 [ext_resource type="Script" uid="uid://crelh1yuijku7" path="res://Scripts/Player/Components/SkillAnimationController.cs" id="9_gk6dx"]
+[ext_resource type="Resource" uid="uid://ug5n202v2dk8" path="res://Resources/Skills/Warrior/CombatStim.tres" id="9_ks1b7"]
 [ext_resource type="PackedScene" uid="uid://bvyx7q6quoo64" path="res://Scenes/SkillEffects/whirlwind_visual.tscn" id="11_74mp2"]
 [ext_resource type="Script" uid="uid://kvtmh2ghdjcb" path="res://Scripts/Player/Components/BuffManager.cs" id="11_r5xpd"]
 [ext_resource type="PackedScene" uid="uid://c132prycoiyp0" path="res://Scenes/SkillEffects/explosion_effect.tscn" id="12_oikmp"]
@@ -900,6 +901,7 @@ BasicAttackSkill = ExtResource("6_gk6dx")
 SpecialAttackSkill = ExtResource("5_jhyir")
 PrimarySkill = ExtResource("7_jhyir")
 SecondarySkill = ExtResource("8_dey5f")
+UltimateSkill = ExtResource("9_ks1b7")
 UtilitySkill = ExtResource("7_06tpx")
 metadata/_custom_type_script = "uid://bvjyaqpu6dell"
 

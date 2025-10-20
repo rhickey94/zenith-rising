@@ -72,26 +72,6 @@ public partial class SkillAnimationController : Node
         }
     }
 
-    public bool ExecuteInstantSkill(Skill skill)
-    {
-        SetCurrentSkill(skill);
-
-        switch (skill.SkillId)
-        {
-            case "warrior_combat_stim":
-                _buffManager?.ApplyBuff("combat_stim",
-                    duration: 6f,
-                    attackSpeedBonus: 0.4f,
-                    moveSpeedBonus: 0.2f,
-                    damageBonus: 0.3f);
-                return true;
-
-            default:
-                GD.PrintErr($"ExecuteInstantSkill: Unknown instant skill {skill.SkillId}");
-                return false;
-        }
-    }
-
     public void SetCurrentSkill(Skill skill)
     {
         _currentCastingSkill = skill;
@@ -358,6 +338,7 @@ public partial class SkillAnimationController : Node
         float finalAngle = baseAngle + Mathf.DegToRad(angleOffset);
         var direction = new Vector2(Mathf.Cos(finalAngle), Mathf.Sin(finalAngle));
 
+        // var sceneToUse = _currentCastingSkill.SkillEffectScene ?? ProjectileScene;
         var projectile = ProjectileScene.Instantiate<Node2D>();
 
         // Initialize BEFORE adding to scene tree (so _Ready has valid data)

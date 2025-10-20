@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="SkillBalanceDatabase" load_steps=21 format=3 uid="uid://dbooxibogc7fp"]
+[gd_resource type="Resource" script_class="SkillBalanceDatabase" load_steps=24 format=3 uid="uid://dbooxibogc7fp"]
 
 [ext_resource type="Script" uid="uid://d25rerypcvb5f" path="res://Scripts/Skills/Balance/SkillBalanceDatabase.cs" id="1_c7wpi"]
 [ext_resource type="Script" uid="uid://bqtal0vugxig6" path="res://Scripts/Skills/Balance/SkillBalanceEntry.cs" id="1_lr0uj"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://cc24cwmf7qnpn" path="res://Scripts/Skills/Balance/Data/AOEData.cs" id="3_37tpb"]
 [ext_resource type="Script" uid="uid://cya6f24ct573v" path="res://Scripts/Skills/Balance/Data/ProjectileData.cs" id="4_36pqe"]
 [ext_resource type="Script" uid="uid://cm2ia0xm80ur6" path="res://Scripts/Skills/Balance/Data/ExplosionData.cs" id="5_37tpb"]
+[ext_resource type="Script" uid="uid://dew00xguvssxq" path="res://Scripts/Skills/Balance/Data/BuffData.cs" id="6_36pqe"]
 
 [sub_resource type="Resource" id="Resource_kcspd"]
 script = ExtResource("1_rvwwg")
@@ -140,7 +141,24 @@ BaseDamage = 40.0
 Cooldown = 4.0
 metadata/_custom_type_script = "uid://bqtal0vugxig6"
 
+[sub_resource type="Resource" id="Resource_dsjrj"]
+script = ExtResource("6_36pqe")
+AttackSpeedBonus = 0.4
+MoveSpeedBonus = 1.0
+DamageBonus = 0.3
+metadata/_custom_type_script = "uid://dew00xguvssxq"
+
+[sub_resource type="Resource" id="Resource_lqfhr"]
+script = ExtResource("1_lr0uj")
+Buff = SubResource("Resource_dsjrj")
+SkillId = "warrior_combat_stim"
+SkillName = "CombatStim"
+BalanceType = 4
+DamageSource = 2
+BaseDamage = 0.0
+metadata/_custom_type_script = "uid://bqtal0vugxig6"
+
 [resource]
 script = ExtResource("1_c7wpi")
-Skills = Array[Object]([SubResource("Resource_ytv5f"), SubResource("Resource_mfapk"), SubResource("Resource_lr0uj"), SubResource("Resource_rvwwg"), SubResource("Resource_b7ssx")])
+Skills = Array[Object]([SubResource("Resource_ytv5f"), SubResource("Resource_mfapk"), SubResource("Resource_lr0uj"), SubResource("Resource_rvwwg"), SubResource("Resource_b7ssx"), SubResource("Resource_lqfhr")])
 metadata/_custom_type_script = "uid://d25rerypcvb5f"

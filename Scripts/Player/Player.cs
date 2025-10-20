@@ -363,8 +363,43 @@ public partial class Player : CharacterBody2D
         }
 
         // Instant skills don't change FSM state (non-interrupting)
-        // Delegate to SkillAnimationController for execution
-        return _skillAnimationController.ExecuteInstantSkill(skill);
+
+        // Check if skill has buff data (data-driven!)
+
+        if (skill.BuffDuration > 0)
+        {
+            GD.Print($"[DEBUG] TryInstantSkill: Applying buff for skill {skill.SkillId}");  // ← Add this
+
+            _buffManager?.ApplyBuff(
+                buffId: skill.SkillId,
+                duration: skill.BuffDuration,
+                attackSpeedBonus: skill.BuffAttackSpeed,
+                moveSpeedBonus: skill.BuffMoveSpeed,
+                castSpeedBonus: skill.BuffCastSpeed,
+                damageBonus: skill.BuffDamage,
+                cooldownReductionBonus: skill.BuffCDR,
+                damageReductionBonus: skill.BuffDamageReduction
+            );
+
+            // ✅ NEW: Spawn visual effect if skill has one
+            if (skill.SkillEffectScene != null)
+            {
+                GD.Print($"[DEBUG] Spawning effect: {skill.SkillEffectScene.ResourcePath}");  // ← Add this
+
+                var effect = skill.SkillEffectScene.Instantiate<Node2D>();
+                GetParent().AddChild(effect);
+                effect.GlobalPosition = GlobalPosition;
+            }
+
+            return true;
+        }
+
+        // Future: Check for other instant effect types
+        // if (skill.HealAmount > 0) { _statsManager.Heal(skill.HealAmount); return true; }
+        // if (skill.SummonScene != null) { SpawnSummon(skill.SummonScene); return true; }
+
+        GD.PrintErr($"TryInstantSkill: Skill {skill.SkillId} has no instant effect data!");
+        return false;
     }
 
     /// <summary>

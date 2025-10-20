@@ -13,6 +13,7 @@ public partial class SkillBalanceEntry : Resource
     [Export] public MeleeData Melee { get; set; }
     [Export] public AOEData AOE { get; set; }
     [Export] public ExplosionData Explosion { get; set; }
+    [Export] public BuffData Buff { get; set; }
 
     [ExportGroup("Animation")]
     [Export] public string AnimationBaseName { get; set; } = "";
