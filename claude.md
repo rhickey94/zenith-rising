@@ -52,14 +52,15 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 
 ## Current Status: Be Honest
 
-**Phase:** Warrior Skills Implementation (Phase 3.5-B) - ⏳ **IN PROGRESS**
+**Phase:** UI System Improvements (Phase 3.75) - ⏳ **IN PROGRESS**
 
-**🎉 PHASES 1, 2, 3, & 3.5-A COMPLETE! 🎉**
+**🎉 PHASES 1, 2, 3, 3.5-A, & 3.5-B VALIDATED! 🎉**
 
 **Phase 1 - Combat:** Proven fun and engaging through multiple playtests
 **Phase 2 - Progression:** Character stats, save/load, stat allocation working
 **Phase 3 - Hub World:** Scene flow and player initialization working
 **Phase 3.5-A - Balance Systems:** Centralized config infrastructure complete
+**Phase 3.5-B - Warrior Skills:** Architecture validated with 5 working skills
 
 ### ✅ Actually Working
 
@@ -117,21 +118,38 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 - **Buff stacking** - Duration refresh, stat bonuses accumulate
 - **Supported bonuses** - Attack speed, move speed, cast speed, damage, CDR, damage reduction
 
-**Warrior Skills (4 + Dash Working):**
+**Warrior Skills (5 Skills - Architecture Validated):**
 - ✅ **Fusion Cutter** (Basic Attack / Left Click) - Melee Pattern, animation-driven hitbox
 - ✅ **Whirlwind** (Special / Right Click) - AOE Pattern with procedural visual effect
 - ✅ **Energy Wave** (Secondary / E) - Hybrid Pattern (melee swing + 3 projectiles)
 - ✅ **Combat Stim** (Buff / F) - Instant Pattern (5s duration, +40% attack speed, +100% move speed, +30% damage)
 - ✅ **Dash** (Utility / Space) - Animation-driven with invincibility frames
 
-### ⏳ Remaining Warrior Skills
+**Architecture Validation Complete:**
+- ✅ Melee Pattern validated (Fusion Cutter)
+- ✅ AOE Pattern validated (Whirlwind)
+- ✅ Hybrid Pattern validated (Energy Wave)
+- ✅ Instant Buff Pattern validated (Combat Stim)
+- ✅ Dash Pattern validated (Dash skill)
+- ✅ Data-driven skill system working (SkillBalanceDatabase)
+- ✅ Animation-driven combat working (Call Method tracks)
+- ✅ Mouse-aimed twin-stick controls working
+- ✅ Buff system working (BuffManager integration)
 
-- 📝 **Leap Slam** - Database entry exists, needs animation + implementation
-- 📝 **Breaching Charge** - Planned dash + explosion skill
-- 📝 **Combat polish** - Animation timing, VFX improvements, balance tuning
+### 📝 Deferred (Post-MVP)
 
-### 📝 Not Started (Phase 4+)
+**Remaining Warrior Skills (Not needed for architecture validation):**
+- 📝 **Leap Slam** - Jump attack (database entry exists)
+- 📝 **Breaching Charge** - Dash + explosion skill
 
+**Skill System Expansion (After Phase 4+):**
+- Complete remaining warrior skills
+- Implement Ranger class skills
+- Implement Psion class skills
+- Animation timing polish
+- VFX improvements
+
+**Other Systems (Phase 4+):**
 - Gear/equipment drops
 - Materials or idle systems
 - NPC vendors/systems
@@ -141,35 +159,53 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 
 ## Current Phase Focus
 
-**Phase 3.5-B: Warrior Skills Implementation** ⏳ **IN PROGRESS**
+**Phase 3.75: UI System Improvements** ⏳ **IN PROGRESS**
 
-### Next Tasks
+### Context
 
-**Remaining Warrior Skills:**
-- **Leap Slam** - Jump attack with takeoff/landing hitboxes (database entry exists)
-- **Breaching Charge** - Dash + explosion skill
+After validating the skill system architecture with 5 working warrior skills, we're shifting focus to UI/UX improvements before tackling the gear/loot system in Phase 4. The skill architecture has proven robust enough to handle complex patterns (melee, AOE, hybrid, instant buffs, dash) - remaining skills can be added later.
 
-**Combat Polish:**
-- Animation timing refinement (hitbox frames, attack feel)
-- Visual effects improvements (particles, impact effects)
-- Balance tuning via inspector (damage, cooldowns, ranges)
+### Goals
 
-**Code Quality:**
-- Address deferred issues from Session 14 code review
-- Remove GetCooldownReduction() method (use CooldownReduction property)
-- Make Skill property setters private (currently public)
+1. **Improve player feedback** - Cooldown indicators, buff timers, visual clarity
+2. **Improve accessibility** - Pause menu everywhere, global stat panel access
+3. **Establish UI architecture** - UIManager autoload for future panels (inventory, mastery, crafting)
+
+### Tasks
+
+**UIManager Architecture:**
+- Create UIManager autoload singleton
+- Persistent UI layer (pause, stats, settings, tooltips)
+- Scene-specific UI stays local (HUD, skill bar in dungeon)
+
+**New UI Components:**
+- Pause Menu (ESC key, accessible in hub + dungeon)
+- Skill Bar HUD (cooldown timers, keybind indicators)
+- Settings Panel (volume controls, basic options)
+- Buff Indicators (active buff icons + timers)
+
+**Refactoring:**
+- Move StatAllocationPanel to UIManager ownership
+- Make stat panel accessible globally (C key works everywhere)
+- Add input handling to UIManager (ESC, C key)
 
 ### Architecture Notes
 
-**Skill Implementation Pattern (Current):**
+**Skill Implementation Pattern (Validated):**
 - **AnimationDriven skills:** Player.TryCastSkill() → Animation plays → Call Method tracks control hitboxes/spawning
 - **Instant skills:** Player.TryInstantSkill() → Data-driven checks (BuffDuration, etc.) → Apply effects
 - **Database-driven:** All skill parameters loaded from SkillBalanceDatabase (zero hardcoding)
 - **Composition pattern:** Skills use sub-resources (ProjectileData, MeleeData, AOEData, BuffData, ExplosionData)
 
-**After Warrior Complete:**
-- Return to Phase 4 (Gear & Loot)
-- Validate skill patterns work for other classes (Ranger, Psion)
+**UI Architecture (New):**
+- **UIManager autoload:** Owns persistent UI (pause, stats, settings)
+- **Scene-local UI:** HUD, skill bar, victory/death screens stay in dungeon.tscn
+- **InputManager:** Player component handles movement/skills, UIManager handles UI inputs (ESC, C)
+
+**After Phase 3.75 Complete:**
+- Move to Phase 4 (Gear & Loot)
+- Skill patterns already validated - can add remaining skills anytime
+- UIManager ready for inventory, mastery panels, tooltips
 
 **See:** [`Docs/02-IMPLEMENTATION/phase-plan.md`](Docs/02-IMPLEMENTATION/phase-plan.md) for full phase details.
 
@@ -736,6 +772,68 @@ Session continued from previous context that ran out. After initial stat system 
 - Implement remaining warrior skills (Leap Slam, Dash, Breaching Charge)
 - Polish particle effects (size, timing, colors)
 
+### Session 15 - Architecture Decision: Skills Validated, Moving to UI 🎯
+
+**Context:**
+After implementing 5 warrior skills (Fusion Cutter, Whirlwind, Energy Wave, Combat Stim, Dash), the skill system architecture has been thoroughly validated. Decided to move on from skill implementation to focus on other core systems.
+
+**Decision Rationale:**
+
+**Skill Architecture Successfully Validated:**
+- ✅ Melee Pattern working (Fusion Cutter)
+- ✅ AOE Pattern working (Whirlwind)
+- ✅ Hybrid Pattern working (Energy Wave - melee + projectiles)
+- ✅ Instant Buff Pattern working (Combat Stim)
+- ✅ Dash/Movement Pattern working (Dash skill)
+- ✅ Data-driven design proven (SkillBalanceDatabase with composition)
+- ✅ Animation-driven combat proven (Call Method tracks)
+- ✅ Mouse-aimed twin-stick controls proven
+- ✅ Buff system integration proven (BuffManager)
+
+**Why Stop Here:**
+- Implementing Leap Slam + Breaching Charge wouldn't teach us anything new architecturally
+- We've proven the system can handle complex patterns
+- Remaining warrior skills + other classes can be added anytime
+- More valuable to validate other core systems (gear, loot, progression)
+- Prevents getting stuck perfecting one feature before proving the rest
+
+**Phase 3.5-B Status:**
+- **Warrior skills:** Architecture VALIDATED (not complete, but proven)
+- **Code quality:** A+ across all skill systems (Session 12 cleanup)
+- **Remaining work:** Deferred to post-MVP (Leap Slam, Breaching Charge, other classes)
+
+**Moving to Phase 3.75:**
+After Session 15 discussion, identified UI/UX improvements as next priority:
+- UIManager autoload architecture designed (Option A: Minimal Refactor)
+- Pause menu (ESC key, accessible everywhere)
+- Skill cooldown indicators (bottom-center skill bar)
+- Global stat panel access (C key works in hub + dungeon)
+- Settings panel (volume controls)
+- Foundation for future UI (inventory, mastery, tooltips)
+
+**Achievements:**
+
+- 🎉 **Phase 3.5-B VALIDATED!** Skill architecture proven with 5 diverse patterns
+- 🎯 **Architecture audit complete** - 3 out of 4 code quality tasks already done
+- 🏗️ **UIManager architecture designed** - Option A (minimal refactor) chosen
+- 📋 **UI improvement plan created** - Pause menu, skill bar, settings, buff indicators
+
+**Lessons Learned:**
+
+- Validating architecture is more important than completing every feature
+- 5 diverse skills teach more than 7 similar skills
+- Moving on when architecture is proven prevents over-engineering
+- UIManager autoload solves persistent UI duplication cleanly
+- Scene-local UI (HUD, skill bar) should stay in dungeon.tscn (efficient)
+
+**Next Session:**
+
+- Implement UIManager core autoload
+- Create PauseMenu scene + script
+- Refactor StatAllocationPanel to use UIManager
+- Create SkillBarHUD for cooldown indicators
+- Create SettingsPanel with volume controls
+
 ### Session 8 - Victory & Death Screens - PHASE 1 COMPLETE! 🎉
 
 **Completed:**
@@ -965,5 +1063,5 @@ For complete stat formulas and progression details, see [`Docs/01-GAME-DESIGN/sy
 
 ---
 
-_Last updated: Session 15 - Documentation Cleanup & Technical Documentation complete!_
-_🎉 PHASES 1, 2, 3, & 3.5-A COMPLETE - 4 warrior skills working, buff system & mastery implemented! 🎉_
+_Last updated: Session 15 - Architecture Decision: Skills Validated, Moving to UI_
+_🎉 PHASES 1, 2, 3, 3.5-A, & 3.5-B VALIDATED - Skill architecture proven, moving to Phase 3.75 (UI Improvements)! 🎉_

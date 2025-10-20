@@ -27,7 +27,8 @@
 | Phase 1 | Combat is fun | 2 weeks | ✅ **PROVEN** |
 | Phase 2 | Progression hooks players | 2 weeks | ✅ **COMPLETE** |
 | Phase 3 | Hub enables meta-progression | 1 week | ✅ **COMPLETE** |
-| **Phase 3.5** | **Warrior combat validates animation/skill systems** | **2 weeks** | **⏳ IN PROGRESS** |
+| **Phase 3.5** | **Warrior combat validates animation/skill systems** | **2 weeks** | **✅ VALIDATED** |
+| **Phase 3.75** | **UI improvements enable better feedback/UX** | **1 week** | **⏳ IN PROGRESS** |
 | Phase 4 | Gear & loot add variety | 2 weeks | 📝 Next |
 | Phase 5 | Idle adds value | 2 weeks | 📝 Planned |
 | Phase 6 | Depth increases retention | 2 weeks | 📝 Planned |
@@ -164,13 +165,13 @@
 
 ---
 
-## Phase 3.5: Warrior Combat Implementation ⏳ IN PROGRESS
+## Phase 3.5: Warrior Combat Implementation ✅ VALIDATED
 
 **Focus:** Complete ONE class (Warrior) fully to validate animation and skill standardization systems
 
-**Status:** ⏳ **IN PROGRESS** - Balance systems foundation prioritized before skill implementation
+**Status:** ✅ **VALIDATED** - Skill architecture proven with 5 diverse patterns
 
-**Why this phase:** Before building 18 skills across 3 classes, establish centralized balance infrastructure and validate systems with 5 warrior skills end-to-end.
+**Decision:** After implementing 5 warrior skills covering all major patterns (melee, AOE, hybrid, instant buff, dash), the architecture has been successfully validated. Remaining warrior skills and other classes deferred to post-MVP.
 
 ### Architecture Completed ✅
 
@@ -179,7 +180,7 @@
 - ✅ Phase 2: Locomotion (walk/idle animations, 4 directions)
 - ✅ Phase 3: State Machine (PlayerState enum, transition logic)
 - ✅ Phase 4: Combat Animations (warrior_attack, warrior_whirlwind with Call Method tracks)
-- ⏳ Phase 5: Hitboxes (Area2D nodes + collision handlers) - IN PROGRESS
+- ✅ Phase 5: Hitboxes (Area2D nodes + collision handlers)
 
 **Skill Standardization Framework**
 - ✅ Two-axis classification (CastBehavior × DamageSource)
@@ -187,6 +188,25 @@
 - ✅ All 18 skills mapped to patterns
 - ✅ Hybrid hitbox approach designed (PlayerHitbox for melee/AOE, EffectCollision for projectiles)
 - ✅ Documentation created ([skill-standardization.md](skill-standardization.md), [animation-architecture.md](animation-architecture.md))
+
+**Implemented Skills (5 Total - Architecture Validated)**
+1. ✅ **Fusion Cutter** - Melee Pattern validated
+2. ✅ **Whirlwind** - AOE Pattern validated
+3. ✅ **Energy Wave** - Hybrid Pattern validated
+4. ✅ **Combat Stim** - Instant Buff Pattern validated
+5. ✅ **Dash** - Movement Pattern validated
+
+**Architecture Achievements:**
+- ✅ Data-driven skill system working (zero hardcoded parameters)
+- ✅ Animation-driven combat working (Call Method tracks)
+- ✅ Mouse-aimed twin-stick controls working
+- ✅ Buff system integration working
+- ✅ Complex skill patterns proven (hybrid melee + projectile)
+
+**Remaining Skills (Deferred to Post-MVP):**
+- Leap Slam (would validate jump/landing pattern - not architecturally novel)
+- Breaching Charge (would validate dash + explosion - patterns already proven separately)
+- Other classes (Ranger, Psion) - will use same architecture
 
 ---
 
@@ -351,6 +371,87 @@ Validates second hitbox pattern (AOE vs Melee).
 - Mage class (8 skills)
 - Additional enemy types
 - Boss abilities
+
+---
+
+## Phase 3.75: UI System Improvements ⏳ IN PROGRESS
+
+**Context:** After validating skill architecture with 5 warrior skills, identified UI/UX gaps that should be addressed before Phase 4 (Gear & Loot).
+
+**Hypothesis:** "Better UI feedback (cooldowns, pause menu, global panels) improves player experience and prepares architecture for inventory/gear systems"
+
+**Status:** ⏳ **IN PROGRESS**
+
+### Goals
+
+1. **Improve Combat Feedback**
+   - Skill cooldown indicators
+   - Buff/debuff timers
+   - Visual clarity for skill states
+
+2. **Improve Accessibility**
+   - Pause menu accessible everywhere (hub + dungeon)
+   - Stat panel accessible everywhere
+   - Settings panel for volume/options
+
+3. **Establish UI Architecture**
+   - UIManager autoload for persistent UI
+   - Foundation for future panels (inventory, mastery, crafting)
+   - Clean separation: persistent vs scene-local UI
+
+### Tasks
+
+**UIManager Architecture:**
+- [ ] Create UIManager autoload singleton
+- [ ] Persistent CanvasLayer (Layer 100) for global UI
+- [ ] Input handling for ESC (pause) and C (stats)
+
+**New UI Components:**
+- [ ] PauseMenu (ESC key, works in hub + dungeon)
+  - Resume, Character Stats, Settings, Return to Hub, Quit
+  - Context-aware (hide "Return to Hub" when already in hub)
+- [ ] SkillBarHUD (bottom-center skill bar)
+  - Skill icons/labels
+  - Keybind indicators (LMB, RMB, E, Space)
+  - Cooldown timers (visual + numeric)
+  - Ready state indicators (green glow)
+- [ ] SettingsPanel (volume controls)
+  - Master, SFX, Music volume sliders
+  - Placeholder for future settings
+- [ ] BuffIndicatorContainer (optional)
+  - Active buff icons near health bar
+  - Duration timers
+
+**Refactoring:**
+- [ ] Move StatAllocationPanel to UIManager ownership
+- [ ] Update Player.cs to use UIManager.ShowStatPanel()
+- [ ] Add SkillManager cooldown signals
+- [ ] Add GetCooldownRemaining() helper methods
+
+### Success Criteria
+
+- [ ] ESC opens pause menu in both hub and dungeon
+- [ ] C key opens stat panel in both hub and dungeon
+- [ ] Skill bar shows accurate cooldown timers
+- [ ] Players can see when skills are ready
+- [ ] Volume controls work in settings
+- [ ] No UI duplication between scenes
+
+### Time Estimate
+~2.5 hours total
+- UIManager core: 20 min
+- PauseMenu: 30 min
+- StatAllocationPanel refactor: 15 min
+- SettingsPanel: 20 min
+- SkillBarHUD: 45 min
+- Buff indicators (optional): 20 min
+
+### Deferred to Later
+- Tooltip system (Phase 4+)
+- Inventory panel (Phase 4)
+- Mastery info panel (Phase 4+)
+- Keybind remapping (Phase 7 polish)
+- Boss health bar (Phase 7 polish)
 
 ---
 
