@@ -1,5 +1,9 @@
 # Animation Architecture: Custom FSM + AnimationPlayer
 
+> **Status:** ✅ CURRENT  
+> **Last Updated:** 2025-10-20  
+> **Dependencies:** Player.cs, AnimationPlayer, skill-standardization.md
+
 ## Decision Summary
 
 **Chosen Approach:** Custom Finite State Machine in Player.cs + AnimationPlayer

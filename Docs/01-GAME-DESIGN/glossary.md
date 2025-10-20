@@ -65,36 +65,41 @@ This document defines all key terms used throughout Zenith Rising's design docum
 ## Character Stats
 
 ### Strength (STR)
-**Primary Effect:** +3% Physical Damage per point  
-**Secondary Effect:** +10 Max HP per point  
+**Primary Effect:** +2 Physical Damage per point (flat bonus)  
+**Secondary Effect:** None  
 **Scales:** Physical weapon attacks, physical skills  
 **Primary Users:** Warriors (Marcus)  
+**Formula:** Base Damage (10) + (STR × 2)  
 
 ### Intelligence (INT)
-**Primary Effect:** +3% Magical Damage per point  
-**Secondary Effect:** +2% Skill Cooldown Reduction per point  
+**Primary Effect:** +2 Magical Damage per point (flat bonus)  
+**Secondary Effect:** +1% Cast Speed per point, +1% Cooldown Reduction per point  
 **Scales:** Magical weapon attacks, magical skills  
 **Primary Users:** Mages (Elias)  
+**Formula:** Base Damage (10) + (INT × 2), Cast Speed: 1.0 × (1 + INT × 0.01)  
+**CDR Cap:** 50% maximum  
 
 ### Agility (AGI)
-**Primary Effect:** +2% Attack Speed per point  
-**Secondary Effect:** +1% Crit Chance per point  
-**Scales:** Attack speed, critical hit chance  
+**Primary Effect:** +1% Attack Speed per point  
+**Secondary Effect:** None (crit chance not yet implemented)  
+**Scales:** Attack speed  
 **Primary Users:** Rangers (Aria)  
-**Cap:** Crit chance capped at 50%  
+**Formula:** Base Attack Rate (1.0) × (1 + AGI × 0.01)  
 
 ### Vitality (VIT)
-**Primary Effect:** +25 Max HP per point  
-**Secondary Effect:** +0.5 HP Regeneration per second per point  
+**Primary Effect:** +10 Max HP per point  
+**Secondary Effect:** None (regen not yet implemented)  
 **Purpose:** Survivability for all playstyles  
 **Primary Users:** Tank builds  
+**Formula:** Base HP (100) + (VIT × 10)  
 
-### Fortune (FOR)
-**Primary Effect:** +2% Crit Damage per point  
-**Secondary Effect:** +1% Rare Drop Rate per point  
-**Purpose:** High-risk reward scaling  
-**Primary Users:** Crit-focused builds  
-**Synergy:** Works with AGI (crit chance) for crit builds  
+### Fortitude (FOR)
+**Primary Effect:** +0.5% Damage Reduction per point  
+**Secondary Effect:** None (drop rate not yet implemented)  
+**Purpose:** Defensive scaling for survivability  
+**Primary Users:** Tank builds  
+**Formula:** Damage Reduction = FOR × 0.005 (capped at 75%)  
+**Note:** Name changed from Fortune to Fortitude to reflect defensive focus  
 
 ---
 
@@ -401,5 +406,5 @@ Iron Sword (150 FP):
 
 ---
 
-_Last updated: 2025-10-17 - Complete overhaul for updated idle systems vision (5 materials, Forge/FP system, updated Workshop/Treasury)_
+_Last updated: 2025-10-20 - Fixed stat formulas to match actual implementation (stat-system.md)_
 _Living document - Update when new terms are introduced_

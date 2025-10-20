@@ -27,8 +27,8 @@
 | Phase 1 | Combat is fun | 2 weeks | ✅ **PROVEN** |
 | Phase 2 | Progression hooks players | 2 weeks | ✅ **COMPLETE** |
 | Phase 3 | Hub enables meta-progression | 1 week | ✅ **COMPLETE** |
-| **Phase 3.5** | **Warrior combat validates animation/skill systems** | **2 weeks** | **✅ VALIDATED** |
-| **Phase 3.75** | **UI improvements enable better feedback/UX** | **1 week** | **⏳ IN PROGRESS** |
+| **Phase 3.5-A** | **Balance systems enable tuning** | **1 week** | **✅ COMPLETE** |
+| **Phase 3.5-B** | **Warrior skills validate animation architecture** | **2 weeks** | **⏳ IN PROGRESS** |
 | Phase 4 | Gear & loot add variety | 2 weeks | 📝 Next |
 | Phase 5 | Idle adds value | 2 weeks | 📝 Planned |
 | Phase 6 | Depth increases retention | 2 weeks | 📝 Planned |
@@ -165,13 +165,51 @@
 
 ---
 
-## Phase 3.5: Warrior Combat Implementation ✅ VALIDATED
+## Phase 3.5-A: Balance Systems Architecture ✅ COMPLETE
 
-**Focus:** Complete ONE class (Warrior) fully to validate animation and skill standardization systems
+**Hypothesis:** "Centralized configuration enables rapid tuning without recompilation"
 
-**Status:** ✅ **VALIDATED** - Skill architecture proven with 5 diverse patterns
+**Status:** ✅ **COMPLETE** - Infrastructure validated and documented
 
-**Decision:** After implementing 5 warrior skills covering all major patterns (melee, AOE, hybrid, instant buff, dash), the architecture has been successfully validated. Remaining warrior skills and other classes deferred to post-MVP.
+### Completed ✅
+
+1. **GameBalance Singleton**
+   - Centralized config access via `GameBalance.Instance.Config`
+   - Autoload configuration for global access
+   - Clean separation of concerns
+
+2. **Five Config Resources**
+   - PlayerStatsConfig (base stats, formulas)
+   - CharacterProgressionConfig (level scaling, stat bonuses)
+   - CombatSystemConfig (damage, crit, buffs)
+   - EnemyConfig (base stats, scaling per wave/floor)
+   - UpgradeSystemConfig (power upgrade values)
+
+3. **SkillBalanceDatabase**
+   - Skill-specific parameters (damage, cooldown, range)
+   - Tier-based mastery bonuses
+   - Pattern-specific data structures (Projectile, Melee, AOE, Buff, Explosion)
+
+4. **Inspector-Based Tuning**
+   - All values editable in Godot Inspector
+   - No recompilation needed for balance changes
+   - Real-time testing iteration
+
+### Success Criteria ✅ Met
+- Balance changes take seconds, not minutes
+- Zero hardcoded values in gameplay code
+- Documentation complete ([balance-systems-architecture.md](balance-systems-architecture.md))
+- Team can tune without touching code
+
+---
+
+## Phase 3.5-B: Warrior Skills Implementation ⏳ IN PROGRESS
+
+**Hypothesis:** "Animation-driven skill architecture scales to all planned abilities"
+
+**Status:** ⏳ **IN PROGRESS** - Implementing Marcus's 6 skills
+
+**Focus:** Validate animation-driven hitbox system with Marcus (Warrior) as reference implementation
 
 ### Architecture Completed ✅
 
@@ -189,12 +227,11 @@
 - ✅ Hybrid hitbox approach designed (PlayerHitbox for melee/AOE, EffectCollision for projectiles)
 - ✅ Documentation created ([skill-standardization.md](skill-standardization.md), [animation-architecture.md](animation-architecture.md))
 
-**Implemented Skills (5 Total - Architecture Validated)**
-1. ✅ **Fusion Cutter** - Melee Pattern validated
-2. ✅ **Whirlwind** - AOE Pattern validated
-3. ✅ **Energy Wave** - Hybrid Pattern validated
-4. ✅ **Combat Stim** - Instant Buff Pattern validated
-5. ✅ **Dash** - Movement Pattern validated
+**Implemented Skills**
+1. ✅ **Fusion Cutter** (Marcus Basic) - Melee pattern (AnimationDriven + PlayerHitbox)
+2. ✅ **Whirlwind** (Test/Prototype) - AOE pattern validation (not in final Marcus design)
+
+**Note:** Whirlwind was implemented as Phase 1 combat prototype and serves as AOE pattern reference. Final Marcus skills per [class-abilities.md](../03-CONTENT-DESIGN/class-abilities.md): Fusion Cutter, Breaching Charge, Crowd Suppression, Fortify, Combat Stim, Last Stand.
 
 **Architecture Achievements:**
 - ✅ Data-driven skill system working (zero hardcoded parameters)

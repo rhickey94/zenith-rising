@@ -1,5 +1,9 @@
 # Stat System Implementation
 
+> **Status:** ✅ CURRENT  
+> **Last Updated:** 2025-10-20  
+> **Dependencies:** StatsManager.cs, balance-systems-architecture.md, CharacterProgressionConfig
+
 ## Overview
 
 The stat system provides character progression through 5 core stats (STR, INT, AGI, VIT, FOR) that scale derived combat stats. It's implemented in StatsManager.cs with formulas loaded from the centralized balance config.

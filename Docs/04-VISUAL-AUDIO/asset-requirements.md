@@ -40,14 +40,14 @@
 - Quality: **Legendary** - universally praised as "best on OpenGameArt"
 - **Why it's #1:** Free, professional quality, matches our theme perfectly, human soldiers
 
-**See detailed comparison:** [`../HUMAN-VS-ROBOT-SPRITES.md`](../HUMAN-VS-ROBOT-SPRITES.md)
+**See detailed comparison:** [`../05-RESEARCH/human-vs-robot-sprites.md`](../05-RESEARCH/human-vs-robot-sprites.md)
 
 **Alternative Option: PenUsbMic Robots**
 - If you prefer robots over humans
 - Pack 10: https://penusbmic.itch.io/sci-fi-character-pack-10
 - Cost: FREE for 1 robot, $7.50 for 3 class packs
 - Style: Metallic sci-fi robots
-- **See:** [`../CHARACTER-SPRITES-RESEARCH.md`](../CHARACTER-SPRITES-RESEARCH.md)
+- **See:** [`../05-RESEARCH/character-sprites-research.md`](../05-RESEARCH/character-sprites-research.md)
 
 #### **Enemy Sprites**
 

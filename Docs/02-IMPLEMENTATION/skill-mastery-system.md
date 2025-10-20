@@ -1,5 +1,9 @@
 # Skill Mastery System
 
+> **Status:** ✅ CURRENT  
+> **Last Updated:** 2025-10-20  
+> **Dependencies:** StatsManager.cs, Skill.cs, kill tracking system
+
 ## Overview
 
 The skill mastery system provides skill-specific progression through kill tracking. As players use skills to defeat enemies, they unlock tiered bonuses that enhance that specific skill's power.

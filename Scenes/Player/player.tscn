@@ -878,6 +878,7 @@ radius = 150.0
 
 [node name="Player" type="CharacterBody2D" groups=["player"]]
 collision_mask = 2
+motion_mode = 1
 script = ExtResource("1_xpcdj")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

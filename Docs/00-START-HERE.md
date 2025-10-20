@@ -40,7 +40,7 @@ Check: **[`04-VISUAL-AUDIO/visual-style-guide.md`](04-VISUAL-AUDIO/visual-style-
 
 ## 📊 Current Project Status
 
-**Phase:** Phase 3.5 (Warrior Combat) - Sub-Phases B+ (Remaining Warrior Skills)
+**Phase:** Phase 3.5-B: Warrior Skills Implementation
 
 **🎉 PHASES 1, 2, 3, & 3.5-A COMPLETE! 🎉**
 
@@ -48,7 +48,7 @@ Check: **[`04-VISUAL-AUDIO/visual-style-guide.md`](04-VISUAL-AUDIO/visual-style-
 - **Phase 2 (Progression):** Character stats, save/load working ✅
 - **Phase 3 (Hub World):** Scene flow and player initialization working ✅
 - **Phase 3.5-A (Balance Systems):** Centralized config infrastructure complete ✅
-- **Phase 3.5 (B-F):** Warrior skills implementation in progress ⏳
+- **Phase 3.5-B (Warrior Skills):** Animation-driven skill system in progress ⏳
 
 ### ✅ Currently Working
 
@@ -77,10 +77,11 @@ Check: **[`04-VISUAL-AUDIO/visual-style-guide.md`](04-VISUAL-AUDIO/visual-style-
 
 ### ⏳ In Progress
 
-**Phase 3.5 (B-F): Remaining Warrior Skills**
-- 2 skills working (Basic Attack, Whirlwind)
-- 4 skills remaining: Crowd Suppression, Fortify, Combat Stim, Last Stand
-- Combat polish: animation timing, hitbox tuning, visual effects
+**Phase 3.5-B: Warrior Skills Implementation**
+- 1 skill working: Fusion Cutter (Marcus basic attack)
+- Test skill: Whirlwind (prototype for AOE validation, not in final Marcus design)
+- 5 Marcus skills remaining: Breaching Charge, Crowd Suppression, Fortify, Combat Stim, Last Stand
+- Focus: Animation-driven hitbox system, timing polish, visual effects
 
 ### 📝 Not Started
 
@@ -91,6 +92,88 @@ Check: **[`04-VISUAL-AUDIO/visual-style-guide.md`](04-VISUAL-AUDIO/visual-style-
 - Multiple dungeons
 
 **For detailed status:** See [`CLAUDE.md`](../CLAUDE.md) in project root (updated daily)
+
+---
+
+## 📋 Documentation Hierarchy
+
+**Understanding Which Document to Trust:**
+
+When multiple documents cover related topics, follow this hierarchy:
+
+### Document Types & Headers
+
+**Why different docs have different headers:**
+
+- **🎯 Design Philosophy docs** (01-GAME-DESIGN/): Timeless principles, rarely change
+  - Headers show: Document Type, Last Updated, Purpose
+  - Example: design-overview.md, combat-skills.md
+  
+- **✅ Implementation docs** (02-IMPLEMENTATION/): Current technical state, change frequently  
+  - Headers show: Status (✅/⏳/📝), Last Updated, Dependencies
+  - Example: stat-system.md, skill-standardization.md
+  
+- **📋 Content Specs** (03-CONTENT-DESIGN/): Authoritative specifications
+  - Headers show: Authority marker (SOURCE OF TRUTH), Related docs
+  - Example: class-abilities.md, upgrade-pool.md
+
+This differentiation helps you quickly understand how current and stable each document is.
+
+### Authority Levels
+
+1. **Current Daily Status** → [`CLAUDE.md`](../CLAUDE.md) (root)
+   - ⚠️ THE single source of truth for "what's happening right now"
+   - Updated after every development session
+   - Shows what's actually built vs planned
+   - **When hub docs conflict with CLAUDE.md, CLAUDE.md wins**
+
+2. **Content Specifications** → `03-CONTENT-DESIGN/`
+   - **class-abilities.md** ✅ SOURCE OF TRUTH for all skill specs
+   - **upgrade-pool.md** for power upgrade definitions
+   - **enemy-design.md** for enemy behaviors
+
+3. **Current Technical Approach** → `02-IMPLEMENTATION/skill-standardization.md`
+   - ✅ CURRENT IMPLEMENTATION pattern for skills
+   - Animation-driven hitbox approach
+   - Use this for new skill implementation
+
+4. **Design Philosophy** → `01-GAME-DESIGN/`
+   - High-level concepts and rationale
+   - "Why" behind decisions
+   - Strategic direction
+
+5. **Historical Reference** → Documents marked ⚠️ HISTORICAL
+   - Preserved for context
+   - Shows architectural evolution
+   - Don't use for new implementation
+
+### Skill System Documentation Guide
+
+The skill system has multiple documents - here's when to use each:
+
+| Your Goal | Read This Document |
+|-----------|-------------------|
+| Understand skill design philosophy | `01-GAME-DESIGN/combat-skills.md` |
+| Get exact skill values & mechanics | `03-CONTENT-DESIGN/class-abilities.md` ✅ |
+| Implement a new skill | `02-IMPLEMENTATION/skill-standardization.md` ✅ |
+| Understand mastery progression | `02-IMPLEMENTATION/skill-mastery-system.md` |
+| Learn about old approaches | `02-IMPLEMENTATION/skill-system-architecture.md` ⚠️ |
+| Configure balance values | `02-IMPLEMENTATION/balance-systems-architecture.md` |
+
+### When Documents Conflict
+
+If you find conflicting information:
+
+1. **Check the status marker:**
+   - ✅ CURRENT = use this
+   - ⚠️ HISTORICAL = don't use this
+   - 📝 PLANNED = not implemented yet
+
+2. **Check the date:** Newer documents override older ones
+
+3. **Check CLAUDE.md:** Always reflects current reality
+
+4. **Update the outdated doc** and note the conflict resolution
 
 ---
 
@@ -129,6 +212,30 @@ Visual design, UI/UX, and asset requirements
 
 - `visual-style-guide.md` - Complete UI style guide
 - `asset-requirements.md` - Asset needs and sources
+- `lpc-character-generator-guide.md` - Character sprite generation guide
+
+### **05-RESEARCH/** - Research & Analysis
+
+Asset research, sprite comparisons, technical evaluations
+
+- `character-sprites-research.md` - Character sprite options analysis
+- `human-vs-robot-sprites.md` - Human vs robot aesthetic comparison
+
+### **06-PROMPTS/** - AI Assistant Prompts
+
+Reusable prompts for Claude AI assistance
+
+- `add-skill.md` - Template for adding new skills
+- `balance-test.md` - Playtesting and balance evaluation
+- `debug-godot.md` - Debugging assistance
+- `session-start.md` - Starting a new dev session
+
+### **07-MAINTENANCE/** - Documentation Maintenance
+
+Review logs, update summaries, consistency checks
+
+- `consistency-review.md` - Documentation consistency audit
+- `terminology-update-summary.md` - Terminology change log
 
 ---
 
@@ -271,5 +378,5 @@ When asking Claude for help:
 
 ---
 
-_Last major update: [Current Date] - Full documentation reorganization_
+_Last major update: 2025-10-20 - Documentation audit: Fixed stat formulas, standardized phase status, clarified Whirlwind as test skill_
 _Living document maintained by the development team_

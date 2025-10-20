@@ -1,7 +1,8 @@
 # Collision Layer Architecture
 
-**Last Updated:** Session 11 - Collision Layer Audit
-**Status:** ✅ Fully Implemented
+> **Status:** ✅ CURRENT  
+> **Last Updated:** 2025-10-20 (Session 11 - Collision Layer Audit)  
+> **Dependencies:** Godot Physics layers, Player.cs, Enemy.cs, skill effects
 
 ## Overview
 

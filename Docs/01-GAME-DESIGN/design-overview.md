@@ -1,5 +1,9 @@
 # Zenith Rising - Game Design Overview
 
+> **Document Type:** 🎯 DESIGN PHILOSOPHY  
+> **Last Updated:** 2025-10-20  
+> **Purpose:** High-level vision and design principles (timeless reference)
+
 ## Core Concept
 
 **Zenith Rising** is a roguelite action-RPG where **active combat grants power**, while **idle time improves efficiency**. Fight your way up the tower in intense combat sessions, then let your base systems refine materials and generate resources while you're away.
@@ -193,7 +197,7 @@
 
 ---
 
-## MVP Scope (Phase 1-2)
+## MVP Scope (Phases 1-3.5)
 
 ### Must Have for Launch
 
@@ -206,25 +210,34 @@
 - 5 floors
 - Wave/boss system
 
-**Progression (Phase 2):** 🔄 IN PROGRESS
+**Progression (Phase 2):** ✅ COMPLETE
 
 - Character stat system (5 stats)
-- Gear drops (3 slots: weapon, armor, accessory)
+- Character XP and leveling
+- Stat allocation panel
 - Save/load system
-- 5 distinct floors
+- Results screen with progression tracking
 
-**Idle Systems (Phase 5):**
+**Hub World (Phase 3):** ✅ COMPLETE
 
-- Workshop (5 material types: Essence, Ore, Fragments, Souls, Crystals)
-- Treasury (gold generation)
-- Material drop and refinement
+- Safe base area between runs
+- Dungeon portal interaction
+- Scene flow (Main Menu → Hub → Dungeon → Hub)
+- Player initialization across scenes
+
+**Balance Systems & Warrior Skills (Phase 3.5):** ⏳ IN PROGRESS
+
+- Centralized balance configuration (GameBalance singleton)
+- Skill balance database for inspector-based tuning
+- 5 warrior skills with animation-driven hitboxes
+- Skill mastery system foundation
 
 **Core Loop Validated:**
 
-- Fight → Collect → Refine → Upgrade → Fight Stronger
-- 15-minute sessions feel productive
-- 2-hour grinds feel rewarding
-- Daily check-ins show meaningful progress
+- Fight → Gain Power → Progress Character → Improve Skills
+- 25-30 minute runs feel complete
+- Permanent progression satisfying
+- Combat systems proven
 
 ### Explicitly Cut for Launch
 

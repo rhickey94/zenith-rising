@@ -1,4 +1,8 @@
-# Idle Systems Implementation Guide (📝 FUTURE - Phases 4-7)
+# Idle Systems Implementation Guide
+
+> **Status:** 📝 PLANNED (Phases 4-7)  
+> **Last Updated:** 2025-10-20  
+> **Dependencies:** Phase 4+ features, Workshop.cs, Treasury.cs, Forge.cs, Ascension.cs
 
 > **🎯 IMPLEMENTATION REFERENCE:** This document provides detailed mechanics and implementation guidance for the idle/meta-progression systems planned for Phases 4-7.
 >

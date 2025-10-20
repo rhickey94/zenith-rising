@@ -1,5 +1,10 @@
 # Systems & Progression
 
+> **Document Type:** 🎯 DESIGN PHILOSOPHY  
+> **Last Updated:** 2025-10-20  
+> **Purpose:** Progression system design and stat formulas (updated to match implementation)  
+> **For Implementation:** See [stat-system.md](../02-IMPLEMENTATION/stat-system.md) for code details
+
 ## Overview
 
 Zenith Rising uses a **stat-based power system** where everything scales from 5 core character stats. Gear provides stats, skills scale from stats, and upgrades modify stats or add effects.
@@ -21,55 +26,67 @@ Every character has 5 base stats that define their combat capabilities:
 
 #### **Strength (STR)** - Physical Power
 
-**Primary Effect:** +3% Physical Damage per point
-**Secondary Effect:** +10 Max HP per point
+**Primary Effect:** +2 Physical Damage per point (flat bonus)
+**Secondary Effect:** None
 
 - Scales physical weapon attacks
-- Scales physical skills (Whirlwind, melee abilities)
+- Scales physical skills (melee abilities)
 - Warriors prioritize this
 - No cap
+- **Formula:** Base Damage (10) + (STR × 2)
+- **Example:** 20 STR = 10 + 40 = 50 damage
 
 #### **Intelligence (INT)** - Magical Power
 
-**Primary Effect:** +3% Magical Damage per point
-**Secondary Effect:** +2% Skill Cooldown Reduction per point
+**Primary Effect:** +2 Magical Damage per point (flat bonus)
+**Secondary Effect:** +1% Cast Speed per point, +1% Cooldown Reduction per point
 
 - Scales magical weapon attacks
 - Scales magical skills (Fireball, elemental abilities)
 - Mages (Elias) prioritize this
-- No cap
+- **Cooldown Reduction Cap:** 50% maximum
+- **Formulas:** 
+  - Damage: Base (10) + (INT × 2)
+  - Cast Speed: 1.0 × (1 + INT × 0.01)
+  - CDR: INT × 0.01 (capped at 0.50)
+- **Example:** 20 INT = 50 damage, 1.20x cast speed, 20% CDR
 
 #### **Agility (AGI)** - Speed & Precision
 
-**Primary Effect:** +2% Attack Speed per point
-**Secondary Effect:** +1% Crit Chance per point
+**Primary Effect:** +1% Attack Speed per point
+**Secondary Effect:** None (crit chance not yet implemented)
 
 - Faster basic attacks
 - Faster skill animations
-- More frequent crits
 - Rangers (Aria) prioritize this
-- Crit Chance capped at 50%
+- No cap
+- **Formula:** Base Attack Rate (1.0) × (1 + AGI × 0.01)
+- **Example:** 20 AGI = 1.0 × 1.20 = 1.20 attacks/sec (20% faster)
 
 #### **Vitality (VIT)** - Survivability
 
-**Primary Effect:** +25 Max HP per point
-**Secondary Effect:** +0.5 HP Regeneration per second per point
+**Primary Effect:** +10 Max HP per point
+**Secondary Effect:** None (regen not yet implemented)
 
 - Pure survival stat
 - Valuable for all playstyles
 - Tank builds prioritize this
 - No cap
+- **Formula:** Base HP (100) + (VIT × 10)
+- **Example:** 20 VIT = 100 + 200 = 300 HP
 
-#### **Fortune (FOR)** - High-Risk Reward
+#### **Fortitude (FOR)** - Defensive Scaling
 
-**Primary Effect:** +2% Crit Damage per point
-**Secondary Effect:** +1% Rare Drop Rate per point
+**Primary Effect:** +0.5% Damage Reduction per point
+**Secondary Effect:** None (drop rate not yet implemented)
 
-- Bigger crits (base crit damage is 150%)
-- Better loot quality
-- Synergizes with AGI (crit chance)
-- Crit-focused builds prioritize this
-- No cap on crit damage
+- Reduces incoming damage
+- Survivability for all playstyles
+- Tank builds prioritize this
+- **Cap:** 75% maximum damage reduction
+- **Formula:** Damage Reduction = FOR × 0.005 (capped at 0.75)
+- **Example:** 20 FOR = 0.10 (10% damage reduction)
+- **Note:** Renamed from Fortune to reflect defensive focus
 
 ### Damage Types
 
@@ -99,18 +116,18 @@ Every character has 5 base stats that define their combat capabilities:
 
 - Prioritizes: STR, VIT
 - Playstyle: Physical damage, tanky
-- Example spread: 8 STR, 5 VIT, 2 AGI
+- Example spread: 8 STR, 5 VIT, 2 FOR
 
 **Aria (Ranger):**
 
 - Prioritizes: AGI, FOR
-- Playstyle: Fast attacks, high crits
+- Playstyle: Fast attacks, damage mitigation
 - Example spread: 6 AGI, 6 FOR, 3 STR
 
 **Elias (Mage):**
 
 - Prioritizes: INT, FOR
-- Playstyle: Magical damage, big crits
+- Playstyle: Magical damage, defensive casting
 - Example spread: 8 INT, 5 FOR, 2 VIT
 
 ### Starting Stats

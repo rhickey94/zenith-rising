@@ -1,5 +1,10 @@
 # Combat & Skills System
 
+> **Document Type:** 🎯 DESIGN PHILOSOPHY  
+> **Last Updated:** 2025-10-20  
+> **Purpose:** Combat design principles and skill system overview (timeless reference)  
+> **For Specs:** See [class-abilities.md](../03-CONTENT-DESIGN/class-abilities.md) for exact skill values
+
 ## Overview
 
 Zenith Rising uses a **hybrid skill system** combining pre-run customization with in-run evolution. You choose your loadout before each run, then random Power Upgrades modify your abilities as you gain Power Levels.
@@ -83,7 +88,7 @@ Before each run, **equip 3 active skills** from your unlocked pool:
 - **E Key** - Utility/Defensive Skill (10-15s cooldown)
 - **R Key** - Ultimate Skill (40-60s cooldown)
 
-**Example Warrior Loadout:**
+**Example Marcus (Warrior) Loadout:**
 
 ```
 Q: Crowd Suppression (ground slam, AOE knockback + slow)
@@ -92,7 +97,7 @@ R: Combat Stim (attack/move speed + damage boost)
 Ultimate: Last Stand (cannot die for 10s, massive damage)
 ```
 
-**Example Mage Loadout:**
+**Example Elias (Mage) Loadout:**
 
 ```
 Q: Arc Lightning (chain lightning, multi-target)
@@ -101,7 +106,7 @@ R: Architect's Blessing (cooldown reduction + chains + shields)
 Ultimate: Singularity (gravity well + implosion)
 ```
 
-**Example Ranger Loadout:**
+**Example Aria (Ranger) Loadout:**
 
 ```
 Q: Tactical Grenade (AOE damage + mark targets for bonus damage)
@@ -304,7 +309,7 @@ Temporary stat increases
 
 ### Build Diversity Examples
 
-**Warrior - Tank Build:**
+**Marcus - Tank Build:**
 
 - Q: Crowd Suppression (knockback + slow)
 - E: Fortify (energy shield, block damage)
@@ -312,7 +317,7 @@ Temporary stat increases
 - Ultimate: Last Stand (invulnerability + damage)
 - Upgrades: +Max HP, +Regen, Lifesteal on hit
 
-**Warrior - Aggressive Build:**
+**Marcus - Aggressive Build:**
 
 - Q: Crowd Suppression (crowd control)
 - E: Combat Stim (damage + attack speed)
@@ -320,7 +325,7 @@ Temporary stat increases
 - Ultimate: Last Stand (clutch moments)
 - Upgrades: +Attack Speed, +Damage, Crit chance
 
-**Mage - Chain Lightning Build:**
+**Elias - Chain Lightning Build:**
 
 - Q: Arc Lightning (multi-target chain)
 - E: Void Rift (sustain + slow)
@@ -328,7 +333,7 @@ Temporary stat increases
 - Ultimate: Singularity (massive AOE)
 - Upgrades: +Chain targets, −Cooldowns, Chain damage
 
-**Ranger - Precision Build:**
+**Aria - Precision Build:**
 
 - Q: Tactical Grenade (mark targets for bonus damage)
 - E: Evasive Roll (positioning + decoy)
@@ -394,7 +399,7 @@ Wave Complete → Next Wave
   - Overwhelming situations
   - Guaranteed value moments
 
-**Example Strategy - Mage:**
+**Example Strategy - Elias (Mage):**
 
 ```
 Normal Wave:

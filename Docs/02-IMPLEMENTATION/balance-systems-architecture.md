@@ -1,5 +1,9 @@
 # Balance Systems Architecture
 
+> **Status:** ✅ CURRENT  
+> **Last Updated:** 2025-10-20  
+> **Dependencies:** GameBalance.cs, Resource files (balance_config.tres, skill_balance_database.tres)
+
 ## Overview
 
 This document describes the centralized balance configuration systems for Zenith Rising. These systems separate balance parameters from code, enabling rapid iteration and sustainable content scaling.

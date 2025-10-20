@@ -1,5 +1,9 @@
 # Godot-Specific Patterns & Best Practices
 
+> **Status:** ✅ CURRENT  
+> **Last Updated:** 2025-10-20  
+> **Dependencies:** Godot 4.3+, C# .NET support
+
 ## Critical Godot Patterns
 
 ### Physics & Deferred Calls

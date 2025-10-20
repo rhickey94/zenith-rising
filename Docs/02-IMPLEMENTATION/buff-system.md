@@ -1,5 +1,9 @@
 # Buff System Implementation
 
+> **Status:** ✅ CURRENT  
+> **Last Updated:** 2025-10-20  
+> **Dependencies:** BuffManager.cs, Buff.cs, skill-standardization.md
+
 ## Overview
 
 The buff system provides temporary stat bonuses to the player through skills, items, or other game mechanics. It's implemented as a component architecture with centralized state management and automatic stat recalculation.
