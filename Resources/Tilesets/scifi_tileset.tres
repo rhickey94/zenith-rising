@@ -1,9 +1,6 @@
-[gd_resource type="TileSet" load_steps=3 format=3 uid="uid://cc6pratv66mvg"]
-
-[ext_resource type="Texture2D" uid="uid://iiio5lwrw25a" path="res://Assets/kenney_top-down-shooter/Tilesheet/tilesheet_complete.png" id="2_xpmbn"]
+[gd_resource type="TileSet" load_steps=2 format=3 uid="uid://cc6pratv66mvg"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4sqva"]
-texture = ExtResource("2_xpmbn")
 texture_region_size = Vector2i(64, 64)
 0:0/0 = 0
 1:0/0 = 0

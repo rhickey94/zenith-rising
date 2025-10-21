@@ -5,7 +5,5 @@
 [resource]
 script = ExtResource("1_xrvrs")
 SkillId = "warrior_energy_wave"
-SkillName = "Energy Wave"
-Cooldown = 2.0
 Slot = 1
 metadata/_custom_type_script = "uid://dff1q4v5i7rpk"

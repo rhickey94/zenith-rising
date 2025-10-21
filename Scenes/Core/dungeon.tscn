@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://6a6ovxmbcjd1"]
+[gd_scene load_steps=20 format=3 uid="uid://6a6ovxmbcjd1"]
 
 [ext_resource type="Script" uid="uid://ije0l625j2w0" path="res://Scripts/Core/Dungeon.cs" id="1_nxi3e"]
 [ext_resource type="PackedScene" uid="uid://cmd26cuctvrk3" path="res://Scenes/Enemies/fast_melee_enemy.tscn" id="2_1ball"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://dq8ntx3n735dh" path="res://Scenes/Enemies/slow_ranged_enemy.tscn" id="4_n4lck"]
 [ext_resource type="PackedScene" uid="uid://bjyl4m6ntddcb" path="res://Scenes/Enemies/boss.tscn" id="5_6rhjy"]
 [ext_resource type="Script" uid="uid://fwkhgpcy2am3" path="res://Scripts/UI/HUD/Hud.cs" id="6_d0mko"]
+[ext_resource type="PackedScene" uid="uid://ccg8e5nl10cau" path="res://Scenes/UI/HUD/skill_bar_hud.tscn" id="7_tuwvs"]
 [ext_resource type="PackedScene" uid="uid://fr50f27cq0cp" path="res://Scenes/UI/Panels/level_up_panel.tscn" id="7_xi64p"]
 [ext_resource type="PackedScene" uid="uid://bchf7gpesikn" path="res://Scenes/UI/Menus/floor_transition_panel.tscn" id="8_fjca2"]
 [ext_resource type="Script" uid="uid://bcvin8tqos5yg" path="res://Scripts/UI/Panels/VictoryScreen.cs" id="9_526qx"]
@@ -62,7 +63,7 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[node name="Dungeon" type="Node" node_paths=PackedStringArray("Player", "HUD", "FloorTransitionPanel", "_victoryScreen", "_deathScreen", "_resultsScreen")]
+[node name="Dungeon" type="Node" node_paths=PackedStringArray("Player", "HUD", "FloorTransitionPanel", "_victoryScreen", "_deathScreen", "_resultsScreen", "LevelUpPanel")]
 script = ExtResource("1_nxi3e")
 EnemyScenes = Array[PackedScene]([ExtResource("2_1ball"), ExtResource("3_b3vbb"), ExtResource("4_n4lck")])
 BossScene = ExtResource("5_6rhjy")
@@ -72,6 +73,7 @@ FloorTransitionPanel = NodePath("UILayer/FloorTransitionPanel")
 _victoryScreen = NodePath("UILayer/VictoryScreen")
 _deathScreen = NodePath("UILayer/DeathScreen")
 _resultsScreen = NodePath("UILayer/ResultsScreen")
+LevelUpPanel = NodePath("UILayer/LevelUpPanel")
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 layer = 100
@@ -219,6 +221,9 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Wave 1- 5 Enemies Remaining"
 horizontal_alignment = 1
+
+[node name="SkillBarHud" parent="UILayer/HUD" instance=ExtResource("7_tuwvs")]
+layout_mode = 1
 
 [node name="LevelUpPanel" parent="UILayer" instance=ExtResource("7_xi64p")]
 process_mode = 3
@@ -377,6 +382,4 @@ visible = false
 
 [node name="ResultsScreen" parent="UILayer" instance=ExtResource("12_ahhlw")]
 
-[node name="Player" parent="." node_paths=PackedStringArray("LevelUpPanel", "StatAllocationPanel") instance=ExtResource("13_ufyag")]
-LevelUpPanel = NodePath("../UILayer/LevelUpPanel")
-StatAllocationPanel = NodePath("../UILayer/StatAllocationPanel")
+[node name="Player" parent="." instance=ExtResource("13_ufyag")]

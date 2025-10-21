@@ -39,11 +39,14 @@ public partial class SkillManager : Node
             GD.PrintErr("SkillManager: StatsManager not found!");
         }
 
-        ValidateSkill(BasicAttackSkill, SkillSlot.BasicAttack);
-        ValidateSkill(SpecialAttackSkill, SkillSlot.SpecialAttack);
         ValidateSkill(PrimarySkill, SkillSlot.Primary);
         ValidateSkill(SecondarySkill, SkillSlot.Secondary);
         ValidateSkill(UltimateSkill, SkillSlot.Ultimate);
+        ValidateSkill(BasicAttackSkill, SkillSlot.BasicAttack);
+        ValidateSkill(SpecialAttackSkill, SkillSlot.SpecialAttack);
+        ValidateSkill(UtilitySkill, SkillSlot.Utility);
+
+        InitializeAllSkills();
     }
 
     public void Update(float delta)
@@ -167,7 +170,8 @@ public partial class SkillManager : Node
             return;
         }
 
-        if (skill.AllowedClass != _player.CurrentClass)
+        bool isAllowed = skill.AllowedClass == PlayerClass.All || skill.AllowedClass == _player.CurrentClass;
+        if (!isAllowed)
         {
             GD.PrintErr($"Skill {skill.SkillName} is for {skill.AllowedClass}, but player is {_player.CurrentClass}!");
         }
@@ -176,5 +180,70 @@ public partial class SkillManager : Node
         {
             GD.PrintErr($"Skill {skill.SkillName} is a {skill.Slot} skill, but equipped in {expectedSlot} slot!");
         }
+    }
+
+    /// <summary>
+    /// Gets the remaining cooldown time for a skill slot.
+    /// </summary>
+    public float GetCooldownRemaining(SkillSlot slot)
+    {
+        return slot switch
+        {
+            SkillSlot.BasicAttack => _basicAttackCooldownTimer,
+            SkillSlot.SpecialAttack => _specialAttackCooldownTimer,
+            SkillSlot.Primary => _primarySkillCooldownTimer,
+            SkillSlot.Secondary => _secondarySkillCooldownTimer,
+            SkillSlot.Ultimate => _ultimateSkillCooldownTimer,
+            SkillSlot.Utility => _utilitySkillCooldownTimer,
+            _ => 0f
+        };
+    }
+
+    /// <summary>
+    /// Gets the total cooldown duration for a skill slot.
+    /// </summary>
+    public float GetCooldownTotal(SkillSlot slot)
+    {
+        var skill = GetSkill(slot);
+        if (skill == null) return 0f;
+
+        // Apply CDR to get actual cooldown
+        if (_statsManager != null && skill.Cooldown > 0)
+        {
+            return skill.Cooldown * (1 - _statsManager.CooldownReduction);
+        }
+
+        return skill.Cooldown;
+    }
+
+    /// <summary>
+    /// Gets the skill equipped in a specific slot.
+    /// </summary>
+    private Skill GetSkill(SkillSlot slot)
+    {
+        return slot switch
+        {
+            SkillSlot.BasicAttack => BasicAttackSkill,
+            SkillSlot.SpecialAttack => SpecialAttackSkill,
+            SkillSlot.Primary => PrimarySkill,
+            SkillSlot.Secondary => SecondarySkill,
+            SkillSlot.Ultimate => UltimateSkill,
+            SkillSlot.Utility => UtilitySkill,
+            _ => null
+        };
+    }
+
+    /// <summary>
+    /// Initializes all equipped skills by loading their data from the balance database.
+    /// Called during _Ready() to ensure skill metadata is available before UI needs it.
+    /// </summary>
+    private void InitializeAllSkills()
+    {
+        BasicAttackSkill?.Initialize();
+        SpecialAttackSkill?.Initialize();
+        PrimarySkill?.Initialize();
+        SecondarySkill?.Initialize();
+        UltimateSkill?.Initialize();
+        UtilitySkill?.Initialize();
     }
 }

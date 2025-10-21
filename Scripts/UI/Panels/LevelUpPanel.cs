@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Godot;
+using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.Progression.Upgrades;
 
 namespace ZenithRising.Scripts.UI.Panels;
@@ -28,7 +29,6 @@ public partial class LevelUpPanel : Control
         _upgradeButton3.Pressed += () => SelectUpgrade(2);
 
         Hide(); // Hidden by default
-
     }
 
     public void ShowUpgrades(List<Upgrade> options)
@@ -41,7 +41,6 @@ public partial class LevelUpPanel : Control
 
         Show();
         GetTree().Paused = true; // Pause game
-
     }
 
     private string FormatUpgrade(Upgrade upgrade)

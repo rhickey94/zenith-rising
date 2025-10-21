@@ -50,7 +50,7 @@ dotnet_sort_system_directives_first = true
 dotnet_separate_import_directive_groups = false
 
 # Code style preferences
-csharp_prefer_braces = true:warning
+csharp_prefer_braces = false:warning
 csharp_prefer_simple_using_statement = true:suggestion
 
 # Expression preferences

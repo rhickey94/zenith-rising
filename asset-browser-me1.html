@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenith Rising - Asset Browser (ME1 Style)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Exo 2', 'Segoe UI', sans-serif;
+            background: #0a0e1a;
+            background-image: 
+                linear-gradient(rgba(20, 40, 80, 0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(20, 40, 80, 0.3) 1px, transparent 1px);
+            background-size: 50px 50px;
+            color: #c5d5e4;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(10, 30, 60, 0.8) 0%, rgba(5, 15, 30, 0.9) 100%);
+            border: 2px solid #2a6f97;
+            border-left: 6px solid #ff8c42;
+            border-radius: 0;
+            box-shadow: 
+                0 0 30px rgba(42, 111, 151, 0.3),
+                inset 0 0 30px rgba(42, 111, 151, 0.1);
+            position: relative;
+            clip-path: polygon(
+                0 0, 100% 0, 100% calc(100% - 15px), 
+                calc(100% - 15px) 100%, 0 100%
+            );
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                #2a6f97 20%, 
+                #61dafb 50%, 
+                #2a6f97 80%, 
+                transparent
+            );
+        }
+        
+        .header h1 {
+            font-family: 'Orbitron', monospace;
+            color: #61dafb;
+            font-size: 2.8em;
+            font-weight: 900;
+            margin-bottom: 15px;
+            text-shadow: 
+                0 0 10px rgba(97, 218, 251, 0.8),
+                0 0 20px rgba(97, 218, 251, 0.4),
+                0 0 30px rgba(97, 218, 251, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+        
+        .header p {
+            color: #8fa8b8;
+            font-size: 1.1em;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        
+        .stats {
+            margin-top: 15px;
+            color: #ff8c42;
+            font-size: 1em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .filter-btn {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, rgba(20, 40, 70, 0.8), rgba(10, 25, 45, 0.9));
+            border: 2px solid #2a6f97;
+            color: #61dafb;
+            border-radius: 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.85em;
+            position: relative;
+            clip-path: polygon(
+                8px 0, 100% 0, 100% calc(100% - 8px), 
+                calc(100% - 8px) 100%, 0 100%, 0 8px
+            );
+        }
+        
+        .filter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                transparent, 
+                rgba(97, 218, 251, 0.1) 50%, 
+                transparent
+            );
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .filter-btn:hover {
+            border-color: #61dafb;
+            box-shadow: 
+                0 0 15px rgba(97, 218, 251, 0.4),
+                inset 0 0 15px rgba(97, 218, 251, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .filter-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(135deg, #2a6f97, #1e5270);
+            border-color: #ff8c42;
+            color: #ffffff;
+            box-shadow: 
+                0 0 20px rgba(255, 140, 66, 0.6),
+                inset 0 0 20px rgba(255, 140, 66, 0.2);
+        }
+        
+        .search-box {
+            padding: 14px 24px;
+            background: linear-gradient(135deg, rgba(10, 25, 45, 0.8), rgba(5, 15, 30, 0.9));
+            border: 2px solid #2a6f97;
+            color: #c5d5e4;
+            border-radius: 0;
+            font-size: 1em;
+            min-width: 320px;
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 300;
+            letter-spacing: 1px;
+            clip-path: polygon(
+                0 0, calc(100% - 12px) 0, 100% 12px, 
+                100% 100%, 12px 100%, 0 calc(100% - 12px)
+            );
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #61dafb;
+            box-shadow: 
+                0 0 15px rgba(97, 218, 251, 0.4),
+                inset 0 0 15px rgba(97, 218, 251, 0.1);
+        }
+        
+        .search-box::placeholder {
+            color: #4a6070;
+            font-weight: 300;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, rgba(20, 40, 70, 0.6), rgba(10, 25, 45, 0.7));
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            border: 2px solid #2a6f97;
+            border-left: 6px solid #ff8c42;
+            border-radius: 0;
+            position: relative;
+            clip-path: polygon(
+                0 0, 100% 0, 100% calc(100% - 12px), 
+                calc(100% - 12px) 100%, 0 100%
+            );
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.5),
+                inset 0 0 20px rgba(42, 111, 151, 0.1);
+        }
+        
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                #61dafb 50%, 
+                transparent
+            );
+        }
+        
+        .section-header h2 {
+            font-family: 'Orbitron', monospace;
+            color: #61dafb;
+            font-size: 1.6em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(97, 218, 251, 0.5);
+        }
+        
+        .section-header p {
+            color: #8fa8b8;
+            margin-top: 8px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(5, 15, 30, 0.5), rgba(10, 20, 40, 0.5));
+            border: 1px solid rgba(42, 111, 151, 0.3);
+            border-radius: 0;
+        }
+        
+        .asset-card {
+            background: linear-gradient(135deg, rgba(20, 40, 70, 0.6), rgba(10, 25, 45, 0.7));
+            padding: 15px;
+            border-radius: 0;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+            clip-path: polygon(
+                10px 0, 100% 0, 100% calc(100% - 10px), 
+                calc(100% - 10px) 100%, 0 100%, 0 10px
+            );
+        }
+        
+        .asset-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                transparent, 
+                rgba(97, 218, 251, 0.05) 50%, 
+                transparent
+            );
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .asset-card:hover {
+            transform: translateY(-5px);
+            border-color: #61dafb;
+            background: linear-gradient(135deg, rgba(30, 60, 100, 0.8), rgba(15, 35, 60, 0.9));
+            box-shadow: 
+                0 8px 25px rgba(97, 218, 251, 0.4),
+                inset 0 0 20px rgba(97, 218, 251, 0.1);
+        }
+        
+        .asset-card:hover::before {
+            opacity: 1;
+        }
+        
+        .asset-img {
+            width: 100%;
+            height: 120px;
+            object-fit: contain;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid rgba(42, 111, 151, 0.3);
+            border-radius: 0;
+            padding: 10px;
+            position: relative;
+        }
+        
+        .asset-name {
+            margin-top: 12px;
+            font-size: 0.85em;
+            color: #8fa8b8;
+            word-break: break-word;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+        
+        .asset-card:hover .asset-name {
+            color: #61dafb;
+            text-shadow: 0 0 8px rgba(97, 218, 251, 0.5);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 10, 20, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            background: linear-gradient(135deg, rgba(10, 30, 60, 0.95), rgba(5, 15, 30, 0.98));
+            padding: 40px;
+            border-radius: 0;
+            border: 3px solid #2a6f97;
+            border-left: 8px solid #ff8c42;
+            position: relative;
+            clip-path: polygon(
+                0 0, 100% 0, 100% calc(100% - 20px), 
+                calc(100% - 20px) 100%, 0 100%
+            );
+            box-shadow: 
+                0 0 50px rgba(97, 218, 251, 0.5),
+                inset 0 0 50px rgba(42, 111, 151, 0.1);
+        }
+        
+        .modal-img {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            background: rgba(5, 10, 20, 0.8);
+            border: 2px solid #2a6f97;
+            padding: 20px;
+        }
+        
+        .modal-info {
+            margin-top: 25px;
+            color: #61dafb;
+            text-align: center;
+            font-size: 1.4em;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px rgba(97, 218, 251, 0.6);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            color: #ff8c42;
+            font-size: 45px;
+            cursor: pointer;
+            z-index: 10;
+            font-weight: 300;
+            transition: all 0.3s;
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+        }
+
+        .close-modal:hover {
+            color: #61dafb;
+            text-shadow: 0 0 20px rgba(97, 218, 251, 0.8);
+            transform: scale(1.1);
+        }
+        
+        /* Scanline effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(97, 218, 251, 0.03) 0px,
+                transparent 1px,
+                transparent 2px,
+                rgba(97, 218, 251, 0.03) 3px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎮 Zenith Rising</h1>
+        <p>Asset Database - Complete Inventory</p>
+        <div class="stats" id="statsDisplay">Loading assets...</div>
+    </div>
+    
+    <div class="controls">
+        <button class="filter-btn active" data-filter="all">All Assets</button>
+        <button class="filter-btn" data-filter="custom">Custom</button>
+        <button class="filter-btn" data-filter="particles">Particles</button>
+        <button class="filter-btn" data-filter="ui">UI Elements</button>
+        <button class="filter-btn" data-filter="scifi">Sci-Fi</button>
+        <input type="text" class="search-box" placeholder="Search assets..." id="searchBox">
+    </div>
+    
+    <div id="customSection" class="section">
+        <div class="section-header">
+            <h2>👤 Custom Characters</h2>
+            <p>Your custom character sprites</p>
+        </div>
+        <div class="gallery" id="customGallery"></div>
+    </div>
+    
+    <div id="particlesSection" class="section">
+        <div class="section-header">
+            <h2>✨ Particle Effects</h2>
+            <p>64 particle effects - explosions, smoke, energy, and more</p>
+        </div>
+        <div class="gallery" id="particlesGallery"></div>
+    </div>
+    
+    <div id="uiBlueSection" class="section">
+        <div class="section-header">
+            <h2>🎨 UI Elements - Blue</h2>
+            <p>54 UI components in blue theme</p>
+        </div>
+        <div class="gallery" id="uiBlueGallery"></div>
+    </div>
+    
+    <div id="uiGreenSection" class="section">
+        <div class="section-header">
+            <h2>🎨 UI Elements - Green</h2>
+            <p>54 UI components in green theme</p>
+        </div>
+        <div class="gallery" id="uiGreenGallery"></div>
+    </div>
+    
+    <div id="uiRedSection" class="section">
+        <div class="section-header">
+            <h2>🎨 UI Elements - Red</h2>
+            <p>54 UI components in red theme</p>
+        </div>
+        <div class="gallery" id="uiRedGallery"></div>
+    </div>
+    
+    <div id="uiYellowSection" class="section">
+        <div class="section-header">
+            <h2>🎨 UI Elements - Yellow</h2>
+            <p>54 UI components in yellow theme</p>
+        </div>
+        <div class="gallery" id="uiYellowGallery"></div>
+    </div>
+    
+    <div id="uiGreySection" class="section">
+        <div class="section-header">
+            <h2>🎨 UI Elements - Grey</h2>
+            <p>54 UI components in grey theme</p>
+        </div>
+        <div class="gallery" id="uiGreyGallery"></div>
+    </div>
+    
+    <div id="uiExtraSection" class="section">
+        <div class="section-header">
+            <h2>🎨 UI Elements - Extra</h2>
+            <p>67 additional UI components - shadows, cursors, panels</p>
+        </div>
+        <div class="gallery" id="uiExtraGallery"></div>
+    </div>
+    
+    <div id="scifiUnitsSection" class="section">
+        <div class="section-header">
+            <h2>🚀 Sci-Fi Units</h2>
+            <p>48 different sci-fi character and unit sprites</p>
+        </div>
+        <div class="gallery" id="scifiUnitsGallery"></div>
+    </div>
+    
+    <div id="scifiEnvironmentSection" class="section">
+        <div class="section-header">
+            <h2>🌌 Sci-Fi Environment</h2>
+            <p>20 environment decoration sprites</p>
+        </div>
+        <div class="gallery" id="scifiEnvironmentGallery"></div>
+    </div>
+    
+    <div id="scifiStructureSection" class="section">
+        <div class="section-header">
+            <h2>🏗️ Sci-Fi Structures</h2>
+            <p>16 building and structure sprites</p>
+        </div>
+        <div class="gallery" id="scifiStructureGallery"></div>
+    </div>
+    
+    <div id="scifiTilesSection" class="section">
+        <div class="section-header">
+            <h2>🗺️ Sci-Fi Tiles</h2>
+            <p>42 tileset sprites for building levels</p>
+        </div>
+        <div class="gallery" id="scifiTilesGallery"></div>
+    </div>
+    
+    <div class="modal" id="modal">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div class="modal-content">
+            <img class="modal-img" id="modalImg" src="" alt="">
+            <div class="modal-info" id="modalInfo"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Asset data
+        const particles = [
+            'circle_01', 'circle_02', 'circle_03', 'circle_04', 'circle_05',
+            'dirt_01', 'dirt_02', 'dirt_03',
+            'fire_01', 'fire_02',
+            'flame_01', 'flame_02', 'flame_03', 'flame_04', 'flame_05', 'flame_06',
+            'flare_01',
+            'light_01', 'light_02', 'light_03',
+            'magic_01', 'magic_02', 'magic_03', 'magic_04', 'magic_05',
+            'muzzle_01', 'muzzle_02', 'muzzle_03', 'muzzle_04', 'muzzle_05',
+            'scorch_01', 'scorch_02', 'scorch_03',
+            'scratch_01',
+            'slash_01', 'slash_02', 'slash_03', 'slash_04',
+            'smoke_01', 'smoke_02', 'smoke_03', 'smoke_04', 'smoke_05',
+            'smoke_06', 'smoke_07', 'smoke_08', 'smoke_09', 'smoke_10',
+            'spark_01', 'spark_02', 'spark_03', 'spark_04', 'spark_05', 'spark_06', 'spark_07',
+            'star_01', 'star_02', 'star_03', 'star_04', 'star_05', 'star_06', 'star_07', 'star_08', 'star_09',
+            'symbol_01', 'symbol_02',
+            'trace_01', 'trace_02', 'trace_03', 'trace_04', 'trace_05', 'trace_06', 'trace_07',
+            'twirl_01', 'twirl_02', 'twirl_03',
+            'window_01', 'window_02', 'window_03', 'window_04'
+        ];
+        
+        const uiElements = [
+            'bar_round_gloss_large', 'bar_round_gloss_large_l', 'bar_round_gloss_large_m', 'bar_round_gloss_large_r', 'bar_round_gloss_large_square',
+            'bar_round_gloss_small', 'bar_round_gloss_small_l', 'bar_round_gloss_small_m', 'bar_round_gloss_small_r', 'bar_round_gloss_small_square',
+            'bar_round_large', 'bar_round_large_l', 'bar_round_large_m', 'bar_round_large_r', 'bar_round_large_square',
+            'bar_round_small', 'bar_round_small_l', 'bar_round_small_m', 'bar_round_small_r', 'bar_round_small_square',
+            'bar_square_gloss_large', 'bar_square_gloss_large_l', 'bar_square_gloss_large_m', 'bar_square_gloss_large_r', 'bar_square_gloss_large_square',
+            'bar_square_gloss_small', 'bar_square_gloss_small_l', 'bar_square_gloss_small_m', 'bar_square_gloss_small_r', 'bar_square_gloss_small_square',
+            'bar_square_large', 'bar_square_large_l', 'bar_square_large_m', 'bar_square_large_r', 'bar_square_large_square',
+            'bar_square_small', 'bar_square_small_l', 'bar_square_small_m', 'bar_square_small_r', 'bar_square_small_square',
+            'button_square_header_blade_rectangle', 'button_square_header_blade_rectangle_screws',
+            'button_square_header_blade_square', 'button_square_header_blade_square_screws',
+            'button_square_header_large_rectangle', 'button_square_header_large_rectangle_screws',
+            'button_square_header_large_square', 'button_square_header_large_square_screws',
+            'button_square_header_notch_rectangle', 'button_square_header_notch_rectangle_screws',
+            'button_square_header_notch_square', 'button_square_header_notch_square_screws',
+            'button_square_header_small_rectangle', 'button_square_header_small_rectangle_screws',
+            'button_square_header_small_square', 'button_square_header_small_square_screws',
+            'crosshair_color_a', 'crosshair_color_b', 'crosshair_color_c', 'crosshair_color_d'
+        ];
+        
+        const uiExtraElements = [
+            'bar_shadow_round_large', 'bar_shadow_round_large_l', 'bar_shadow_round_large_m', 'bar_shadow_round_large_r', 'bar_shadow_round_large_square',
+            'bar_shadow_round_outline_large', 'bar_shadow_round_outline_large_l', 'bar_shadow_round_outline_large_m', 'bar_shadow_round_outline_large_r', 'bar_shadow_round_outline_large_square',
+            'bar_shadow_round_outline_small', 'bar_shadow_round_outline_small_l', 'bar_shadow_round_outline_small_m', 'bar_shadow_round_outline_small_r', 'bar_shadow_round_outline_small_square',
+            'bar_shadow_round_small', 'bar_shadow_round_small_l', 'bar_shadow_round_small_m', 'bar_shadow_round_small_r', 'bar_shadow_round_small_square',
+            'bar_shadow_square_large', 'bar_shadow_square_large_l', 'bar_shadow_square_large_m', 'bar_shadow_square_large_r', 'bar_shadow_square_large_square',
+            'bar_shadow_square_outline_large', 'bar_shadow_square_outline_large_l', 'bar_shadow_square_outline_large_m', 'bar_shadow_square_outline_large_r', 'bar_shadow_square_outline_large_square',
+            'bar_shadow_square_outline_small', 'bar_shadow_square_outline_small_l', 'bar_shadow_square_outline_small_m', 'bar_shadow_square_outline_small_r', 'bar_shadow_square_outline_small_square',
+            'bar_shadow_square_small', 'bar_shadow_square_small_l', 'bar_shadow_square_small_m', 'bar_shadow_square_small_r', 'bar_shadow_square_small_square',
+            'button_rectangle', 'button_rectangle_depth', 'button_square', 'button_square_depth',
+            'crosshair_a', 'crosshair_b', 'crosshair_c', 'crosshair_d',
+            'cursor_a', 'cursor_b', 'cursor_c', 'cursor_d', 'cursor_e', 'cursor_f', 'cursor_g', 'cursor_h',
+            'panel_glass', 'panel_glass_notches', 'panel_glass_notches_top',
+            'panel_glass_notch_bl', 'panel_glass_notch_br', 'panel_glass_notch_tl', 'panel_glass_notch_tr',
+            'panel_glass_screws', 'panel_glass_tab', 'panel_glass_tab_blade',
+            'panel_rectangle', 'panel_rectangle_screws', 'panel_square', 'panel_square_screws'
+        ];
+        
+        let totalAssets = 0;
+        
+        function createAssetCard(name, path, category) {
+            const card = document.createElement('div');
+            card.className = 'asset-card';
+            card.dataset.category = category;
+            card.dataset.name = name.toLowerCase();
+            
+            const img = document.createElement('img');
+            img.className = 'asset-img';
+            img.src = path;
+            img.alt = name;
+            
+            const nameEl = document.createElement('div');
+            nameEl.className = 'asset-name';
+            nameEl.textContent = name;
+            
+            card.appendChild(img);
+            card.appendChild(nameEl);
+            card.onclick = () => openModal(path, name);
+            
+            totalAssets++;
+            return card;
+        }
+        
+        function loadAssets() {
+            // Custom Characters
+            const customGallery = document.getElementById('customGallery');
+            const warriorPath = 'Assets/Sprites/Characters/warrior.png';
+            customGallery.appendChild(createAssetCard('warrior', warriorPath, 'custom'));
+            
+            // Particles
+            const particlesGallery = document.getElementById('particlesGallery');
+            particles.forEach(name => {
+                const path = `Assets/kenney_particle-pack/PNG%20(Transparent)/${name}.png`;
+                particlesGallery.appendChild(createAssetCard(name, path, 'particles'));
+            });
+            
+            // UI Elements - Blue
+            const uiBlueGallery = document.getElementById('uiBlueGallery');
+            uiElements.forEach(name => {
+                const path = `Assets/kenney_ui-pack-space-expansion/PNG/Blue/Default/${name}.png`;
+                uiBlueGallery.appendChild(createAssetCard(name, path, 'ui'));
+            });
+            
+            // UI Elements - Green
+            const uiGreenGallery = document.getElementById('uiGreenGallery');
+            uiElements.forEach(name => {
+                const path = `Assets/kenney_ui-pack-space-expansion/PNG/Green/Default/${name}.png`;
+                uiGreenGallery.appendChild(createAssetCard(name, path, 'ui'));
+            });
+            
+            // UI Elements - Red
+            const uiRedGallery = document.getElementById('uiRedGallery');
+            uiElements.forEach(name => {
+                const path = `Assets/kenney_ui-pack-space-expansion/PNG/Red/Default/${name}.png`;
+                uiRedGallery.appendChild(createAssetCard(name, path, 'ui'));
+            });
+            
+            // UI Elements - Yellow
+            const uiYellowGallery = document.getElementById('uiYellowGallery');
+            uiElements.forEach(name => {
+                const path = `Assets/kenney_ui-pack-space-expansion/PNG/Yellow/Default/${name}.png`;
+                uiYellowGallery.appendChild(createAssetCard(name, path, 'ui'));
+            });
+            
+            // UI Elements - Grey
+            const uiGreyGallery = document.getElementById('uiGreyGallery');
+            uiElements.forEach(name => {
+                const path = `Assets/kenney_ui-pack-space-expansion/PNG/Grey/Default/${name}.png`;
+                uiGreyGallery.appendChild(createAssetCard(name, path, 'ui'));
+            });
+            
+            // UI Elements - Extra
+            const uiExtraGallery = document.getElementById('uiExtraGallery');
+            uiExtraElements.forEach(name => {
+                const path = `Assets/kenney_ui-pack-space-expansion/PNG/Extra/Default/${name}.png`;
+                uiExtraGallery.appendChild(createAssetCard(name, path, 'ui'));
+            });
+            
+            // Sci-Fi Units
+            const scifiUnitsGallery = document.getElementById('scifiUnitsGallery');
+            for (let i = 1; i <= 48; i++) {
+                const name = `scifiUnit_${String(i).padStart(2, '0')}`;
+                const path = `Assets/kenney_sci-fi-rts/PNG/Default%20size/Unit/${name}.png`;
+                scifiUnitsGallery.appendChild(createAssetCard(name, path, 'scifi'));
+            }
+            
+            // Sci-Fi Environment
+            const scifiEnvironmentGallery = document.getElementById('scifiEnvironmentGallery');
+            for (let i = 1; i <= 20; i++) {
+                const name = `scifiEnvironment_${String(i).padStart(2, '0')}`;
+                const path = `Assets/kenney_sci-fi-rts/PNG/Default%20size/Environment/${name}.png`;
+                scifiEnvironmentGallery.appendChild(createAssetCard(name, path, 'scifi'));
+            }
+            
+            // Sci-Fi Structure
+            const scifiStructureGallery = document.getElementById('scifiStructureGallery');
+            for (let i = 1; i <= 16; i++) {
+                const name = `scifiStructure_${String(i).padStart(2, '0')}`;
+                const path = `Assets/kenney_sci-fi-rts/PNG/Default%20size/Structure/${name}.png`;
+                scifiStructureGallery.appendChild(createAssetCard(name, path, 'scifi'));
+            }
+            
+            // Sci-Fi Tiles
+            const scifiTilesGallery = document.getElementById('scifiTilesGallery');
+            for (let i = 1; i <= 42; i++) {
+                const name = `scifiTile_${String(i).padStart(2, '0')}`;
+                const path = `Assets/kenney_sci-fi-rts/PNG/Default%20size/Tile/${name}.png`;
+                scifiTilesGallery.appendChild(createAssetCard(name, path, 'scifi'));
+            }
+            
+            // Update stats
+            document.getElementById('statsDisplay').textContent = `◢ Total Assets: ${totalAssets} ◣`;
+        }
+        
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const filter = btn.dataset.filter;
+                
+                if (filter === 'all') {
+                    document.querySelectorAll('.section').forEach(s => s.classList.remove('hidden'));
+                } else {
+                    document.querySelectorAll('.section').forEach(s => {
+                        const sectionId = s.id.toLowerCase();
+                        if (sectionId.includes(filter)) {
+                            s.classList.remove('hidden');
+                        } else {
+                            s.classList.add('hidden');
+                        }
+                    });
+                }
+            });
+        });
+        
+        // Search functionality
+        document.getElementById('searchBox').addEventListener('input', (e) => {
+            const search = e.target.value.toLowerCase();
+            document.querySelectorAll('.asset-card').forEach(card => {
+                const name = card.dataset.name;
+                card.style.display = name.includes(search) ? 'block' : 'none';
+            });
+        });
+        
+        // Modal functions
+        function openModal(path, name) {
+            const modal = document.getElementById('modal');
+            const modalImg = document.getElementById('modalImg');
+            const modalInfo = document.getElementById('modalInfo');
+            
+            modalImg.src = path;
+            modalInfo.textContent = name;
+            modal.classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') {
+                closeModal();
+            }
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        // Initialize
+        loadAssets();
+    </script>
+</body>
+</html>

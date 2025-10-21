@@ -1,0 +1,260 @@
+[gd_scene load_steps=3 format=3 uid="uid://ccg8e5nl10cau"]
+
+[ext_resource type="Script" uid="uid://d3l75npwutluk" path="res://Scripts/UI/HUD/SkillBarHud.cs" id="1_wci4j"]
+[ext_resource type="Script" uid="uid://cldncop8ny18g" path="res://Scripts/UI/HUD/SkillSlotUI.cs" id="2_seijh"]
+
+[node name="SkillBarHud" type="Control"]
+layout_mode = 3
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -65.0
+offset_bottom = -65.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("1_wci4j")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -50.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="PrimarySlot" type="PanelContainer" parent="HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+script = ExtResource("2_seijh")
+
+[node name="VBox" type="VBoxContainer" parent="HBoxContainer/PrimarySlot"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="PrimarySkillNameLabel" type="Label" parent="HBoxContainer/PrimarySlot/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Primary Skill"
+horizontal_alignment = 1
+
+[node name="PrimaryCooldownBar" type="ProgressBar" parent="HBoxContainer/PrimarySlot/VBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+
+[node name="PrimaryCooldownLabel" type="Label" parent="HBoxContainer/PrimarySlot/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "0.0s"
+horizontal_alignment = 1
+
+[node name="PrimaryKeybindLabel" type="Label" parent="HBoxContainer/PrimarySlot/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "1"
+horizontal_alignment = 1
+
+[node name="SecondarySlot" type="PanelContainer" parent="HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+script = ExtResource("2_seijh")
+
+[node name="VBox" type="VBoxContainer" parent="HBoxContainer/SecondarySlot"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="SecondarySkillNameLabel" type="Label" parent="HBoxContainer/SecondarySlot/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Secondary Skill"
+horizontal_alignment = 1
+
+[node name="SecondaryCooldownBar" type="ProgressBar" parent="HBoxContainer/SecondarySlot/VBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+
+[node name="SecondaryCooldownLabel" type="Label" parent="HBoxContainer/SecondarySlot/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "0.0s"
+horizontal_alignment = 1
+
+[node name="SecondaryKeybindLabel" type="Label" parent="HBoxContainer/SecondarySlot/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "2"
+horizontal_alignment = 1
+
+[node name="UltimateSlot" type="PanelContainer" parent="HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+script = ExtResource("2_seijh")
+
+[node name="VBox" type="VBoxContainer" parent="HBoxContainer/UltimateSlot"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="UltimateSkillNameLabel" type="Label" parent="HBoxContainer/UltimateSlot/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Ultimate Skill"
+horizontal_alignment = 1
+
+[node name="UltimateCooldownBar" type="ProgressBar" parent="HBoxContainer/UltimateSlot/VBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+
+[node name="UltimateCooldownLabel" type="Label" parent="HBoxContainer/UltimateSlot/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "0.0s"
+horizontal_alignment = 1
+
+[node name="UltimateKeybindLabel" type="Label" parent="HBoxContainer/UltimateSlot/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "3"
+horizontal_alignment = 1
+
+[node name="VSeparator" type="VSeparator" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="BasicAttackSlot" type="PanelContainer" parent="HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+script = ExtResource("2_seijh")
+
+[node name="VBox" type="VBoxContainer" parent="HBoxContainer/BasicAttackSlot"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="BasicAttackSkillNameLabel" type="Label" parent="HBoxContainer/BasicAttackSlot/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Basic Attack"
+horizontal_alignment = 1
+
+[node name="BasicAttackCooldownBar" type="ProgressBar" parent="HBoxContainer/BasicAttackSlot/VBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+
+[node name="BasicAttackCooldownLabel" type="Label" parent="HBoxContainer/BasicAttackSlot/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "0.0s"
+horizontal_alignment = 1
+
+[node name="BasicAttackKeybindLabel" type="Label" parent="HBoxContainer/BasicAttackSlot/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "LMB"
+horizontal_alignment = 1
+
+[node name="SpecialAttackSlot" type="PanelContainer" parent="HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+script = ExtResource("2_seijh")
+
+[node name="VBox" type="VBoxContainer" parent="HBoxContainer/SpecialAttackSlot"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="SpecialAttackSkillNameLabel" type="Label" parent="HBoxContainer/SpecialAttackSlot/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Special Attack"
+horizontal_alignment = 1
+
+[node name="SpecialAttackCooldownBar" type="ProgressBar" parent="HBoxContainer/SpecialAttackSlot/VBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+
+[node name="SpecialAttackCooldownLabel" type="Label" parent="HBoxContainer/SpecialAttackSlot/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "0.0s"
+horizontal_alignment = 1
+
+[node name="SpecialAttackKeybindLabel" type="Label" parent="HBoxContainer/SpecialAttackSlot/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "RMB"
+horizontal_alignment = 1
+
+[node name="UtilitySlot" type="PanelContainer" parent="HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 2
+size_flags_vertical = 4
+script = ExtResource("2_seijh")
+
+[node name="VBox" type="VBoxContainer" parent="HBoxContainer/UtilitySlot"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="UtilitySkillNameLabel" type="Label" parent="HBoxContainer/UtilitySlot/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Dash"
+horizontal_alignment = 1
+
+[node name="UtilityCooldownBar" type="ProgressBar" parent="HBoxContainer/UtilitySlot/VBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+
+[node name="UtilityCooldownLabel" type="Label" parent="HBoxContainer/UtilitySlot/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "0.0s"
+horizontal_alignment = 1
+
+[node name="UtilityKeybindLabel" type="Label" parent="HBoxContainer/UtilitySlot/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Space"
+horizontal_alignment = 1

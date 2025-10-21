@@ -1,7 +1,9 @@
 using Godot;
+using Godot.Collections;
 using ZenithRising.Scripts.Enemies.Base;
 using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.PlayerScripts.Components;
+using ZenithRising.Scripts.Progression.Upgrades;
 using ZenithRising.Scripts.UI.HUD;
 using ZenithRising.Scripts.UI.Panels;
 
@@ -20,6 +22,7 @@ public partial class Dungeon : Node
     [Export] private VictoryScreen _victoryScreen;
     [Export] private DeathScreen _deathScreen;
     [Export] private ResultsScreen _resultsScreen;
+    [Export] public LevelUpPanel LevelUpPanel;
 
     // ===== EXPORT FIELDS - Settings =====
     [Export] public string HubScenePath = "res://Scenes/Core/hub.tscn";
@@ -61,6 +64,7 @@ public partial class Dungeon : Node
         SetupFloorTransitionPanel();
         SetupResultsScreen();
         SetupVictoryDeathScreens();
+        SetupLevelUpScreen();
     }
 
     public override void _PhysicsProcess(double delta)
@@ -319,10 +323,10 @@ public partial class Dungeon : Node
     private void OnAllocateStatsRequested()
     {
         // Open stat allocation panel
-        Player?.StatAllocationPanel?.ShowPanel(
-            Player.GetNode<StatsManager>("StatsManager"),
-            Player.GetNode<UpgradeManager>("UpgradeManager")
-        );
+        // Player?.StatAllocationPanel?.ShowPanel(
+        //     Player.GetNode<StatsManager>("StatsManager"),
+        //     Player.GetNode<UpgradeManager>("UpgradeManager")
+        // );
     }
 
     private void OnReturnToMenuFromResults()
@@ -330,6 +334,18 @@ public partial class Dungeon : Node
         // Return to hub
         GetTree().ChangeSceneToFile(HubScenePath);
     }
+
+    // ===== SIGNAL HANDLERS - Level Up Panel =====
+    private void OnPlayerLevelUp(Array<Upgrade> upgrades)
+    {
+        LevelUpPanel.ShowUpgrades([.. upgrades]);
+    }
+
+    private void OnUpgradeSelected(Upgrade upgrade)
+    {
+        Player.ApplyUpgrade(upgrade);
+    }
+
 
     // ===== CALCULATION HELPERS =====
     private float GetCurrentSpawnInterval()
@@ -391,6 +407,12 @@ public partial class Dungeon : Node
     {
         _victoryScreen.ContinueButtonPressed += ShowResultsScreen;
         _deathScreen.ContinueButtonPressed += ShowResultsScreen;
+    }
+
+    private void SetupLevelUpScreen()
+    {
+        Player.ShowLevelUpPanel += OnPlayerLevelUp;
+        LevelUpPanel.UpgradeSelected += OnUpgradeSelected;
     }
 
     private void ResetRunTracking()
@@ -465,6 +487,12 @@ public partial class Dungeon : Node
         if (_resultsScreen == null)
         {
             GD.PrintErr("Dungeon: ResultsScreen not assigned!");
+            valid = false;
+        }
+
+        if (LevelUpPanel == null)
+        {
+            GD.PrintErr("Dungeon: LevelUpPanel not assigned!");
             valid = false;
         }
 

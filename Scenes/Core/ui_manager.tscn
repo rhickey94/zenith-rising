@@ -1,0 +1,13 @@
+[gd_scene load_steps=4 format=3 uid="uid://s32b3smgty6p"]
+
+[ext_resource type="Script" uid="uid://x1kuqduiafbk" path="res://Scripts/Core/UIManager.cs" id="1_tolqc"]
+[ext_resource type="PackedScene" uid="uid://cggfbynyfbjc" path="res://Scenes/UI/Panels/stat_allocation_panel.tscn" id="2_dkm4q"]
+[ext_resource type="PackedScene" uid="uid://ry6nrnwnnheb" path="res://Scenes/UI/Menus/pause_menu.tscn" id="3_nl6qu"]
+
+[node name="UIManager" type="CanvasLayer"]
+layer = 200
+script = ExtResource("1_tolqc")
+
+[node name="StatAllocationPanel" parent="." instance=ExtResource("2_dkm4q")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("3_nl6qu")]

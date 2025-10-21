@@ -22,16 +22,13 @@ public partial class Player : CharacterBody2D
     // ===== EXPORT FIELDS - Config =====
     [Export] public PlayerClass CurrentClass = PlayerClass.Warrior;
 
-    // ===== EXPORT FIELDS - UI Dependencies =====
-    [Export] public LevelUpPanel LevelUpPanel;
-    [Export] public StatAllocationPanel StatAllocationPanel;
-
     // ===== SIGNALS =====
     [Signal] public delegate void HealthChangedEventHandler(float currentHealth, float maxHealth);
     [Signal] public delegate void ExperienceChangedEventHandler(int currentXP, int requiredXP, int level);
     [Signal] public delegate void ResourcesChangedEventHandler(int gold, int cores, int components, int fragments);
     [Signal] public delegate void FloorInfoChangedEventHandler(int floorNumber, string floorName);
     [Signal] public delegate void WaveInfoChangedEventHandler(int waveNumber, int enemiesRemaining);
+    [Signal] public delegate void ShowLevelUpPanelEventHandler(Godot.Collections.Array<Upgrade> upgrades);
 
     // ===== PRIVATE FIELDS - Components =====
     private InputManager _inputManager;
@@ -73,7 +70,6 @@ public partial class Player : CharacterBody2D
         else
         {
             _inputManager.SkillPressed += OnSkillPressed;
-            _inputManager.StatPanelPressed += OnStatPanelPressed;
         }
 
         _skillManager = GetNode<SkillManager>("SkillManager");
@@ -131,19 +127,6 @@ public partial class Player : CharacterBody2D
         {
             _skillAnimationController.Initialize(this, _statsManager, _animationPlayer, _buffManager);
         }
-
-        // Connect to LevelUpPanel
-        if (LevelUpPanel != null)
-        {
-            LevelUpPanel.UpgradeSelected += HandleUpgradeSelection;
-        }
-
-        // Debug test: Apply buff after 2 seconds
-        GetTree().CreateTimer(2.0).Timeout += () =>
-        {
-            _buffManager?.ApplyBuff("test", 5f, attackSpeedBonus: 0.5f);
-            GD.Print("Test buff applied: +50% attack speed for 5 seconds");
-        };
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -415,6 +398,11 @@ public partial class Player : CharacterBody2D
         _dashElapsed = 0f;
     }
 
+    public void ApplyUpgrade(Upgrade upgrade)
+    {
+        _upgradeManager?.ApplyUpgrade(upgrade);
+    }
+
     /// <summary>
     /// Forcibly ends the dash movement.
     /// Called by SkillAnimationController via animation callback.
@@ -430,18 +418,18 @@ public partial class Player : CharacterBody2D
     // ===== PRIVATE HELPERS - Event Handlers =====
     private void OnLeveledUp()
     {
-        if (LevelUpPanel != null)
+        var upgradeOptions = GetRandomUpgrades(3);
+
+        // Emit signal for UI to handle (decoupled from LevelUpPanel)
+        var upgradesArray = new Godot.Collections.Array<Upgrade>();
+        foreach (var upgrade in upgradeOptions)
         {
-            var upgradeOptions = GetRandomUpgrades(3);
-
-            LevelUpPanel.ShowUpgrades(upgradeOptions);
+            upgradesArray.Add(upgrade);
         }
+
+        EmitSignal(SignalName.ShowLevelUpPanel, upgradesArray);
     }
 
-    private void HandleUpgradeSelection(Upgrade upgrade)
-    {
-        _upgradeManager?.ApplyUpgrade(upgrade);
-    }
 
     // ===== PRIVATE HELPERS - Upgrades =====
     private List<Upgrade> GetRandomUpgrades(int count)
@@ -596,10 +584,5 @@ public partial class Player : CharacterBody2D
     private void OnSkillPressed(int skillSlot)
     {
         _skillManager?.UseSkill((SkillSlot)skillSlot);
-    }
-
-    private void OnStatPanelPressed()
-    {
-        StatAllocationPanel?.ShowPanel(_statsManager, _upgradeManager);
     }
 }

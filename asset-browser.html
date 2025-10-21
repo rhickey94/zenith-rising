@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenith Rising - Complete Asset Browser</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+            background: #000000;
+            background-image: 
+                repeating-linear-gradient(0deg, rgba(255, 107, 53, 0.02) 0px, transparent 1px, transparent 2px, rgba(255, 107, 53, 0.02) 3px),
+                repeating-linear-gradient(90deg, rgba(255, 107, 53, 0.02) 0px, transparent 1px, transparent 2px, rgba(255, 107, 53, 0.02) 3px),
+                linear-gradient(135deg, #000000 0%, #0a0a0a 100%);
+            background-size: 60px 60px, 60px 60px, 100% 100%;
+            color: #e8e8e8;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 35px;
+            background: 
+                linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(10, 10, 10, 0.98) 100%);
+            border: 3px solid #1a1a1a;
+            border-left: 6px solid #ff6b35;
+            border-right: 6px solid #ff6b35;
+            box-shadow: 
+                0 0 40px rgba(255, 107, 53, 0.4),
+                inset 0 0 60px rgba(0, 0, 0, 0.8),
+                inset 0 2px 0 rgba(255, 107, 53, 0.3),
+                inset 0 -2px 0 rgba(255, 107, 53, 0.3);
+            position: relative;
+            clip-path: polygon(
+                0 0, 100% 0, 100% calc(100% - 20px), 
+                calc(100% - 20px) 100%, 0 100%
+            );
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                #ff6b35 10%, 
+                #ff8c42 50%, 
+                #ff6b35 90%, 
+                transparent
+            );
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.8);
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                #ff6b35 10%, 
+                #ff8c42 50%, 
+                #ff6b35 90%, 
+                transparent
+            );
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.8);
+        }
+        
+        .header h1 {
+            font-family: 'Orbitron', monospace;
+            color: #ffffff;
+            font-size: 3.2em;
+            font-weight: 900;
+            margin-bottom: 15px;
+            text-shadow: 
+                0 0 20px rgba(255, 107, 53, 0.8),
+                0 0 40px rgba(255, 107, 53, 0.4),
+                0 4px 8px rgba(0, 0, 0, 1);
+            text-transform: uppercase;
+            letter-spacing: 12px;
+        }
+        
+        .header p {
+            color: #b8b8b8;
+            font-size: 1.2em;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 1);
+        }
+        
+        .stats {
+            margin-top: 20px;
+            color: #ff8c42;
+            font-size: 1.1em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 
+                0 0 15px rgba(255, 140, 66, 0.8),
+                0 2px 4px rgba(0, 0, 0, 1);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .filter-btn {
+            padding: 16px 32px;
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(15, 15, 15, 0.95));
+            border: 2px solid #2a2a2a;
+            border-left: 3px solid #444444;
+            color: #e8e8e8;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 700;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.85em;
+            position: relative;
+            clip-path: polygon(
+                10px 0, 100% 0, 100% calc(100% - 10px), 
+                calc(100% - 10px) 100%, 0 100%, 0 10px
+            );
+            box-shadow: 
+                0 4px 8px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        
+        .filter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                transparent, 
+                rgba(255, 107, 53, 0.1) 50%, 
+                transparent
+            );
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .filter-btn:hover {
+            border-color: #ff6b35;
+            border-left-color: #ff8c42;
+            background: linear-gradient(135deg, rgba(40, 40, 40, 0.95), rgba(25, 25, 25, 1));
+            box-shadow: 
+                0 0 20px rgba(255, 107, 53, 0.6),
+                0 4px 8px rgba(0, 0, 0, 0.8),
+                inset 0 0 20px rgba(255, 107, 53, 0.1);
+            transform: translateY(-2px);
+            color: #ffffff;
+        }
+        
+        .filter-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(255, 107, 53, 0.3));
+            border-color: #ff6b35;
+            border-left-color: #ff8c42;
+            border-left-width: 5px;
+            color: #ffffff;
+            box-shadow: 
+                0 0 30px rgba(255, 107, 53, 0.8),
+                0 4px 8px rgba(0, 0, 0, 0.8),
+                inset 0 0 40px rgba(255, 107, 53, 0.2),
+                inset 0 2px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .search-box {
+            padding: 16px 28px;
+            background: linear-gradient(135deg, rgba(15, 15, 15, 0.9), rgba(5, 5, 5, 0.95));
+            border: 2px solid #2a2a2a;
+            border-left: 3px solid #444444;
+            color: #e8e8e8;
+            font-size: 1em;
+            min-width: 350px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 500;
+            letter-spacing: 2px;
+            clip-path: polygon(
+                0 0, calc(100% - 15px) 0, 100% 15px, 
+                100% 100%, 15px 100%, 0 calc(100% - 15px)
+            );
+            box-shadow: 
+                0 4px 8px rgba(0, 0, 0, 0.8),
+                inset 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #ff6b35;
+            border-left-color: #ff8c42;
+            box-shadow: 
+                0 0 20px rgba(255, 107, 53, 0.6),
+                0 4px 8px rgba(0, 0, 0, 0.8),
+                inset 0 0 20px rgba(255, 107, 53, 0.1);
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(10, 10, 10, 1));
+        }
+        
+        .search-box::placeholder {
+            color: #5a5a5a;
+            font-weight: 400;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, rgba(25, 25, 25, 0.9), rgba(15, 15, 15, 0.95));
+            padding: 22px 30px;
+            margin-bottom: 20px;
+            border: 2px solid #2a2a2a;
+            border-left: 6px solid #ff6b35;
+            position: relative;
+            clip-path: polygon(
+                0 0, 100% 0, 100% calc(100% - 15px), 
+                calc(100% - 15px) 100%, 0 100%
+            );
+            box-shadow: 
+                0 6px 15px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.03),
+                0 0 30px rgba(255, 107, 53, 0.2);
+        }
+        
+        .section-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                #ff6b35 0%, 
+                rgba(255, 107, 53, 0.5) 20%, 
+                transparent 50%
+            );
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.6);
+        }
+        
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                #ff6b35 50%, 
+                transparent
+            );
+        }
+        
+        .section-header h2 {
+            font-family: 'Orbitron', monospace;
+            color: #ffffff;
+            font-size: 1.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 
+                0 0 15px rgba(255, 107, 53, 0.6),
+                0 2px 4px rgba(0, 0, 0, 1);
+        }
+        
+        .section-header p {
+            color: #b8b8b8;
+            margin-top: 10px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 1);
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(5, 5, 5, 0.8), rgba(10, 10, 10, 0.7));
+            border: 1px solid rgba(42, 42, 42, 0.5);
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+        }
+        
+        .asset-card {
+            background: linear-gradient(135deg, rgba(25, 25, 25, 0.8), rgba(15, 15, 15, 0.9));
+            padding: 15px;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 2px solid rgba(42, 42, 42, 0.8);
+            border-left: 3px solid #444444;
+            position: relative;
+            clip-path: polygon(
+                12px 0, 100% 0, 100% calc(100% - 12px), 
+                calc(100% - 12px) 100%, 0 100%, 0 12px
+            );
+            box-shadow: 
+                0 4px 8px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.03);
+        }
+        
+        .asset-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                transparent, 
+                rgba(255, 107, 53, 0.05) 50%, 
+                transparent
+            );
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .asset-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff6b35;
+            border-left-color: #ff8c42;
+            border-left-width: 4px;
+            background: linear-gradient(135deg, rgba(35, 35, 35, 0.9), rgba(20, 20, 20, 0.95));
+            box-shadow: 
+                0 0 30px rgba(255, 107, 53, 0.6),
+                0 8px 16px rgba(0, 0, 0, 0.9),
+                inset 0 0 30px rgba(255, 107, 53, 0.1),
+                inset 0 2px 0 rgba(255, 255, 255, 0.05);
+        }
+        
+        .asset-card:hover::before {
+            opacity: 1;
+        }
+        
+        .asset-img {
+            width: 100%;
+            height: 120px;
+            object-fit: contain;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid rgba(42, 42, 42, 0.8);
+            padding: 10px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
+        }
+        
+        .asset-card:hover .asset-img {
+            border-color: rgba(255, 107, 53, 0.5);
+            box-shadow: 
+                inset 0 0 25px rgba(255, 107, 53, 0.1),
+                inset 0 0 20px rgba(0, 0, 0, 0.9);
+        }
+        
+        .asset-name {
+            margin-top: 12px;
+            font-size: 0.9em;
+            color: #b8b8b8;
+            word-break: break-word;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 1);
+        }
+        
+        .asset-card:hover .asset-name {
+            color: #ffffff;
+            text-shadow: 
+                0 0 10px rgba(255, 107, 53, 0.5),
+                0 1px 2px rgba(0, 0, 0, 1);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.97);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.98), rgba(10, 10, 10, 0.99));
+            padding: 50px;
+            border: 4px solid #2a2a2a;
+            border-left: 8px solid #ff6b35;
+            border-right: 8px solid #ff6b35;
+            position: relative;
+            clip-path: polygon(
+                0 0, 100% 0, 100% calc(100% - 25px), 
+                calc(100% - 25px) 100%, 0 100%
+            );
+            box-shadow: 
+                0 0 60px rgba(255, 107, 53, 0.6),
+                0 20px 40px rgba(0, 0, 0, 0.9),
+                inset 0 0 60px rgba(0, 0, 0, 0.8),
+                inset 0 4px 0 rgba(255, 107, 53, 0.4),
+                inset 0 -4px 0 rgba(255, 107, 53, 0.4);
+        }
+        
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                #ff6b35 20%, 
+                #ff8c42 50%, 
+                #ff6b35 80%, 
+                transparent
+            );
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.8);
+        }
+        
+        .modal-content::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                #ff6b35 20%, 
+                #ff8c42 50%, 
+                #ff6b35 80%, 
+                transparent
+            );
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.8);
+        }
+        
+        .modal-img {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            background: rgba(0, 0, 0, 0.95);
+            border: 3px solid #2a2a2a;
+            padding: 30px;
+            box-shadow: 
+                0 0 40px rgba(255, 107, 53, 0.3),
+                inset 0 0 40px rgba(0, 0, 0, 0.9);
+        }
+        
+        .modal-info {
+            margin-top: 30px;
+            color: #ffffff;
+            text-align: center;
+            font-size: 1.8em;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            text-shadow: 
+                0 0 20px rgba(255, 107, 53, 0.8),
+                0 2px 4px rgba(0, 0, 0, 1);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            color: #ff6b35;
+            font-size: 50px;
+            cursor: pointer;
+            z-index: 10;
+            font-weight: 300;
+            transition: all 0.2s;
+            text-shadow: 
+                0 0 15px rgba(255, 107, 53, 0.8),
+                0 2px 4px rgba(0, 0, 0, 1);
+            font-family: Arial, sans-serif;
+        }
+
+        .close-modal:hover {
+            color: #ffffff;
+            text-shadow: 
+                0 0 30px rgba(255, 107, 53, 1),
+                0 2px 4px rgba(0, 0, 0, 1);
+            transform: scale(1.2);
+        }
+        
+        /* Hexagonal pattern overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(90deg, rgba(255, 107, 53, 0.01) 0px, transparent 1px, transparent 3px);
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* Vignette effect */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.5) 100%);
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ZENITH RISING</h1>
+        <p>Asset Database • Tactical Archive</p>
+        <div class="stats" id="statsDisplay">Initializing Systems...</div>
+    </div>
+    
+    <div class="controls">
+        <button class="filter-btn active" data-filter="all">ALL ASSETS</button>
+        <button class="filter-btn" data-filter="custom">CUSTOM</button>
+        <button class="filter-btn" data-filter="particles">PARTICLES</button>
+        <button class="filter-btn" data-filter="ui">UI ELEMENTS</button>
+        <button class="filter-btn" data-filter="scifi">SCI-FI</button>
+        <input type="text" class="search-box" placeholder="SEARCH DATABASE..." id="searchBox">
+    </div>
+    
+    <div id="customSection" class="section">
+        <div class="section-header">
+            <h2>CUSTOM CHARACTERS</h2>
+            <p>Your custom character sprites</p>
+        </div>
+        <div class="gallery" id="customGallery"></div>
+    </div>
+    
+    <div id="particlesSection" class="section">
+        <div class="section-header">
+            <h2>PARTICLE EFFECTS</h2>
+            <p>64 particle effects - explosions, smoke, energy, and more</p>
+        </div>
+        <div class="gallery" id="particlesGallery"></div>
+    </div>
+    
+    <div id="uiBlueSection" class="section">
+        <div class="section-header">
+            <h2>UI ELEMENTS - BLUE</h2>
+            <p>54 UI components in blue theme</p>
+        </div>
+        <div class="gallery" id="uiBlueGallery"></div>
+    </div>
+    
+    <div id="uiGreenSection" class="section">
+        <div class="section-header">
+            <h2>UI ELEMENTS - GREEN</h2>
+            <p>54 UI components in green theme</p>
+        </div>
+        <div class="gallery" id="uiGreenGallery"></div>
+    </div>
+    
+    <div id="uiRedSection" class="section">
+        <div class="section-header">
+            <h2>UI ELEMENTS - RED</h2>
+            <p>54 UI components in red theme</p>
+        </div>
+        <div class="gallery" id="uiRedGallery"></div>
+    </div>
+    
+    <div id="uiYellowSection" class="section">
+        <div class="section-header">
+            <h2>UI ELEMENTS - YELLOW</h2>
+            <p>54 UI components in yellow theme</p>
+        </div>
+        <div class="gallery" id="uiYellowGallery"></div>
+    </div>
+    
+    <div id="uiGreySection" class="section">
+        <div class="section-header">
+            <h2>UI ELEMENTS - GREY</h2>
+            <p>54 UI components in grey theme</p>
+        </div>
+        <div class="gallery" id="uiGreyGallery"></div>
+    </div>
+    
+    <div id="uiExtraSection" class="section">
+        <div class="section-header">
+            <h2>UI ELEMENTS - EXTRA</h2>
+            <p>67 additional UI components - shadows, cursors, panels</p>
+        </div>
+        <div class="gallery" id="uiExtraGallery"></div>
+    </div>
+    
+    <div id="scifiUnitsSection" class="section">
+        <div class="section-header">
+            <h2>SCI-FI UNITS</h2>
+            <p>48 different sci-fi character and unit sprites</p>
+        </div>
+        <div class="gallery" id="scifiUnitsGallery"></div>
+    </div>
+    
+    <div id="scifiEnvironmentSection" class="section">
+        <div class="section-header">
+            <h2>SCI-FI ENVIRONMENT</h2>
+            <p>20 environment decoration sprites</p>
+        </div>
+        <div class="gallery" id="scifiEnvironmentGallery"></div>
+    </div>
+    
+    <div id="scifiStructureSection" class="section">
+        <div class="section-header">
+            <h2>SCI-FI STRUCTURES</h2>
+            <p>16 building and structure sprites</p>
+        </div>
+        <div class="gallery" id="scifiStructureGallery"></div>
+    </div>
+    
+    <div id="scifiTilesSection" class="section">
+        <div class="section-header">
+            <h2>SCI-FI TILES</h2>
+            <p>42 tileset sprites for building levels</p>
+        </div>
+        <div class="gallery" id="scifiTilesGallery"></div>
+    </div>
+    
+    <div class="modal" id="modal">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div class="modal-content">
+            <img class="modal-img" id="modalImg" src="" alt="">
+            <div class="modal-info" id="modalInfo"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Asset data
+        const particles = [
+            'circle_01', 'circle_02', 'circle_03', 'circle_04', 'circle_05',
+            'dirt_01', 'dirt_02', 'dirt_03',
+            'fire_01', 'fire_02',
+            'flame_01', 'flame_02', 'flame_03', 'flame_04', 'flame_05', 'flame_06',
+            'flare_01',
+            'light_01', 'light_02', 'light_03',
+            'magic_01', 'magic_02', 'magic_03', 'magic_04', 'magic_05',
+            'muzzle_01', 'muzzle_02', 'muzzle_03', 'muzzle_04', 'muzzle_05',
+            'scorch_01', 'scorch_02', 'scorch_03',
+            'scratch_01',
+            'slash_01', 'slash_02', 'slash_03', 'slash_04',
+            'smoke_01', 'smoke_02', 'smoke_03', 'smoke_04', 'smoke_05',
+            'smoke_06', 'smoke_07', 'smoke_08', 'smoke_09', 'smoke_10',
+            'spark_01', 'spark_02', 'spark_03', 'spark_04', 'spark_05', 'spark_06', 'spark_07',
+            'star_01', 'star_02', 'star_03', 'star_04', 'star_05', 'star_06', 'star_07', 'star_08', 'star_09',
+            'symbol_01', 'symbol_02',
+            'trace_01', 'trace_02', 'trace_03', 'trace_04', 'trace_05', 'trace_06', 'trace_07',
+            'twirl_01', 'twirl_02', 'twirl_03',
+            'window_01', 'window_02', 'window_03', 'window_04'
+        ];
+        
+        const uiElements = [
+            'bar_round_gloss_large', 'bar_round_gloss_large_l', 'bar_round_gloss_large_m', 'bar_round_gloss_large_r', 'bar_round_gloss_large_square',
+            'bar_round_gloss_small', 'bar_round_gloss_small_l', 'bar_round_gloss_small_m', 'bar_round_gloss_small_r', 'bar_round_gloss_small_square',
+            'bar_round_large', 'bar_round_large_l', 'bar_round_large_m', 'bar_round_large_r', 'bar_round_large_square',
+            'bar_round_small', 'bar_round_small_l', 'bar_round_small_m', 'bar_round_small_r', 'bar_round_small_square',
+            'bar_square_gloss_large', 'bar_square_gloss_large_l', 'bar_square_gloss_large_m', 'bar_square_gloss_large_r', 'bar_square_gloss_large_square',
+            'bar_square_gloss_small', 'bar_square_gloss_small_l', 'bar_square_gloss_small_m', 'bar_square_gloss_small_r', 'bar_square_gloss_small_square',
+            'bar_square_large', 'bar_square_large_l', 'bar_square_large_m', 'bar_square_large_r', 'bar_square_large_square',
+            'bar_square_small', 'bar_square_small_l', 'bar_square_small_m', 'bar_square_small_r', 'bar_square_small_square',
+            'button_square_header_blade_rectangle', 'button_square_header_blade_rectangle_screws',
+            'button_square_header_blade_square', 'button_square_header_blade_square_screws',
+            'button_square_header_large_rectangle', 'button_square_header_large_rectangle_screws',
+            'button_square_header_large_square', 'button_square_header_large_square_screws',
+            'button_square_header_notch_rectangle', 'button_square_header_notch_rectangle_screws',
+            'button_square_header_notch_square', 'button_square_header_notch_square_screws',
+            'button_square_header_small_rectangle', 'button_square_header_small_rectangle_screws',
+            'button_square_header_small_square', 'button_square_header_small_square_screws',
+            'crosshair_color_a', 'crosshair_color_b', 'crosshair_color_c', 'crosshair_color_d'
+        ];
+        
+        const uiExtraElements = [
+            'bar_shadow_round_large', 'bar_shadow_round_large_l', 'bar_shadow_round_large_m', 'bar_shadow_round_large_r', 'bar_shadow_round_large_square',
+            'bar_shadow_round_outline_large', 'bar_shadow_round_outline_large_l', 'bar_shadow_round_outline_large_m', 'bar_shadow_round_outline_large_r', 'bar_shadow_round_outline_large_square',
+            'bar_shadow_round_outline_small', 'bar_shadow_round_outline_small_l', 'bar_shadow_round_outline_small_m', 'bar_shadow_round_outline_small_r', 'bar_shadow_round_outline_small_square',
+            'bar_shadow_round_small', 'bar_shadow_round_small_l', 'bar_shadow_round_small_m', 'bar_shadow_round_small_r', 'bar_shadow_round_small_square',
+            'bar_shadow_square_large', 'bar_shadow_square_large_l', 'bar_shadow_square_large_m', 'bar_shadow_square_large_r', 'bar_shadow_square_large_square',
+            'bar_shadow_square_outline_large', 'bar_shadow_square_outline_large_l', 'bar_shadow_square_outline_large_m', 'bar_shadow_square_outline_large_r', 'bar_shadow_square_outline_large_square',
+            'bar_shadow_square_outline_small', 'bar_shadow_square_outline_small_l', 'bar_shadow_square_outline_small_m', 'bar_shadow_square_outline_small_r', 'bar_shadow_square_outline_small_square',
+            'bar_shadow_square_small', 'bar_shadow_square_small_l', 'bar_shadow_square_small_m', 'bar_shadow_square_small_r', 'bar_shadow_square_small_square',
+            'button_rectangle', 'button_rectangle_depth', 'button_square', 'button_square_depth',
+            'crosshair_a', 'crosshair_b', 'crosshair_c', 'crosshair_d',
+            'cursor_a', 'cursor_b', 'cursor_c', 'cursor_d', 'cursor_e', 'cursor_f', 'cursor_g', 'cursor_h',
+            'panel_glass', 'panel_glass_notches', 'panel_glass_notches_top',
+            'panel_glass_notch_bl', 'panel_glass_notch_br', 'panel_glass_notch_tl', 'panel_glass_notch_tr',
+            'panel_glass_screws', 'panel_glass_tab', 'panel_glass_tab_blade',
+            'panel_rectangle', 'panel_rectangle_screws', 'panel_square', 'panel_square_screws'
+        ];
+        
+        let totalAssets = 0;
+        
+        function createAssetCard(name, path, category) {
+            const card = document.createElement('div');
+            card.className = 'asset-card';
+            card.dataset.category = category;
+            card.dataset.name = name.toLowerCase();
+            
+            const img = document.createElement('img');
+            img.className = 'asset-img';
+            img.src = path;
+            img.alt = name;
+            
+            const nameEl = document.createElement('div');
+            nameEl.className = 'asset-name';
+            nameEl.textContent = name;
+            
+            card.appendChild(img);
+            card.appendChild(nameEl);
+            card.onclick = () => openModal(path, name);
+            
+            totalAssets++;
+            return card;
+        }
+        
+        function loadAssets() {
+            // Custom Characters
+            const customGallery = document.getElementById('customGallery');
+            const warriorPath = 'Assets/Sprites/Characters/warrior.png';
+            customGallery.appendChild(createAssetCard('warrior', warriorPath, 'custom'));
+            
+            // Particles
+            const particlesGallery = document.getElementById('particlesGallery');
+            particles.forEach(name => {
+                const path = `Assets/kenney_particle-pack/PNG%20(Transparent)/${name}.png`;
+                particlesGallery.appendChild(createAssetCard(name, path, 'particles'));
+            });
+            
+            // UI Elements - Blue
+            const uiBlueGallery = document.getElementById('uiBlueGallery');
+            uiElements.forEach(name => {
+                const path = `Assets/kenney_ui-pack-space-expansion/PNG/Blue/Default/${name}.png`;
+                uiBlueGallery.appendChild(createAssetCard(name, path, 'ui'));
+            });
+            
+            // UI Elements - Green
+            const uiGreenGallery = document.getElementById('uiGreenGallery');
+            uiElements.forEach(name => {
+                const path = `Assets/kenney_ui-pack-space-expansion/PNG/Green/Default/${name}.png`;
+                uiGreenGallery.appendChild(createAssetCard(name, path, 'ui'));
+            });
+            
+            // UI Elements - Red
+            const uiRedGallery = document.getElementById('uiRedGallery');
+            uiElements.forEach(name => {
+                const path = `Assets/kenney_ui-pack-space-expansion/PNG/Red/Default/${name}.png`;
+                uiRedGallery.appendChild(createAssetCard(name, path, 'ui'));
+            });
+            
+            // UI Elements - Yellow
+            const uiYellowGallery = document.getElementById('uiYellowGallery');
+            uiElements.forEach(name => {
+                const path = `Assets/kenney_ui-pack-space-expansion/PNG/Yellow/Default/${name}.png`;
+                uiYellowGallery.appendChild(createAssetCard(name, path, 'ui'));
+            });
+            
+            // UI Elements - Grey
+            const uiGreyGallery = document.getElementById('uiGreyGallery');
+            uiElements.forEach(name => {
+                const path = `Assets/kenney_ui-pack-space-expansion/PNG/Grey/Default/${name}.png`;
+                uiGreyGallery.appendChild(createAssetCard(name, path, 'ui'));
+            });
+            
+            // UI Elements - Extra
+            const uiExtraGallery = document.getElementById('uiExtraGallery');
+            uiExtraElements.forEach(name => {
+                const path = `Assets/kenney_ui-pack-space-expansion/PNG/Extra/Default/${name}.png`;
+                uiExtraGallery.appendChild(createAssetCard(name, path, 'ui'));
+            });
+            
+            // Sci-Fi Units
+            const scifiUnitsGallery = document.getElementById('scifiUnitsGallery');
+            for (let i = 1; i <= 48; i++) {
+                const name = `scifiUnit_${String(i).padStart(2, '0')}`;
+                const path = `Assets/kenney_sci-fi-rts/PNG/Default%20size/Unit/${name}.png`;
+                scifiUnitsGallery.appendChild(createAssetCard(name, path, 'scifi'));
+            }
+            
+            // Sci-Fi Environment
+            const scifiEnvironmentGallery = document.getElementById('scifiEnvironmentGallery');
+            for (let i = 1; i <= 20; i++) {
+                const name = `scifiEnvironment_${String(i).padStart(2, '0')}`;
+                const path = `Assets/kenney_sci-fi-rts/PNG/Default%20size/Environment/${name}.png`;
+                scifiEnvironmentGallery.appendChild(createAssetCard(name, path, 'scifi'));
+            }
+            
+            // Sci-Fi Structure
+            const scifiStructureGallery = document.getElementById('scifiStructureGallery');
+            for (let i = 1; i <= 16; i++) {
+                const name = `scifiStructure_${String(i).padStart(2, '0')}`;
+                const path = `Assets/kenney_sci-fi-rts/PNG/Default%20size/Structure/${name}.png`;
+                scifiStructureGallery.appendChild(createAssetCard(name, path, 'scifi'));
+            }
+            
+            // Sci-Fi Tiles
+            const scifiTilesGallery = document.getElementById('scifiTilesGallery');
+            for (let i = 1; i <= 42; i++) {
+                const name = `scifiTile_${String(i).padStart(2, '0')}`;
+                const path = `Assets/kenney_sci-fi-rts/PNG/Default%20size/Tile/${name}.png`;
+                scifiTilesGallery.appendChild(createAssetCard(name, path, 'scifi'));
+            }
+            
+            // Update stats
+            document.getElementById('statsDisplay').textContent = `[ TOTAL ASSETS: ${totalAssets} ]`;
+        }
+        
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const filter = btn.dataset.filter;
+                
+                if (filter === 'all') {
+                    document.querySelectorAll('.section').forEach(s => s.classList.remove('hidden'));
+                } else {
+                    document.querySelectorAll('.section').forEach(s => {
+                        const sectionId = s.id.toLowerCase();
+                        if (sectionId.includes(filter)) {
+                            s.classList.remove('hidden');
+                        } else {
+                            s.classList.add('hidden');
+                        }
+                    });
+                }
+            });
+        });
+        
+        // Search functionality
+        document.getElementById('searchBox').addEventListener('input', (e) => {
+            const search = e.target.value.toLowerCase();
+            document.querySelectorAll('.asset-card').forEach(card => {
+                const name = card.dataset.name;
+                card.style.display = name.includes(search) ? 'block' : 'none';
+            });
+        });
+        
+        // Modal functions
+        function openModal(path, name) {
+            const modal = document.getElementById('modal');
+            const modalImg = document.getElementById('modalImg');
+            const modalInfo = document.getElementById('modalInfo');
+            
+            modalImg.src = path;
+            modalInfo.textContent = name;
+            modal.classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') {
+                closeModal();
+            }
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        // Initialize
+        loadAssets();
+    </script>
+</body>
+</html>

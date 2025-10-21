@@ -17,6 +17,8 @@ public partial class StatAllocationPanel : Control
     private readonly Dictionary<StatType, Label> _statBonusLabels = [];
     private readonly Dictionary<StatType, Button> _statButtons = [];
 
+    private bool _shouldPauseGame = false;
+
     public override void _Ready()
     {
         // Get node references using % unique names
@@ -53,14 +55,32 @@ public partial class StatAllocationPanel : Control
         Hide();
     }
 
-    public void ShowPanel(StatsManager statsManager, UpgradeManager upgradeManager)
+    public void ShowPanel(StatsManager statsManager, UpgradeManager upgradeManager, bool shouldPause = false)
     {
         _statsManager = statsManager;
         _upgradeManager = upgradeManager;
+        _shouldPauseGame = shouldPause;
 
         UpdateDisplay();
         Show();
-        GetTree().Paused = true;
+
+        if (_shouldPauseGame)
+        {
+            GetTree().Paused = true;
+        }
+    }
+
+    /// <summary>
+    /// Hides the stat allocation panel.
+    /// </summary>
+    public void HidePanel()
+    {
+        Hide();
+
+        if (_shouldPauseGame)
+        {
+            GetTree().Paused = false;
+        }
     }
 
     private void OnStatButtonPressed(StatType statType)
@@ -117,6 +137,11 @@ public partial class StatAllocationPanel : Control
 
     private string FormatIntelligenceBonus(StatsManager stats)
     {
+        if (GameBalance.Instance == null || GameBalance.Instance.Config == null)
+        {
+            return "Loading...";
+        }
+
         float magDmg = (stats.MagicalDamageMultiplier - 1.0f) * 100f;
         return $"Magical Dmg +{magDmg:F0}%, CDR +{stats.CooldownReduction * 100f:F0}%";
     }
@@ -159,7 +184,6 @@ public partial class StatAllocationPanel : Control
 
     private void OnClosePressed()
     {
-        Hide();
-        GetTree().Paused = false;
+        HidePanel();
     }
 }

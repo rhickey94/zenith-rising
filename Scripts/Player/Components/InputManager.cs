@@ -55,15 +55,8 @@ public partial class InputManager : Node
                 EmitSignal(SignalName.SkillPressed, (int)SkillSlot.Utility);
                 break;
         }
-
-        // UI inputs
-        if (keyEvent.Keycode == Key.C)
-        {
-            EmitSignal(SignalName.StatPanelPressed);
-        }
     }
 
     // Signals
     [Signal] public delegate void SkillPressedEventHandler(int skillSlot);
-    [Signal] public delegate void StatPanelPressedEventHandler();
 }
