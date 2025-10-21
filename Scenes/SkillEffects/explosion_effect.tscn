@@ -1,9 +1,34 @@
 [gd_scene load_steps=7 format=3 uid="uid://c132prycoiyp0"]
 
 [ext_resource type="Script" uid="uid://7jrvea7g62vs" path="res://Scripts/Skills/Entities/Zones/ExplosionEffect.cs" id="1_2icis"]
+[ext_resource type="Texture2D" uid="uid://c2ocp0teqvkq8" path="res://Assets/kenney_particle-pack/PNG (Transparent)/star_09.png" id="2_jnaqv"]
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_ub61p"]
-size = Vector2(50, 50)
+[sub_resource type="Animation" id="Animation_cfbfh"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 0.6, 0.2, 1)]
+}
 
 [sub_resource type="Animation" id="Animation_jnaqv"]
 resource_name = "explode"
@@ -33,33 +58,6 @@ tracks/1/keys = {
 "values": [Color(1, 0.6, 0.2, 1), Color(1, 0.6, 0.2, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_cfbfh"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:scale")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(1, 1)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Sprite2D:modulate")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 0.6, 0.2, 1)]
-}
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_jvyg3"]
 _data = {
 &"RESET": SubResource("Animation_cfbfh"),
@@ -76,7 +74,7 @@ script = ExtResource("1_2icis")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 modulate = Color(1, 0.6, 0.2, 1)
-texture = SubResource("PlaceholderTexture2D_ub61p")
+texture = ExtResource("2_jnaqv")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

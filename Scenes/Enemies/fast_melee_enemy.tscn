@@ -1,9 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://cmd26cuctvrk3"]
+[gd_scene load_steps=3 format=3 uid="uid://cmd26cuctvrk3"]
 
 [ext_resource type="PackedScene" uid="uid://cvuvmrd8khk2g" path="res://Scenes/Enemies/enemy.tscn" id="1_ts1ew"]
+[ext_resource type="Texture2D" uid="uid://drdt0ck2b8tmc" path="res://Assets/Sprites/Enemies/scifiUnit_02.png" id="2_q6tts"]
 
 [node name="enemy" instance=ExtResource("1_ts1ew")]
-modulate = Color(0.5953107, 0.31248838, 3.85046e-07, 1)
 Speed = 100.0
 MaxHealth = 25.0
 Damage = 5.0
+
+[node name="Sprite2D" parent="." index="0"]
+texture = ExtResource("2_q6tts")

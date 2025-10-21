@@ -50,6 +50,13 @@ public partial class Enemy : CharacterBody2D
         {
             GD.PrintErr("Enemy: ExperienceShardScene not assigned!");
         }
+
+        // DEBUG: Print actual color at runtime
+        GD.Print($"Enemy spawned - Modulate: {Modulate}");
+        if (_sprite != null)
+        {
+            GD.Print($"Enemy sprite modulate: {_sprite.Modulate}");
+        }
     }
 
     public override void _PhysicsProcess(double delta)
@@ -64,7 +71,7 @@ public partial class Enemy : CharacterBody2D
 
         if (direction != Vector2.Zero)
         {
-            Rotation = direction.Angle();
+            // Rotation = direction.Angle();
         }
 
         MoveAndSlide();

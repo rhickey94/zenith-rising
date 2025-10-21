@@ -6,4 +6,4 @@
 script = ExtResource("1_4fmep")
 SkillId = "universal_dash"
 AllowedClass = 3
-Slot = 6
+Slot = 5

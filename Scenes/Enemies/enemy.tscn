@@ -2,23 +2,20 @@
 
 [ext_resource type="Script" uid="uid://b3miivhebvgen" path="res://Scripts/Enemies/Base/Enemy.cs" id="1_hghv2"]
 [ext_resource type="PackedScene" uid="uid://byy2xqaagfcws" path="res://Scenes/Items/Collectibles/experience_shard.tscn" id="2_1f0kj"]
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_1f0kj"]
-size = Vector2(40, 40)
+[ext_resource type="Texture2D" uid="uid://c25wm4m24xbbm" path="res://Assets/Sprites/Enemies/scifiUnit_01.png" id="3_x1rqp"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_afpow"]
 size = Vector2(40, 40)
 
 [node name="enemy" type="CharacterBody2D"]
 collision_layer = 2
-collision_mask = 1
-modulate = Color(1, 0, 0, 1)
 script = ExtResource("1_hghv2")
 ExperienceReward = 100
 ExperienceShardScene = ExtResource("2_1f0kj")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = SubResource("PlaceholderTexture2D_1f0kj")
+scale = Vector2(2, 2)
+texture = ExtResource("3_x1rqp")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_afpow")

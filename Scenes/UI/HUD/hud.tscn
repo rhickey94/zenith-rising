@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://clcxd71e8dwac"]
+[gd_scene load_steps=8 format=3 uid="uid://clcxd71e8dwac"]
 
 [ext_resource type="Script" uid="uid://fwkhgpcy2am3" path="res://Scripts/UI/HUD/Hud.cs" id="1_e0onf"]
+[ext_resource type="Texture2D" uid="uid://b7cktcjjhhjhm" path="res://Assets/kenney_ui-pack-space-expansion/PNG/Green/Default/bar_square_gloss_large.png" id="2_e0a1q"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3gfia"]
 bg_color = Color(0.16470589, 0.16470589, 0.16470589, 1)
@@ -13,12 +14,8 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e0onf"]
-bg_color = Color(0.3529412, 0.6392157, 0.9607843, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_l566u"]
+texture = ExtResource("2_e0a1q")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fccik"]
 bg_color = Color(0.16470589, 0.16470589, 0.16470589, 1)
@@ -79,7 +76,7 @@ text = "Health"
 custom_minimum_size = Vector2(250, 25)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_3gfia")
-theme_override_styles/fill = SubResource("StyleBoxFlat_e0onf")
+theme_override_styles/fill = SubResource("StyleBoxTexture_l566u")
 value = 75.0
 show_percentage = false
 
@@ -103,6 +100,7 @@ theme_override_font_sizes/font_size = 18
 text = "Level 1"
 
 [node name="TopRight" type="VBoxContainer" parent="HUD"]
+visible = false
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 1
 anchors_preset = 1

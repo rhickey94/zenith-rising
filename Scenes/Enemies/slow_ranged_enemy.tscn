@@ -1,11 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://dq8ntx3n735dh"]
+[gd_scene load_steps=5 format=3 uid="uid://dq8ntx3n735dh"]
 
 [ext_resource type="PackedScene" uid="uid://cvuvmrd8khk2g" path="res://Scenes/Enemies/enemy.tscn" id="1_00308"]
 [ext_resource type="Script" uid="uid://cetc8fe2xgf5s" path="res://Scripts/Enemies/Types/SlowRangedEnemy.cs" id="2_0djtb"]
 [ext_resource type="PackedScene" uid="uid://kdnjd4wirqp8" path="res://Scenes/SkillEffects/enemy_projectile.tscn" id="3_yeubo"]
+[ext_resource type="Texture2D" uid="uid://7l6jmt11f8e1" path="res://Assets/Sprites/Enemies/scifiUnit_03.png" id="4_pjw4u"]
 
 [node name="enemy" instance=ExtResource("1_00308")]
-modulate = Color(0, 0, 1, 1)
 script = ExtResource("2_0djtb")
 ProjectileScene = ExtResource("3_yeubo")
 AttackRange = 300.0
@@ -14,3 +14,6 @@ Speed = 25.0
 MaxHealth = 50.0
 Damage = 2.0
 AttackCooldown = 2.0
+
+[node name="Sprite2D" parent="." index="0"]
+texture = ExtResource("4_pjw4u")
