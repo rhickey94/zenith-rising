@@ -49,12 +49,14 @@ public partial class EnergyProjectile : DamageEntityBase
 
         _totalDamage *= damageMultiplier;
 
-        // Diamond tier bonuses: +50% speed, +2 pierce
-        // (These could also be data-driven in the future)
+        // Diamond tier bonuses: Load from database (data-driven!)
         if (_sourceSkill.CurrentTier == SkillMasteryTier.Diamond)
         {
-            _speed *= 1.5f;
-            _maxPierce += 2;
+            float speedBonus = _sourceSkill.ProjectileDiamondSpeedBonus;
+            int pierceBonus = _sourceSkill.ProjectileDiamondPierceBonus;
+
+            _speed *= (1f + speedBonus); // +50% = 1.5x multiplier
+            _maxPierce += pierceBonus;
         }
     }
 

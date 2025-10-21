@@ -146,22 +146,30 @@ public partial class UIManager : CanvasLayer
 
     // ===== PRIVATE HELPERS =====
 
+    /// <summary>
+    /// Checks if the current scene is the hub scene.
+    /// Type-based detection is more robust than string matching.
+    /// </summary>
     private bool IsInHub()
     {
-        var root = GetTree().Root;
-        if (root.GetChildCount() == 0) return false;
+        var currentScene = GetTree().CurrentScene;
+        if (currentScene == null) return false;
 
-        var currentScene = root.GetChild(root.GetChildCount() - 1);
-        return currentScene.SceneFilePath.Contains("hub", System.StringComparison.CurrentCultureIgnoreCase);
+        // Type-based check (rename-safe)
+        return currentScene is Hub;
     }
 
+    /// <summary>
+    /// Checks if the current scene is the dungeon scene.
+    /// Type-based detection is more robust than string matching.
+    /// </summary>
     private bool IsInDungeon()
     {
-        var root = GetTree().Root;
-        if (root.GetChildCount() == 0) return false;
+        var currentScene = GetTree().CurrentScene;
+        if (currentScene == null) return false;
 
-        var currentScene = root.GetChild(root.GetChildCount() - 1);
-        return currentScene.SceneFilePath.Contains("dungeon", System.StringComparison.CurrentCultureIgnoreCase);
+        // Type-based check (rename-safe)
+        return currentScene is Dungeon;
     }
 
     // ===== EVENT HANDLERS =====

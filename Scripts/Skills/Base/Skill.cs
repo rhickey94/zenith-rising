@@ -54,6 +54,9 @@ public partial class Skill : Resource
     public int ProjectileCount { get; private set; }
     public float ProjectileDamage { get; private set; }
     public float ProjectileSpreadAngle { get; private set; }
+    // Projectile Diamond Bonuses (loaded from ProjectileData)
+    public float ProjectileDiamondSpeedBonus { get; private set; }
+    public int ProjectileDiamondPierceBonus { get; private set; }
 
     // Melee Properties (loaded from MeleeData)
     public float Range { get; private set; }
@@ -198,6 +201,9 @@ public partial class Skill : Resource
         ProjectileCount = entry.Projectile.ProjectileCount;
         ProjectileDamage = entry.Projectile.ProjectileDamage;
         ProjectileSpreadAngle = entry.Projectile.ProjectileSpreadAngle;
+
+        ProjectileDiamondSpeedBonus = entry.Projectile.DiamondSpeedBonus;
+        ProjectileDiamondPierceBonus = entry.Projectile.DiamondPierceBonus;
     }
 
     private void LoadMeleeData(SkillBalanceEntry entry)

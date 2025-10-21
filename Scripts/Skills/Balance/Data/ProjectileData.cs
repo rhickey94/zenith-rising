@@ -12,4 +12,8 @@ public partial class ProjectileData : Resource
     [Export] public int ProjectileCount { get; set; } = 0;
     [Export] public float ProjectileDamage { get; set; } = 0f;
     [Export] public float ProjectileSpreadAngle { get; set; } = 0f;
+
+    [ExportGroup("Diamond Tier Mastery Bonuses")]
+    [Export] public float DiamondSpeedBonus { get; set; } = 0.5f; // +50% speed
+    [Export] public int DiamondPierceBonus { get; set; } = 2; // +2 pierce
 }
