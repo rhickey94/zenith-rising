@@ -27,17 +27,13 @@ public partial class SkillManager : Node
 
     public override void _Ready()
     {
-        _player = GetParent<Player>();
-        if (_player == null)
-        {
-            GD.PrintErr("SkillManager: Could not find Player parent!");
-        }
+        // Don't call GetNode here - wait for Initialize()
+    }
 
-        _statsManager = _player.GetNode<StatsManager>("StatsManager");
-        if (_statsManager == null)
-        {
-            GD.PrintErr("SkillManager: StatsManager not found!");
-        }
+    public void Initialize(Player player, StatsManager statsManager)
+    {
+        _player = player;
+        _statsManager = statsManager;
 
         ValidateSkill(PrimarySkill, SkillSlot.Primary);
         ValidateSkill(SecondarySkill, SkillSlot.Secondary);

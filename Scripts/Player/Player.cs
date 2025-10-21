@@ -25,9 +25,6 @@ public partial class Player : CharacterBody2D
     // ===== SIGNALS =====
     [Signal] public delegate void HealthChangedEventHandler(float currentHealth, float maxHealth);
     [Signal] public delegate void ExperienceChangedEventHandler(int currentXP, int requiredXP, int level);
-    [Signal] public delegate void ResourcesChangedEventHandler(int gold, int cores, int components, int fragments);
-    [Signal] public delegate void FloorInfoChangedEventHandler(int floorNumber, string floorName);
-    [Signal] public delegate void WaveInfoChangedEventHandler(int waveNumber, int enemiesRemaining);
     [Signal] public delegate void ShowLevelUpPanelEventHandler(Godot.Collections.Array<Upgrade> upgrades);
 
     // ===== PRIVATE FIELDS - Components =====
@@ -36,25 +33,16 @@ public partial class Player : CharacterBody2D
     private StatsManager _statsManager;
     private BuffManager _buffManager;
     private UpgradeManager _upgradeManager;
-    private SkillAnimationController _skillAnimationController;
+    private SkillEffectController _skillEffectController;
+    private AnimationController _animationController;
+    private VisualFeedbackController _visualFeedbackController;
+    private ForcedMovementController _movementController;
     private Sprite2D _sprite;
     private AnimationPlayer _animationPlayer;
-    private Vector2 _lastDirection = Vector2.Down;
     private PlayerState _currentState = PlayerState.Idle;
     private Skill _currentCastingSkill;
     private bool _isCastingWhileMoving = false;
-    private bool _movementControlledBySkill = false;
     private PlayerState _previousState = PlayerState.Idle;
-    private Tween _invincibilityTween;
-
-    // Dash state
-    private bool _isDashing = false;
-    private Vector2 _dashStartPos = Vector2.Zero;
-    private Vector2 _dashEndPos = Vector2.Zero;
-    private float _dashElapsed = 0f;
-    private float _dashDuration = 0f;
-
-    public Vector2 GetLastDirection() => _lastDirection;
 
     // ===== LIFECYCLE METHODS =====
     public override void _Ready()
@@ -87,6 +75,8 @@ public partial class Player : CharacterBody2D
         {
             // Subscribe to level up event
             _statsManager.LeveledUp += OnLeveledUp;
+            _statsManager.HealthChanged += OnStatsManagerHealthChanged;       // 🆕 NEW
+            _statsManager.ExperienceChanged += OnStatsManagerExperienceChanged; // 🆕 NEW
         }
 
         _upgradeManager = GetNode<UpgradeManager>("UpgradeManager");
@@ -118,15 +108,43 @@ public partial class Player : CharacterBody2D
         }
 
         // Get or create SkillAnimationController
-        _skillAnimationController = GetNode<SkillAnimationController>("SkillAnimationController");
-        if (_skillAnimationController == null)
+        _skillEffectController = GetNode<SkillEffectController>("SkillEffectController");
+        if (_skillEffectController == null)
         {
-            GD.PrintErr("Player: SkillAnimationController not found!");
+            GD.PrintErr("Player: SkillEffectController not found!");
         }
-        else
+
+        // Get AnimationController
+        _animationController = GetNode<AnimationController>("AnimationController");
+        if (_animationController == null)
         {
-            _skillAnimationController.Initialize(this, _statsManager, _animationPlayer, _buffManager);
+            GD.PrintErr("Player: AnimationController not found!");
         }
+
+        // Get VisualFeedbackController
+        _visualFeedbackController = GetNode<VisualFeedbackController>("VisualFeedbackController");
+        if (_visualFeedbackController == null)
+        {
+            GD.PrintErr("Player: VisualFeedbackController not found!");
+        }
+
+        // Get ForcedMovementController
+        _movementController = GetNode<ForcedMovementController>("ForcedMovementController");
+        if (_movementController == null)
+        {
+            GD.PrintErr("Player: ForcedMovementController not found!");
+        }
+
+        // Initialize SkillEffectController with ForcedMovementController
+        _skillEffectController.Initialize(this, _statsManager, _buffManager, _movementController);
+
+        // 🆕 Inject dependencies into managers
+        _upgradeManager?.Initialize(this, _statsManager, _buffManager);
+        _skillManager?.Initialize(this, _statsManager);
+        _animationController?.Initialize(this, _animationPlayer);
+        _visualFeedbackController?.Initialize(_sprite, _statsManager);
+        _movementController?.Initialize(this);
+
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -136,54 +154,11 @@ public partial class Player : CharacterBody2D
 
     public override void _PhysicsProcess(double delta)
     {
-        if (_statsManager != null && _sprite != null)
-        {
-            if (_statsManager.IsInvincible && _invincibilityTween == null)
-            {
-                // Start flashing
-                _invincibilityTween = CreateTween();
-                _invincibilityTween.SetLoops();
-                _invincibilityTween.TweenProperty(_sprite, "modulate:a", 0.5, 0.1);
-                _invincibilityTween.TweenProperty(_sprite, "modulate:a", 1.0, 0.1);
-            }
-            else if (!_statsManager.IsInvincible && _invincibilityTween != null)
-            {
-                // Stop flashing
-                _invincibilityTween.Kill();
-                _invincibilityTween = null;
-                _sprite.Modulate = new Color(1, 1, 1, 1); // Reset to full opacity
-            }
-        }
-
         Vector2 direction = Vector2.Zero;
 
-        // Code-driven dash movement overrides normal movement
-        if (_isDashing)
+        // Forced movement (dash, leap, etc.) overrides normal movement
+        if (_movementController != null && _movementController.UpdateMovement(delta))
         {
-            _dashElapsed += (float)delta;
-            float t = Mathf.Clamp(_dashElapsed / _dashDuration, 0f, 1f);
-
-            // Ease-out curve for smooth deceleration
-            t = (float)Mathf.Ease(t, -2.0);
-
-            // Interpolate position
-            GlobalPosition = _dashStartPos.Lerp(_dashEndPos, t);
-
-            // Check if dash completed
-            if (t >= 1.0f)
-            {
-                _isDashing = false;
-            }
-
-            // Skip normal movement logic
-            MoveAndSlide();
-            return;
-        }
-
-        // Skip manual movement if skill controls it (other forced movement skills)
-        if (_movementControlledBySkill)
-        {
-            // For other skills that might need forced movement in the future
             MoveAndSlide();
             return;
         }
@@ -209,24 +184,15 @@ public partial class Player : CharacterBody2D
         // Update locomotion animations only in pure locomotion states
         if (_currentState == PlayerState.Idle || _currentState == PlayerState.Running)
         {
-            if (direction != Vector2.Zero)
-            {
-                _lastDirection = direction;
-                PlayWalkAnimation(GetMouseDirection());
+            _animationController?.PlayLocomotion(_currentState, direction);
 
-                if (_currentState != PlayerState.Running)
-                {
-                    ChangeState(PlayerState.Running);
-                }
+            if (direction != Vector2.Zero && _currentState != PlayerState.Running)
+            {
+                ChangeState(PlayerState.Running);
             }
-            else
+            else if (direction == Vector2.Zero && _currentState != PlayerState.Idle)
             {
-                PlayIdleAnimation(GetMouseDirection());
-
-                if (_currentState != PlayerState.Idle)
-                {
-                    ChangeState(PlayerState.Idle);
-                }
+                ChangeState(PlayerState.Idle);
             }
         }
 
@@ -258,10 +224,6 @@ public partial class Player : CharacterBody2D
             // New game - initialize fresh stats
             _statsManager?.Initialize();
         }
-
-        EmitResourcesUpdate(0, 0, 0, 0);
-        EmitFloorInfoUpdate(1, "Initialization");
-        EmitWaveInfoUpdate(1, 0);
     }
 
     public void TakeDamage(float damage)
@@ -276,7 +238,7 @@ public partial class Player : CharacterBody2D
 
     public Vector2 GetAttackDirection()
     {
-        return GetMouseDirection();
+        return _animationController?.GetFacingDirection() ?? Vector2.Down;
     }
 
     public bool TryCastSkill(Skill skill)
@@ -294,7 +256,7 @@ public partial class Player : CharacterBody2D
 
         // Store skill reference
         _currentCastingSkill = skill;
-        _skillAnimationController?.SetCurrentSkill(skill);
+        _skillEffectController?.SetCurrentSkill(skill);
 
         // Handle movement based on skill's MovementBehavior
         if (_currentState != PlayerState.Idle && _currentState != PlayerState.Running)
@@ -309,31 +271,22 @@ public partial class Player : CharacterBody2D
         {
             _isCastingWhileMoving = true;
         }
-        else if (skill.MovementBehavior == MovementBehavior.Forced)
-        {
-            _movementControlledBySkill = true;
-        }
 
-        // Play animation with speed scaling based on skill category
-        string animName = GetSkillAnimationName(skill);
-        _animationPlayer.Play(animName);
-
-        // Apply animation speed based on skill category
+        float speedScale = 1.0f;
         if (_statsManager != null)
         {
             if (skill.Category == SkillCategory.Attack)
             {
-                // Attacks: scale with attack speed
-                float attackSpeedRatio = _statsManager.CurrentAttackRate / _statsManager.BaseAttackRate;
-                _animationPlayer.SpeedScale = attackSpeedRatio;
+                speedScale = _statsManager.CurrentAttackRate / _statsManager.BaseAttackRate;
             }
             else // SkillCategory.Spell
             {
-                // Spells: scale with cast speed
-                float castSpeedRatio = _statsManager.CurrentCastSpeed / _statsManager.BaseCastSpeed;
-                _animationPlayer.SpeedScale = castSpeedRatio;
+                speedScale = _statsManager.CurrentCastSpeed / _statsManager.BaseCastSpeed;
             }
         }
+
+        // Delegate animation playback to AnimationController
+        _animationController?.PlaySkillAnimation(skill, speedScale);
 
         return true;
     }
@@ -351,8 +304,6 @@ public partial class Player : CharacterBody2D
 
         if (skill.BuffDuration > 0)
         {
-            GD.Print($"[DEBUG] TryInstantSkill: Applying buff for skill {skill.SkillId}");  // ← Add this
-
             _buffManager?.ApplyBuff(
                 buffId: skill.SkillId,
                 duration: skill.BuffDuration,
@@ -367,8 +318,6 @@ public partial class Player : CharacterBody2D
             // ✅ NEW: Spawn visual effect if skill has one
             if (skill.SkillEffectScene != null)
             {
-                GD.Print($"[DEBUG] Spawning effect: {skill.SkillEffectScene.ResourcePath}");  // ← Add this
-
                 var effect = skill.SkillEffectScene.Instantiate<Node2D>();
                 GetParent().AddChild(effect);
                 effect.GlobalPosition = GlobalPosition;
@@ -385,34 +334,19 @@ public partial class Player : CharacterBody2D
         return false;
     }
 
-    /// <summary>
-    /// Starts a dash movement in the specified direction.
-    /// Called by SkillAnimationController via animation callback.
-    /// </summary>
-    public void StartDash(Vector2 direction, float distance, float duration)
-    {
-        _isDashing = true;
-        _dashStartPos = GlobalPosition;
-        _dashEndPos = GlobalPosition + (direction.Normalized() * distance);
-        _dashDuration = duration;
-        _dashElapsed = 0f;
-    }
-
     public void ApplyUpgrade(Upgrade upgrade)
     {
         _upgradeManager?.ApplyUpgrade(upgrade);
     }
 
-    /// <summary>
-    /// Forcibly ends the dash movement.
-    /// Called by SkillAnimationController via animation callback.
-    /// </summary>
+    public void StartDash(Vector2 direction, float distance, float duration)
+    {
+        _movementController?.StartDash(direction, distance, duration);
+    }
+
     public void EndDash()
     {
-        if (_isDashing)
-        {
-            _isDashing = false;
-        }
+        _movementController?.EndMovement();
     }
 
     // ===== PRIVATE HELPERS - Event Handlers =====
@@ -435,96 +369,6 @@ public partial class Player : CharacterBody2D
     private List<Upgrade> GetRandomUpgrades(int count)
     {
         return _upgradeManager?.GetRandomUpgrades(count);
-    }
-
-    // ===== PRIVATE HELPERS - Signal Emission =====
-    private void EmitResourcesUpdate(int gold, int cores, int components, int fragments)
-    {
-        EmitSignal(SignalName.ResourcesChanged, gold, cores, components, fragments);
-    }
-
-    private void EmitFloorInfoUpdate(int floorNumber, string floorName)
-    {
-        EmitSignal(SignalName.FloorInfoChanged, floorNumber, floorName);
-    }
-
-    private void EmitWaveInfoUpdate(int waveNumber, int enemiesRemaining)
-    {
-        EmitSignal(SignalName.WaveInfoChanged, waveNumber, enemiesRemaining);
-    }
-
-    // ===== PRIVATE HELPERS - Animation =====
-    private Vector2 GetMouseDirection()
-    {
-        Vector2 mousePosition = GetGlobalMousePosition();
-        Vector2 direction = mousePosition - GlobalPosition;
-
-        // Guard against mouse exactly on player
-        if (direction.LengthSquared() < 0.01f)
-        {
-            return _lastDirection; // Fallback to movement direction
-        }
-
-        return direction.Normalized();
-    }
-
-    private void PlayWalkAnimation(Vector2 direction)
-    {
-        if (_animationPlayer == null)
-        {
-            return;
-        }
-
-        string animName = GetDirectionalAnimationName("walk", direction);
-
-        if (_animationPlayer.CurrentAnimation != animName)
-        {
-            _animationPlayer.Play(animName);
-        }
-    }
-
-    private void PlayIdleAnimation(Vector2 direction)
-    {
-        if (_animationPlayer == null)
-        {
-            return;
-        }
-
-        string animName = GetDirectionalAnimationName("idle", direction);
-
-        if (_animationPlayer.CurrentAnimation != animName)
-        {
-            _animationPlayer.Play(animName);
-        }
-    }
-
-    private string GetDirectionalAnimationName(string baseAnimation, Vector2 direction)
-    {
-        string directionSuffix;
-
-        if (Mathf.Abs(direction.X) > Mathf.Abs(direction.Y))
-        {
-            directionSuffix = direction.X > 0 ? "right" : "left";
-        }
-        else
-        {
-            directionSuffix = direction.Y > 0 ? "down" : "up";
-        }
-
-        return $"{baseAnimation}_{directionSuffix}";
-    }
-
-    private string GetSkillAnimationName(Skill skill)
-    {
-        if (string.IsNullOrEmpty(skill.AnimationBaseName))
-        {
-            GD.PrintErr($"No AnimationBaseName for skill: {skill.SkillId}");
-            return "idle_down";
-        }
-
-        return skill.UsesDirectionalAnimation
-            ? GetDirectionalAnimationName(skill.AnimationBaseName, GetMouseDirection())
-            : skill.AnimationBaseName;
     }
 
     private bool CanTransitionTo(PlayerState newState)
@@ -567,9 +411,8 @@ public partial class Player : CharacterBody2D
         if (wasCasting)
         {
             _isCastingWhileMoving = false;
-            _movementControlledBySkill = false;
             _currentCastingSkill = null;
-            _skillAnimationController.ClearCurrentSkill();
+            _skillEffectController.ClearCurrentSkill();
 
             // Return to previous state
             if (_currentState == PlayerState.CastingSkill)
@@ -584,5 +427,15 @@ public partial class Player : CharacterBody2D
     private void OnSkillPressed(int skillSlot)
     {
         _skillManager?.UseSkill((SkillSlot)skillSlot);
+    }
+
+    private void OnStatsManagerHealthChanged(float current, float max)
+    {
+        EmitSignal(SignalName.HealthChanged, current, max);
+    }
+
+    private void OnStatsManagerExperienceChanged(int currentXP, int requiredXP, int level)
+    {
+        EmitSignal(SignalName.ExperienceChanged, currentXP, requiredXP, level);
     }
 }

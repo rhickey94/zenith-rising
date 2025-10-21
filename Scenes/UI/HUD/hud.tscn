@@ -47,7 +47,7 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[node name="CanvasLayer" type="CanvasLayer"]
+[node name="UILayer" type="CanvasLayer"]
 layer = 100
 
 [node name="HUD" type="Control" parent="."]

@@ -5,7 +5,9 @@ namespace ZenithRising.Scripts.PlayerScripts.Components;
 
 public partial class BuffManager : Node
 {
-    private readonly Dictionary<string, BuffInstance> _activeBuffs = new();
+    [Signal] public delegate void BuffsChangedEventHandler();
+
+    private readonly Dictionary<string, BuffInstance> _activeBuffs = [];
 
     public override void _Process(double delta)
     {
@@ -90,9 +92,7 @@ public partial class BuffManager : Node
 
     private void TriggerStatRecalculation()
     {
-        // Find UpgradeManager sibling and tell it to recalculate
-        var upgradeManager = GetParent().GetNode<UpgradeManager>("UpgradeManager");
-        upgradeManager?.RecalculateAllStats();
+        EmitSignal(SignalName.BuffsChanged);
     }
 
     private class BuffInstance

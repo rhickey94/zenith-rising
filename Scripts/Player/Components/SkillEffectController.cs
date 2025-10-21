@@ -10,13 +10,13 @@ using ZenithRising.Scripts.Skills.Entities.Zones;
 namespace ZenithRising.Scripts.PlayerScripts.Components;
 
 [GlobalClass]
-public partial class SkillAnimationController : Node
+public partial class SkillEffectController : Node
 {
     // Injected dependencies
     private Player _player;
     private StatsManager _statsManager;
     private BuffManager _buffManager;
-    private AnimationPlayer _animationPlayer;
+    private ForcedMovementController _forcedMovementController;
 
     // Hitbox references
     private Area2D _meleeHitbox;
@@ -32,12 +32,12 @@ public partial class SkillAnimationController : Node
     [Export] public PackedScene WhirlwindVisualScene { get; set; }
     [Export] public PackedScene ExplosionEffectScene { get; set; }
 
-    public void Initialize(Player player, StatsManager statsManager, AnimationPlayer animationPlayer, BuffManager buffManager)
+    public void Initialize(Player player, StatsManager statsManager, BuffManager buffManager, ForcedMovementController forcedMovementController)
     {
         _player = player;
         _statsManager = statsManager;
-        _animationPlayer = animationPlayer;
         _buffManager = buffManager;
+        _forcedMovementController = forcedMovementController;
     }
 
     public override void _Ready()
@@ -219,42 +219,28 @@ public partial class SkillAnimationController : Node
 
     // ===== DASH CALLBACKS (Called from AnimationPlayer) =====
 
-    /// <summary>
-    /// Called at start of dash animation to initiate movement + i-frames.
-    /// </summary>
     public void StartDash()
     {
-        if (_statsManager == null || _player == null)
+        if (_statsManager == null || _forcedMovementController == null)
         {
-            GD.PrintErr("StartDash: StatsManager or Player not found!");
+            GD.PrintErr("StartDash: StatsManager or MovementController not found!");
             return;
         }
 
-        // Get dash direction from mouse
         Vector2 dashDirection = _player.GetAttackDirection();
-
-        // Start code-driven movement (200 pixels, 0.3 seconds)
-        _player.StartDash(dashDirection, _currentCastingSkill.Range, _currentCastingSkill.Duration);
-
-        // Enable i-frames
+        _forcedMovementController.StartDash(dashDirection, _currentCastingSkill.Range, _currentCastingSkill.Duration);
         _statsManager.SetInvincible(true);
     }
 
-    /// <summary>
-    /// Called at end of dash animation to end movement + i-frames.
-    /// </summary>
     public void EndDash()
     {
-        if (_statsManager == null || _player == null)
+        if (_statsManager == null || _forcedMovementController == null)
         {
-            GD.PrintErr("EndDash: StatsManager or Player not found!");
+            GD.PrintErr("EndDash: StatsManager or MovementController not found!");
             return;
         }
 
-        // Stop code-driven movement (in case animation ends early)
-        _player.EndDash();
-
-        // Disable i-frames
+        _forcedMovementController.EndMovement();
         _statsManager.SetInvincible(false);
     }
 

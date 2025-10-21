@@ -60,9 +60,9 @@ public partial class Hud : Control
         {
             player.HealthChanged += UpdateHealth;
             player.ExperienceChanged += UpdateExperience;
-            player.ResourcesChanged += UpdateResources;
-            player.FloorInfoChanged += UpdateFloorInfo;
-            player.WaveInfoChanged += UpdateWaveInfo;
+            // player.ResourcesChanged += UpdateResources;
+            // player.FloorInfoChanged += UpdateFloorInfo;
+            // player.WaveInfoChanged += UpdateWaveInfo;
         }
         else
         {

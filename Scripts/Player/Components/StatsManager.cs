@@ -108,7 +108,6 @@ public partial class StatsManager : Node
     // ═══════════════════════════════════════════════════════════════
     // PRIVATE FIELDS
     // ═══════════════════════════════════════════════════════════════
-    private Player _player;
     private int _strength = 0;
     private int _intelligence = 0;
     private int _agility = 0;
@@ -119,16 +118,12 @@ public partial class StatsManager : Node
     [Signal] public delegate void LeveledUpEventHandler();
     [Signal] public delegate void CharacterLeveledUpEventHandler();
     [Signal] public delegate void StatAllocatedEventHandler(int statType);
+    [Signal] public delegate void HealthChangedEventHandler(float currentHealth, float maxHealth);
+    [Signal] public delegate void ExperienceChangedEventHandler(int currentXP, int requiredXP, int level);
 
     // ===== LIFECYCLE METHODS =====
     public override void _Ready()
     {
-        _player = GetParent<Player>();
-        if (_player == null)
-        {
-            GD.PrintErr("StatsManager: Could not find Player parent!");
-        }
-
         LoadCharacterStatsFromConfig();
 
         CurrentMaxHealth = BaseMaxHealth;
@@ -484,12 +479,12 @@ public partial class StatsManager : Node
     // ===== PRIVATE HELPERS - Signals =====
     private void EmitHealthUpdate()
     {
-        _player?.EmitSignal(Player.SignalName.HealthChanged, CurrentHealth, CurrentMaxHealth);
+        EmitSignal(SignalName.HealthChanged, CurrentHealth, CurrentMaxHealth);
     }
 
     private void EmitExperienceUpdate()
     {
-        _player?.EmitSignal(Player.SignalName.ExperienceChanged, PowerExperience, PowerExperienceRequired, PowerLevel);
+        EmitSignal(SignalName.ExperienceChanged, PowerExperience, PowerExperienceRequired, PowerLevel);
     }
 
     private void CalculateExperienceRequirements()

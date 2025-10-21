@@ -20,22 +20,19 @@ public partial class UpgradeManager : Node
 
     public override void _Ready()
     {
-        _player = GetParent<Player>();
-        if (_player == null)
-        {
-            GD.PrintErr("UpgradeManager: Could not find Player parent!");
-        }
+        // Don't call GetNode here - wait for Initialize()
+        // Only do initialization that doesn't need dependencies
+    }
 
-        _statsManager = _player.GetNode<StatsManager>("StatsManager");
-        if (_statsManager == null)
-        {
-            GD.PrintErr("UpgradeManager: Could not find StatsManager on Player!");
-        }
+    public void Initialize(Player player, StatsManager statsManager, BuffManager buffManager)
+    {
+        _player = player;
+        _statsManager = statsManager;
+        _buffManager = buffManager;
 
-        _buffManager = _player.GetNode<BuffManager>("BuffManager");
-        if (_buffManager == null)
+        if (_buffManager != null)
         {
-            GD.PrintErr("UpgradeManager: BuffManager not found!");
+            _buffManager.BuffsChanged += OnBuffsChanged;
         }
 
         InitializeUpgradeList();
@@ -198,5 +195,10 @@ public partial class UpgradeManager : Node
             HealthRegenPerSecond = healthRegenFlat,
             ProjectilePierceCount = (int)projectilePierceFlat
         };
+    }
+
+    private void OnBuffsChanged()
+    {
+        RecalculateAllStats();
     }
 }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=48 format=3 uid="uid://jb1p3bafbe1"]
+[gd_scene load_steps=51 format=3 uid="uid://jb1p3bafbe1"]
 
 [ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="1_a3d8c"]
 [ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_xpcdj"]
@@ -12,11 +12,14 @@
 [ext_resource type="Resource" uid="uid://cfhxmf7mcmobn" path="res://Resources/Skills/Universal/Dash.tres" id="7_06tpx"]
 [ext_resource type="Resource" uid="uid://5g8accyxr8hh" path="res://Resources/Skills/Warrior/Whirlwind.tres" id="7_jhyir"]
 [ext_resource type="Resource" uid="uid://ce7pfefkpj56w" path="res://Resources/Skills/Warrior/LeapSlam.tres" id="8_dey5f"]
-[ext_resource type="Script" uid="uid://crelh1yuijku7" path="res://Scripts/Player/Components/SkillAnimationController.cs" id="9_gk6dx"]
+[ext_resource type="Script" uid="uid://crelh1yuijku7" path="res://Scripts/Player/Components/SkillEffectController.cs" id="9_gk6dx"]
 [ext_resource type="Resource" uid="uid://ug5n202v2dk8" path="res://Resources/Skills/Warrior/CombatStim.tres" id="9_ks1b7"]
 [ext_resource type="PackedScene" uid="uid://bvyx7q6quoo64" path="res://Scenes/SkillEffects/whirlwind_visual.tscn" id="11_74mp2"]
 [ext_resource type="Script" uid="uid://kvtmh2ghdjcb" path="res://Scripts/Player/Components/BuffManager.cs" id="11_r5xpd"]
 [ext_resource type="PackedScene" uid="uid://c132prycoiyp0" path="res://Scenes/SkillEffects/explosion_effect.tscn" id="12_oikmp"]
+[ext_resource type="Script" uid="uid://bi4x5apap7d20" path="res://Scripts/Player/Components/AnimationController.cs" id="18_rcvs5"]
+[ext_resource type="Script" uid="uid://dtgjrcyj8fd1v" path="res://Scripts/Player/Components/VisualFeedbackController.cs" id="19_h8ma5"]
+[ext_resource type="Script" uid="uid://2xvtberx4hnj" path="res://Scripts/Player/Components/ForcedMovementController.cs" id="20_eksi1"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
 size = Vector2(50, 62)
@@ -66,7 +69,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -111,7 +114,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -156,7 +159,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -201,7 +204,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -378,7 +381,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -411,7 +414,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -444,7 +447,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -477,7 +480,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -510,7 +513,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -546,7 +549,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -582,7 +585,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -618,7 +621,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -654,7 +657,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -696,7 +699,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -738,7 +741,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -780,7 +783,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -822,7 +825,7 @@ tracks/0/keys = {
 tracks/1/type = "method"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SkillAnimationController")
+tracks/1/path = NodePath("SkillEffectController")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -884,7 +887,7 @@ script = ExtResource("1_xpcdj")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_0u5uq")
 region_enabled = true
-region_rect = Rect2(0, 1664, 64, 64)
+region_rect = Rect2(0, 640, 64, 64)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
@@ -917,12 +920,24 @@ script = ExtResource("11_r5xpd")
 script = ExtResource("5_htcer")
 metadata/_custom_type_script = "uid://cx5d7m8au6iit"
 
-[node name="SkillAnimationController" type="Node" parent="."]
+[node name="SkillEffectController" type="Node" parent="."]
 script = ExtResource("9_gk6dx")
 ProjectileScene = ExtResource("2_jlvik")
 WhirlwindVisualScene = ExtResource("11_74mp2")
 ExplosionEffectScene = ExtResource("12_oikmp")
 metadata/_custom_type_script = "uid://crelh1yuijku7"
+
+[node name="AnimationController" type="Node" parent="."]
+script = ExtResource("18_rcvs5")
+metadata/_custom_type_script = "uid://bi4x5apap7d20"
+
+[node name="VisualFeedbackController" type="Node" parent="."]
+script = ExtResource("19_h8ma5")
+metadata/_custom_type_script = "uid://dtgjrcyj8fd1v"
+
+[node name="ForcedMovementController" type="Node" parent="."]
+script = ExtResource("20_eksi1")
+metadata/_custom_type_script = "uid://2xvtberx4hnj"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 reset_on_save = false
