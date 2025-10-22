@@ -125,7 +125,8 @@ public partial class SkillManager : Node
     // ═══════════════════════════════════════════════════════════════
     /// <summary>
     /// Primary entry point for skill execution. Called by InputManager via Player.OnSkillPressed().
-    /// Handles: Animation lock checking, input buffering, cooldown routing.
+    /// Handles: Proactive input buffering, cooldown routing, dash interrupts.
+    /// New behavior: Always buffers inputs during animations for smooth combos (latest input wins).
     /// </summary>
     public void UseSkill(SkillSlot slot)
     {
@@ -135,14 +136,18 @@ public partial class SkillManager : Node
             ClearInputBuffer();
         }
 
-        // Animation Lock: During first 85% of animation, ignore inputs (except Dash)
+        // Special case: Dash can interrupt animations
         bool isDash = (slot == SkillSlot.Utility);
 
-        if (_player.IsInAnimationLock() && !isDash)
+        // Proactive Buffering: If player is casting, buffer the input for execution after animation ends
+        if (_player.IsCastingSkill() && !isDash)
         {
-            return; // Player committed to animation
+            _bufferedSkillSlot = slot;
+            _bufferTimestamp = Time.GetTicksMsec() / 1000.0;
+            return;
         }
 
+        // Try to execute skill immediately (player is idle/running or this is a dash interrupt)
         bool success = false;
 
         switch (slot)
@@ -167,16 +172,8 @@ public partial class SkillManager : Node
                 break;
         }
 
-        // Input Buffer: If skill failed during recovery window, buffer for retry
-        if (!success)
-        {
-            if (_player.IsInRecoveryWindow())
-            {
-                _bufferedSkillSlot = slot;
-                _bufferTimestamp = Time.GetTicksMsec() / 1000.0;
-            }
-        }
-        else
+        // Clear buffer on successful execution
+        if (success)
         {
             ClearInputBuffer();
         }
@@ -362,11 +359,40 @@ public partial class SkillManager : Node
     }
 
     // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - INPUT BUFFERING
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Immediately attempts to execute buffered input (frame-perfect transitions).
+    /// Called by Player.OnAnimationFinished() for instant skill chaining.
+    /// Returns true if buffered input was executed successfully.
+    /// </summary>
+    public bool TryExecuteBufferedInput()
+    {
+        if (_bufferedSkillSlot == null) return false;
+
+        // Check if buffer is still valid (within buffer window)
+        double currentTime = Time.GetTicksMsec() / 1000.0;
+        double age = currentTime - _bufferTimestamp;
+
+        if (age > BufferWindowSeconds)
+        {
+            ClearInputBuffer();
+            return false;
+        }
+
+        // Execute buffered skill immediately
+        SkillSlot bufferedSlot = _bufferedSkillSlot.Value;
+        ClearInputBuffer(); // Clear before execution to prevent infinite loops
+        UseSkill(bufferedSlot);
+        return true;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
     // PRIVATE HELPERS - INPUT BUFFERING
     // ═══════════════════════════════════════════════════════════════
     /// <summary>
     /// Processes buffered input if within buffer window.
-    /// Called every frame from Update().
+    /// Called every frame from Update() as fallback (TryExecuteBufferedInput is preferred).
     /// </summary>
     public void ProcessInputBuffer(double delta)
     {
@@ -384,10 +410,18 @@ public partial class SkillManager : Node
         UseSkill(_bufferedSkillSlot.Value);
     }
 
-    private void ClearInputBuffer()
+    /// <summary>
+    /// Clears the buffered input (used when dash interrupts animations).
+    /// </summary>
+    public void ClearBuffer()
     {
         _bufferedSkillSlot = null;
         _bufferTimestamp = 0.0;
+    }
+
+    private void ClearInputBuffer()
+    {
+        ClearBuffer();
     }
 
     // ═══════════════════════════════════════════════════════════════

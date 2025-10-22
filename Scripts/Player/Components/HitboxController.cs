@@ -84,7 +84,7 @@ public partial class HitboxController : Node
     /// <summary>
     /// Enables a named hitbox (for simple skills like Whirlwind).
     /// </summary>
-    public void EnableHitbox(string hitboxName, bool followPlayer = false)
+    public void EnableHitbox(string hitboxName, bool followPlayer = false, bool useDirectionalPositioning = false, Vector2 positionOffset = default)
     {
         if (!_hitboxPool.TryGetValue(hitboxName, out Area2D hitbox))
         {
@@ -94,6 +94,18 @@ public partial class HitboxController : Node
 
         _hitEnemiesThisStrike.Clear();
         hitbox.Monitoring = true;
+
+        // Direction-aware positioning (for Energy Wave melee portion)
+        if (useDirectionalPositioning)
+        {
+            Vector2 attackDir = _player.GetAttackDirection();
+            float baseAngle = attackDir.Angle();
+
+            // Apply configured offset rotated by attack direction
+            Vector2 rotatedOffset = positionOffset.Rotated(baseAngle);
+            hitbox.Position = rotatedOffset;
+            hitbox.Rotation = baseAngle;
+        }
 
         if (followPlayer)
         {

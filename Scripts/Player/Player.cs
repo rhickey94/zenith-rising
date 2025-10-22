@@ -98,6 +98,7 @@ public partial class Player : CharacterBody2D
     public ComboTracker GetComboTracker() => _comboTracker;
     public bool IsInRecoveryWindow() => _isInRecoveryWindow;
     public bool IsInAnimationLock() => _currentState == PlayerState.CastingSkill && !_isInRecoveryWindow;
+    public bool IsCastingSkill() => _currentState == PlayerState.CastingSkill || _isCastingWhileMoving;
     public bool IsDashActive() => _isDashSkillActive;
     public bool IsDead() => _currentState == PlayerState.Dead;
 
@@ -346,10 +347,20 @@ public partial class Player : CharacterBody2D
         _currentCastingSkill = skill;
         _skillEffectController?.SetCurrentSkill(skill);
 
-        // Check if can cast
-        if (_currentState != PlayerState.Idle && _currentState != PlayerState.Running)
+        // Check if can cast (dash skills can interrupt animations)
+        bool canInterrupt = skill.IsDashSkill || skill.Slot == SkillSlot.Utility;
+        bool isIdleOrRunning = _currentState == PlayerState.Idle || _currentState == PlayerState.Running;
+        bool isCasting = _currentState == PlayerState.CastingSkill;
+
+        if (!isIdleOrRunning && !(isCasting && canInterrupt))
         {
             return false;
+        }
+
+        // If interrupting an animation, clear any pending buffered input
+        if (isCasting && canInterrupt)
+        {
+            _skillManager?.ClearBuffer();
         }
 
         ChangeState(PlayerState.CastingSkill);
@@ -494,11 +505,14 @@ public partial class Player : CharacterBody2D
             _skillEffectController.ClearCurrentSkill();
             _isDashSkillActive = false;
 
-            // Return to previous state
+            // Return to previous state BEFORE executing buffered input (allows TryCastSkill to succeed)
             if (_currentState == PlayerState.CastingSkill)
             {
                 ChangeState(_previousState);
             }
+
+            // Execute buffered input immediately (frame-perfect skill chaining)
+            _skillManager?.TryExecuteBufferedInput();
         }
 
         _animationPlayer.SpeedScale = 1.0f;
