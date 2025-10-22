@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b7vmk3snajck7" path="res://Scripts/Core/Hub.cs" id="1_jaytn"]
 [ext_resource type="PackedScene" uid="uid://jb1p3bafbe1" path="res://Scenes/Player/player.tscn" id="2_5jboa"]
-[ext_resource type="TileSet" uid="uid://8rkbeytryfrf" path="res://Assets/Tilesheets/hub_tilesheet.tres" id="4_5jboa"]
+[ext_resource type="TileSet" uid="uid://8rkbeytryfrf" path="res://Resources/Tilesets/hub_tilesheet.tres" id="4_5jboa"]
 [ext_resource type="Texture2D" uid="uid://bty1gqoua1prf" path="res://Assets/kenney_particle-pack/PNG (Transparent)/star_03.png" id="4_nfv6j"]
 [ext_resource type="Script" uid="uid://r8ukq3w6hjof" path="res://Scripts/Core/DungeonPortal.cs" id="8_eu2np"]
 

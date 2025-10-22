@@ -11,7 +11,7 @@
 
 [sub_resource type="Resource" id="Resource_combo_basic"]
 script = ExtResource("7_combo")
-HitboxName = "MeleeHitbox"
+HitboxName = "ComboHitbox1"
 PositionOffset = Vector2(40, 0)
 
 [sub_resource type="Resource" id="Resource_kcspd"]

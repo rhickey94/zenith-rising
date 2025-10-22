@@ -1139,6 +1139,36 @@ monitorable = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxContainer/AOEHitbox"]
 shape = SubResource("CircleShape2D_jhyir")
 
+[node name="ComboHitbox1" type="Area2D" parent="HitboxContainer"]
+collision_layer = 0
+collision_mask = 2
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxContainer/ComboHitbox1"]
+position = Vector2(40, 0)
+shape = SubResource("RectangleShape2D_gk6dx")
+
+[node name="ComboHitbox2" type="Area2D" parent="HitboxContainer"]
+collision_layer = 0
+collision_mask = 2
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxContainer/ComboHitbox2"]
+position = Vector2(40, 0)
+shape = SubResource("RectangleShape2D_gk6dx")
+
+[node name="ComboHitbox3" type="Area2D" parent="HitboxContainer"]
+collision_layer = 0
+collision_mask = 2
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxContainer/ComboHitbox3"]
+position = Vector2(40, 0)
+shape = SubResource("RectangleShape2D_gk6dx")
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 reset_on_save = false
 libraries = {
