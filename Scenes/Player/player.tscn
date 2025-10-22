@@ -410,11 +410,11 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0.03333333, 0.46666667),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
-"args": [],
-"method": &"EnableMeleeHitbox"
+"args": [0],
+"method": &"EnableComboStrike"
 }, {
-"args": [],
-"method": &"DisableMeleeHitbox"
+"args": [0],
+"method": &"DisableComboStrike"
 }]
 }
 
@@ -443,11 +443,11 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0.06666666, 0.5),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
-"args": [],
-"method": &"EnableMeleeHitbox"
+"args": [0],
+"method": &"EnableComboStrike"
 }, {
-"args": [],
-"method": &"DisableMeleeHitbox"
+"args": [0],
+"method": &"DisableComboStrike"
 }]
 }
 
@@ -476,11 +476,11 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0.06666666, 0.5),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
-"args": [],
-"method": &"EnableMeleeHitbox"
+"args": [0],
+"method": &"EnableComboStrike"
 }, {
-"args": [],
-"method": &"DisableMeleeHitbox"
+"args": [0],
+"method": &"DisableComboStrike"
 }]
 }
 
@@ -509,11 +509,11 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0.06666666, 0.46666667),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
-"args": [],
-"method": &"EnableMeleeHitbox"
+"args": [0],
+"method": &"EnableComboStrike"
 }, {
-"args": [],
-"method": &"DisableMeleeHitbox"
+"args": [0],
+"method": &"DisableComboStrike"
 }]
 }
 
@@ -542,14 +542,14 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0.03333333, 0.23333333, 0.46666667),
 "transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
-"args": [],
-"method": &"EnableMeleeHitbox"
+"args": [0],
+"method": &"EnableComboStrike"
 }, {
 "args": [],
 "method": &"SpawnWaveProjectiles"
 }, {
-"args": [],
-"method": &"DisableMeleeHitbox"
+"args": [0],
+"method": &"DisableComboStrike"
 }]
 }
 
@@ -578,14 +578,14 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0.06666666, 0.26666668, 0.5),
 "transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
-"args": [],
-"method": &"EnableMeleeHitbox"
+"args": [0],
+"method": &"EnableComboStrike"
 }, {
 "args": [],
 "method": &"SpawnWaveProjectiles"
 }, {
-"args": [],
-"method": &"DisableMeleeHitbox"
+"args": [0],
+"method": &"DisableComboStrike"
 }]
 }
 
@@ -614,14 +614,14 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0.06666666, 0.26666668, 0.5),
 "transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
-"args": [],
-"method": &"EnableMeleeHitbox"
+"args": [0],
+"method": &"EnableComboStrike"
 }, {
 "args": [],
 "method": &"SpawnWaveProjectiles"
 }, {
-"args": [],
-"method": &"DisableMeleeHitbox"
+"args": [0],
+"method": &"DisableComboStrike"
 }]
 }
 
@@ -650,14 +650,14 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0.06666666, 0.26666668, 0.46666667),
 "transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
-"args": [],
-"method": &"EnableMeleeHitbox"
+"args": [0],
+"method": &"EnableComboStrike"
 }, {
 "args": [],
 "method": &"SpawnWaveProjectiles"
 }, {
-"args": [],
-"method": &"DisableMeleeHitbox"
+"args": [0],
+"method": &"DisableComboStrike"
 }]
 }
 

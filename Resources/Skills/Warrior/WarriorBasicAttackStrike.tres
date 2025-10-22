@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ComboStrikeData" load_steps=2 format=3 uid="uid://basic_attack_strike_1"]
+
+[ext_resource type="Script" path="res://Scripts/Skills/Balance/Data/ComboStrikeData.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+StrikeIndex = 0
+HitboxName = "MeleeHitbox"
+PositionOffset = Vector2(40, 0)
+RotationOffset = 0.0
+DamageMultiplier = 1.0
