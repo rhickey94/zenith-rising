@@ -8,6 +8,14 @@ using ZenithRising.Scripts.Skills.Base;
 
 namespace ZenithRising.Scripts.PlayerScripts;
 
+/// <summary>
+/// Player character FSM state machine.
+/// Idle: Standing still
+/// Running: Moving with WASD
+/// CastingSkill: Animation-driven skill execution (locks movement unless MovementAllowed)
+/// Hurt: Taking damage animation (not currently used)
+/// Dead: Death state (blocks all inputs)
+/// </summary>
 public enum PlayerState
 {
     Idle,
@@ -17,17 +25,38 @@ public enum PlayerState
     Dead
 }
 
+/// <summary>
+/// Player character controller using component architecture.
+/// Responsibilities: FSM state management, input routing, component coordination.
+/// Delegates gameplay logic to components:
+/// - StatsManager: Stats, health, progression
+/// - SkillManager: Skill execution, cooldowns
+/// - AnimationController: Animation playback
+/// - SkillEffectController: Animation callbacks (hitboxes, projectiles)
+/// - BuffManager: Temporary stat boosts
+/// - UpgradeManager: Permanent power-ups
+/// - ForcedMovementController: Dash/leap movement
+/// - HitboxController/HurtboxController: Combat collision
+/// - ComboTracker: Basic attack combo system
+/// - VisualFeedbackController: Hit flashes, visual effects
+/// </summary>
 public partial class Player : CharacterBody2D
 {
-    // ===== EXPORT FIELDS - Config =====
+    // ═══════════════════════════════════════════════════════════════
+    // EXPORT FIELDS
+    // ═══════════════════════════════════════════════════════════════
     [Export] public PlayerClass CurrentClass = PlayerClass.Warrior;
 
-    // ===== SIGNALS =====
+    // ═══════════════════════════════════════════════════════════════
+    // SIGNALS
+    // ═══════════════════════════════════════════════════════════════
     [Signal] public delegate void HealthChangedEventHandler(float currentHealth, float maxHealth);
     [Signal] public delegate void ExperienceChangedEventHandler(int currentXP, int requiredXP, int level);
     [Signal] public delegate void ShowLevelUpPanelEventHandler(Godot.Collections.Array<Upgrade> upgrades);
 
-    // ===== PRIVATE FIELDS - Components =====
+    // ═══════════════════════════════════════════════════════════════
+    // COMPONENT REFERENCES
+    // ═══════════════════════════════════════════════════════════════
     private InputManager _inputManager;
     private SkillManager _skillManager;
     private StatsManager _statsManager;
@@ -43,25 +72,38 @@ public partial class Player : CharacterBody2D
 
     private Sprite2D _sprite;
     private AnimationPlayer _animationPlayer;
+
+    // ═══════════════════════════════════════════════════════════════
+    // FSM STATE
+    // ═══════════════════════════════════════════════════════════════
     private PlayerState _currentState = PlayerState.Idle;
-    private Skill _currentCastingSkill;
-    private bool _isCastingWhileMoving = false;
     private PlayerState _previousState = PlayerState.Idle;
 
-    // Add to Player.cs
+    // ═══════════════════════════════════════════════════════════════
+    // SKILL CASTING STATE
+    // ═══════════════════════════════════════════════════════════════
+    private Skill _currentCastingSkill;
+    private bool _isCastingWhileMoving = false;
+    private bool _isDashSkillActive = false;
+
+    // Recovery Window System (allows input buffering during last 15% of animation)
     private double _currentSkillStartTime = 0.0;
     private float _currentSkillDuration = 0.0f;
-    private const float RecoveryWindowPercent = 0.15f; // Last 15% of animation
+    private const float RecoveryWindowPercent = 0.15f;
     private bool _isInRecoveryWindow = false;
-    private bool _isDashSkillActive = false; // Special flag for dash
 
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - STATE QUERIES
+    // ═══════════════════════════════════════════════════════════════
     public ComboTracker GetComboTracker() => _comboTracker;
     public bool IsInRecoveryWindow() => _isInRecoveryWindow;
     public bool IsInAnimationLock() => _currentState == PlayerState.CastingSkill && !_isInRecoveryWindow;
     public bool IsDashActive() => _isDashSkillActive;
     public bool IsDead() => _currentState == PlayerState.Dead;
 
-    // ===== LIFECYCLE METHODS =====
+    // ═══════════════════════════════════════════════════════════════
+    // LIFECYCLE METHODS
+    // ═══════════════════════════════════════════════════════════════
     public override void _Ready()
     {
         AddToGroup("player");
@@ -112,7 +154,7 @@ public partial class Player : CharacterBody2D
         _sprite = GetNode<Sprite2D>("Sprite2D");
         if (_sprite == null)
         {
-            GD.PrintErr("Player: AnimatedSprite2D not found!");
+            GD.PrintErr("Player: Sprite2D not found!");
         }
 
         _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
@@ -125,41 +167,36 @@ public partial class Player : CharacterBody2D
             _animationPlayer.AnimationFinished += OnAnimationFinished;
         }
 
-        // Get or create SkillAnimationController
         _skillEffectController = GetNode<SkillEffectController>("SkillEffectController");
         if (_skillEffectController == null)
         {
             GD.PrintErr("Player: SkillEffectController not found!");
         }
 
-        // Get AnimationController
         _animationController = GetNode<AnimationController>("AnimationController");
         if (_animationController == null)
         {
             GD.PrintErr("Player: AnimationController not found!");
         }
 
-        // Get VisualFeedbackController
         _visualFeedbackController = GetNode<VisualFeedbackController>("VisualFeedbackController");
         if (_visualFeedbackController == null)
         {
             GD.PrintErr("Player: VisualFeedbackController not found!");
         }
 
-        // Get ForcedMovementController
         _movementController = GetNode<ForcedMovementController>("ForcedMovementController");
         if (_movementController == null)
         {
             GD.PrintErr("Player: ForcedMovementController not found!");
         }
+
         _hitboxController = GetNode<HitboxController>("HitboxController");
         _hurtboxController = GetNode<HurtboxController>("HurtboxController");
         _comboTracker = GetNode<ComboTracker>("ComboTracker");
 
-        // Initialize SkillEffectController with ForcedMovementController
+        // Inject dependencies into all components
         _skillEffectController.Initialize(this, _statsManager, _movementController, _hitboxController);
-
-        // 🆕 Inject dependencies into managers
         _upgradeManager?.Initialize(this, _statsManager, _buffManager);
         _skillManager?.Initialize(this, _statsManager, _animationController, _buffManager);
         _animationController?.Initialize(this, _animationPlayer);
@@ -180,14 +217,14 @@ public partial class Player : CharacterBody2D
     {
         Vector2 direction = Vector2.Zero;
 
-        // Forced movement (dash, leap, etc.) overrides normal movement
+        // Forced movement (dash, leap) overrides normal WASD input
         if (_movementController != null && _movementController.UpdateMovement(delta))
         {
             MoveAndSlide();
             return;
         }
 
-        // Allow movement in locomotion states OR while casting with MovementAllowed
+        // Determine if player can move based on FSM state
         if (_currentState == PlayerState.Idle ||
             _currentState == PlayerState.Running ||
             _isCastingWhileMoving)
@@ -196,11 +233,10 @@ public partial class Player : CharacterBody2D
         }
         else if (_currentState == PlayerState.CastingSkill)
         {
-            // Movement locked during cast
-            direction = Vector2.Zero;
+            direction = Vector2.Zero; // Movement locked during animation-driven skills
         }
 
-        // NEW: Update recovery window state
+        // Update recovery window (last 15% of animation allows input buffering)
         if (_currentState == PlayerState.CastingSkill && _currentSkillDuration > 0.0f)
         {
             double elapsed = (Time.GetTicksMsec() / 1000.0) - _currentSkillStartTime;
@@ -212,12 +248,13 @@ public partial class Player : CharacterBody2D
             _isInRecoveryWindow = false;
         }
 
+        // Apply movement
         if (_statsManager != null)
         {
             Velocity = direction * _statsManager.CurrentSpeed;
         }
 
-        // Update locomotion animations only in pure locomotion states
+        // Update locomotion animations (walk/idle based on input direction)
         if (_currentState == PlayerState.Idle || _currentState == PlayerState.Running)
         {
             _animationController?.PlayLocomotion(_currentState, direction);
@@ -233,23 +270,26 @@ public partial class Player : CharacterBody2D
         }
 
         _hitboxController?.UpdateFollowingHitboxes();
-
         _skillManager?.Update((float)delta);
         MoveAndSlide();
     }
 
-    // ===== PUBLIC API =====
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - INITIALIZATION
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Initializes player from save data or starts fresh game.
+    /// Called by Hub.cs when player enters scene.
+    /// </summary>
     public void Initialize()
     {
         if (SaveManager.Instance != null && SaveManager.Instance.SaveExists())
         {
-            // Existing save game - load it
             SaveData? saveData = SaveManager.Instance.LoadGame();
             if (saveData.HasValue)
             {
                 _statsManager?.LoadSaveData(saveData.Value);
 
-                // Restore upgrades if active run
                 if (saveData.Value.HasActiveRun)
                 {
                     var upgradeManager = GetNode<UpgradeManager>("UpgradeManager");
@@ -259,11 +299,13 @@ public partial class Player : CharacterBody2D
         }
         else
         {
-            // New game - initialize fresh stats
             _statsManager?.Initialize();
         }
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - COMBAT
+    // ═══════════════════════════════════════════════════════════════
     public void TakeDamage(float damage)
     {
         _statsManager?.TakeDamage(damage);
@@ -279,7 +321,14 @@ public partial class Player : CharacterBody2D
         return _animationController?.GetFacingDirection() ?? Vector2.Down;
     }
 
-    // Modify TryCastSkill signature to accept strike number:
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - SKILL EXECUTION
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Attempts to execute an animation-driven skill. Called by SkillManager.
+    /// Returns false if FSM state prevents casting (dead, already casting).
+    /// strikeNumber: For combo attacks (basic attack chains).
+    /// </summary>
     public bool TryCastSkill(Skill skill, int strikeNumber = 1)
     {
         if (_currentState == PlayerState.Dead)
@@ -310,13 +359,12 @@ public partial class Player : CharacterBody2D
             _comboTracker?.ResetCombo();
         }
 
-        // Set movement flags
         if (skill.MovementBehavior == MovementBehavior.Allowed)
         {
             _isCastingWhileMoving = true;
         }
 
-        // Calculate speed scaling
+        // Calculate animation speed based on attack rate (attacks) or cast speed (spells)
         float speedScale = 1.0f;
         if (_statsManager != null)
         {
@@ -330,10 +378,9 @@ public partial class Player : CharacterBody2D
             }
         }
 
-        // === MODIFIED: Pass strike number to animation controller ===
         _animationController?.PlaySkillAnimation(skill, strikeNumber, speedScale);
 
-        // === NEW: Track timing for recovery window ===
+        // Track timing for recovery window calculation
         _currentSkillStartTime = Time.GetTicksMsec() / 1000.0;
         _currentSkillDuration = _animationController?.GetSkillAnimationDuration(skill, strikeNumber) ?? 0.5f;
 
@@ -342,17 +389,21 @@ public partial class Player : CharacterBody2D
         return true;
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - PROGRESSION
+    // ═══════════════════════════════════════════════════════════════
     public void ApplyUpgrade(Upgrade upgrade)
     {
         _upgradeManager?.ApplyUpgrade(upgrade);
     }
 
-    // ===== PRIVATE HELPERS - Event Handlers =====
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - EVENT HANDLERS
+    // ═══════════════════════════════════════════════════════════════
     private void OnLeveledUp()
     {
         var upgradeOptions = GetRandomUpgrades(3);
 
-        // Emit signal for UI to handle (decoupled from LevelUpPanel)
         var upgradesArray = new Godot.Collections.Array<Upgrade>();
         foreach (var upgrade in upgradeOptions)
         {
@@ -362,13 +413,43 @@ public partial class Player : CharacterBody2D
         EmitSignal(SignalName.ShowLevelUpPanel, upgradesArray);
     }
 
-
-    // ===== PRIVATE HELPERS - Upgrades =====
     private List<Upgrade> GetRandomUpgrades(int count)
     {
         return _upgradeManager?.GetRandomUpgrades(count);
     }
 
+    private void OnSkillPressed(int skillSlot)
+    {
+        _skillManager?.UseSkill((SkillSlot)skillSlot);
+    }
+
+    private void OnStatsManagerHealthChanged(float current, float max)
+    {
+        EmitSignal(SignalName.HealthChanged, current, max);
+    }
+
+    private void OnStatsManagerExperienceChanged(int currentXP, int requiredXP, int level)
+    {
+        EmitSignal(SignalName.ExperienceChanged, currentXP, requiredXP, level);
+    }
+
+    private void OnPlayerDied()
+    {
+        var dungeon = GetTree().Root.GetNode<Dungeon>("Dungeon");
+        if (dungeon != null)
+        {
+            dungeon.OnPlayerDeath();
+        }
+        else
+        {
+            GD.PrintErr("Player: Could not find Dungeon node on death!");
+            GetTree().ReloadCurrentScene();
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - FSM STATE TRANSITIONS
+    // ═══════════════════════════════════════════════════════════════
     private bool CanTransitionTo(PlayerState newState)
     {
         if (_currentState == PlayerState.Dead)
@@ -421,35 +502,5 @@ public partial class Player : CharacterBody2D
         }
 
         _animationPlayer.SpeedScale = 1.0f;
-    }
-
-    private void OnSkillPressed(int skillSlot)
-    {
-        _skillManager?.UseSkill((SkillSlot)skillSlot);
-    }
-
-    private void OnStatsManagerHealthChanged(float current, float max)
-    {
-        EmitSignal(SignalName.HealthChanged, current, max);
-    }
-
-    private void OnStatsManagerExperienceChanged(int currentXP, int requiredXP, int level)
-    {
-        EmitSignal(SignalName.ExperienceChanged, currentXP, requiredXP, level);
-    }
-
-    private void OnPlayerDied()
-    {
-        // Player handles death flow (knows about game context)
-        var dungeon = GetTree().Root.GetNode<Dungeon>("Dungeon");
-        if (dungeon != null)
-        {
-            dungeon.OnPlayerDeath();
-        }
-        else
-        {
-            GD.PrintErr("Player: Could not find Dungeon node on death!");
-            GetTree().ReloadCurrentScene(); // Fallback
-        }
     }
 }

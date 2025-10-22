@@ -3,18 +3,44 @@ using Godot;
 
 namespace ZenithRising.Scripts.PlayerScripts.Components;
 
+/// <summary>
+/// Temporary buff (de)buff lifecycle management for player character.
+/// Responsibilities:
+/// - Buff storage and lifetime tracking (duration countdown)
+/// - Buff stacking behavior (duration refresh, stat bonuses accumulate)
+/// - Stat modifier aggregation for UpgradeManager
+/// - Triggering stat recalculation when buffs change
+/// Example: Combat Stim skill applies +40% attack speed, +100% move speed for 5 seconds.
+/// Does NOT handle: Buff application logic (SkillManager), stat calculation (StatsManager)
+/// </summary>
 [GlobalClass]
 public partial class BuffManager : Node
 {
+    // ═══════════════════════════════════════════════════════════════
+    // SIGNALS
+    // ═══════════════════════════════════════════════════════════════
     [Signal] public delegate void BuffsChangedEventHandler();
 
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE FIELDS
+    // ═══════════════════════════════════════════════════════════════
     private readonly Dictionary<string, BuffInstance> _activeBuffs = [];
 
+    // ═══════════════════════════════════════════════════════════════
+    // LIFECYCLE METHODS
+    // ═══════════════════════════════════════════════════════════════
     public override void _Process(double delta)
     {
         UpdateBuffs((float)delta);
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - BUFF APPLICATION
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Applies or refreshes a buff. If buffId exists, duration refreshes (stacking).
+    /// Triggers BuffsChanged signal → UpgradeManager → StatsManager.RecalculateStats().
+    /// </summary>
     public void ApplyBuff(string buffId, float duration,
     float attackSpeedBonus = 0f,
     float moveSpeedBonus = 0f,
@@ -37,11 +63,17 @@ public partial class BuffManager : Node
         TriggerStatRecalculation();
     }
 
+    /// <summary>
+    /// Checks if a specific buff is currently active.
+    /// </summary>
     public bool HasBuff(string buffId)
     {
         return _activeBuffs.ContainsKey(buffId);
     }
 
+    /// <summary>
+    /// Manually removes a buff by ID. Triggers stat recalculation.
+    /// </summary>
     public void RemoveBuff(string buffId)
     {
         if (_activeBuffs.Remove(buffId))
@@ -50,7 +82,13 @@ public partial class BuffManager : Node
         }
     }
 
-    // PUBLIC API: UpgradeManager calls this to get current buff modifiers
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - STAT MODIFIER AGGREGATION
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Aggregates stat bonuses from all active buffs.
+    /// Called by UpgradeManager.RecalculateAllStats() to combine with upgrade modifiers.
+    /// </summary>
     public StatModifiers GetStatModifiers()
     {
         var modifiers = new StatModifiers();
@@ -60,13 +98,20 @@ public partial class BuffManager : Node
             modifiers.PercentAttackSpeed += buff.AttackSpeedBonus;
             modifiers.PercentSpeed += buff.MoveSpeedBonus;
             modifiers.PercentDamage += buff.DamageBonus;
-            modifiers.PercentCastSpeed += buff.CastSpeedBonus; // NEW
-            modifiers.PercentCooldownReduction += buff.CooldownReductionBonus; // NEW
+            modifiers.PercentCastSpeed += buff.CastSpeedBonus;
+            modifiers.PercentCooldownReduction += buff.CooldownReductionBonus;
         }
 
         return modifiers;
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - BUFF LIFETIME
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Counts down buff durations and removes expired buffs.
+    /// Called every frame from _Process().
+    /// </summary>
     private void UpdateBuffs(float delta)
     {
         var expiredBuffs = new List<string>();
@@ -91,11 +136,22 @@ public partial class BuffManager : Node
         }
     }
 
+    /// <summary>
+    /// Emits BuffsChanged signal to trigger stat recalculation.
+    /// UpgradeManager listens to this signal and calls StatsManager.RecalculateStats().
+    /// </summary>
     private void TriggerStatRecalculation()
     {
         EmitSignal(SignalName.BuffsChanged);
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE CLASSES
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Internal storage for a single buff's data.
+    /// Duration counts down each frame until buff expires.
+    /// </summary>
     private class BuffInstance
     {
         public float AttackSpeedBonus;
@@ -107,3 +163,4 @@ public partial class BuffManager : Node
         public float Duration;
     }
 }
+

@@ -4,18 +4,23 @@ using ZenithRising.Scripts.Core;
 
 namespace ZenithRising.Scripts.PlayerScripts.Components;
 
+/// <summary>
+/// Stat modifier aggregation structure.
+/// Collected by UpgradeManager from upgrades + buffs, passed to StatsManager.RecalculateStats().
+/// Formula: FinalStat = (BaseStat + FlatBonus) * (1 + PercentBonus)
+/// </summary>
 public struct StatModifiers
 {
-    // Flat bonuses
+    // Flat bonuses (added before percent multipliers)
     public float FlatHealth;
     public float FlatSpeed;
     public float FlatDamage;
 
-    // Percent bonuses (0.10 = +10%)
+    // Percent bonuses (0.10 = +10%, multiplicative with base)
     public float PercentHealth;
     public float PercentSpeed;
-    public float PercentAttackSpeed;  // now uses same direction as other stats
-    public float PercentCastSpeed;  // now uses same direction as other stats
+    public float PercentAttackSpeed;
+    public float PercentCastSpeed;
     public float PercentDamage;
     public float PercentCritChance;
     public float PercentCritDamage;
@@ -27,6 +32,14 @@ public struct StatModifiers
     public int ProjectilePierceCount;
 }
 
+/// <summary>
+/// The 5 core character attributes.
+/// STR: Physical damage, HP
+/// INT: Magical damage, Cast speed, CDR
+/// AGI: Attack speed, Crit chance
+/// VIT: HP, HP regen
+/// FOR: Crit damage
+/// </summary>
 public enum StatType
 {
     Strength,
@@ -36,31 +49,39 @@ public enum StatType
     Fortune
 }
 
+/// <summary>
+/// Character stat management and calculation.
+/// Responsibilities:
+/// - Core stat storage (STR/INT/AGI/VIT/FOR) and derived stat calculation
+/// - Character/Power progression tracking (dual XP system)
+/// - Health/damage management
+/// - Save/load data serialization
+/// - Stat recalculation when upgrades/buffs change
+/// Formula: FinalStat = (BaseStat + AttributeBonus + FlatModifier) * (1 + PercentModifier)
+/// Does NOT handle: Buff lifecycle (BuffManager), upgrade tracking (UpgradeManager)
+/// </summary>
 [GlobalClass]
 public partial class StatsManager : Node
 {
     // ═══════════════════════════════════════════════════════════════
-    // CHARACTER STATS (Loaded from Config - Not Exported)
+    // BASE STATS (Loaded from GameBalance config)
     // ═══════════════════════════════════════════════════════════════
-    // Core Stats
     public float BaseMaxHealth { get; set; } = 100f;
     public float BaseSpeed { get; set; } = 300f;
     public float BasePickupRadius { get; private set; } = 80f;
-
-    // Combat Stats
-    public float BaseAttackRate { get; set; } = 2.0f; // 2 attacks per second (0.5s between attacks)
-    public float BaseCastSpeed { get; set; } = 1.0f; // 1.0x multiplier
+    public float BaseAttackRate { get; set; } = 2.0f;      // Attacks per second
+    public float BaseCastSpeed { get; set; } = 1.0f;       // Cast speed multiplier
     public float BaseDamage { get; private set; } = 10f;
 
     // ═══════════════════════════════════════════════════════════════
-    // ATTRIBUTE STATS (Exported for Debug Visibility Only)
+    // CORE ATTRIBUTES (5 stats - allocated by player)
     // ═══════════════════════════════════════════════════════════════
-    [ExportGroup("Attribute Stats (Debug Visibility)")]
-    [Export] public int Strength { get => _strength; private set => _strength = Mathf.Max(0, value); }       // STR: +3% Physical Dmg, +10 HP
-    [Export] public int Intelligence { get => _intelligence; private set => _intelligence = Mathf.Max(0, value); }   // INT: +3% Magical Dmg, +2% CDR
-    [Export] public int Agility { get => _agility; private set => _agility = Mathf.Max(0, value); }        // AGI: +2% Attack Speed, +1% Crit
-    [Export] public int Vitality { get => _vitality; private set => _vitality = Mathf.Max(0, value); }       // VIT: +25 HP, +0.5 HP/sec
-    [Export] public int Fortune { get => _fortune; private set => _fortune = Mathf.Max(0, value); }        // FOR: +2% Crit Dmg, +1% Drop Rate
+    [ExportGroup("Core Attributes (Debug Visibility)")]
+    [Export] public int Strength { get => _strength; private set => _strength = Mathf.Max(0, value); }
+    [Export] public int Intelligence { get => _intelligence; private set => _intelligence = Mathf.Max(0, value); }
+    [Export] public int Agility { get => _agility; private set => _agility = Mathf.Max(0, value); }
+    [Export] public int Vitality { get => _vitality; private set => _vitality = Mathf.Max(0, value); }
+    [Export] public int Fortune { get => _fortune; private set => _fortune = Mathf.Max(0, value); }
 
     [ExportGroup("Character Progression")]
     [Export] public int CharacterLevel { get; private set; } = 1;
@@ -75,13 +96,13 @@ public partial class StatsManager : Node
     [Export] public int HighestFloor { get; private set; } = 1;
 
     // ═══════════════════════════════════════════════════════════════
-    // CALCULATED STATS (Runtime Only - Not Exported)
+    // DERIVED STATS (Calculated from base + attributes + modifiers)
     // ═══════════════════════════════════════════════════════════════
-    // Experience Requirements (calculated from formulas)
+    // XP Requirements (calculated from progression formulas)
     public int CharacterExperienceRequired { get; private set; } = 100;
     public int PowerExperienceRequired { get; private set; } = 100;
 
-    // Current Stats (after all modifiers)
+    // Final Stats (after RecalculateStats())
     public float CurrentMaxHealth { get; private set; }
     public float CurrentHealth { get; private set; }
     public float CurrentSpeed { get; private set; }
@@ -89,13 +110,11 @@ public partial class StatsManager : Node
     public float CurrentPickupRadius { get; private set; }
     public float CurrentCritChance { get; private set; }
     public float CurrentCritMultiplier { get; private set; }
+    public float CurrentAttackRate { get; private set; }
+    public float CurrentCastSpeed { get; private set; }
+    public float CooldownReduction { get; private set; } = 0f;
 
-    // New Combat Stats
-    public float CurrentAttackRate { get; private set; }  // Final attacks per second
-    public float CurrentCastSpeed { get; private set; }   // Final cast speed multiplier
-    public float CooldownReduction { get; private set; } = 0f; // 0% - 40% cap
-
-    // Damage Multipliers (used by CombatSystem)
+    // Damage Multipliers (used by CombatSystem.CalculateDamage())
     public float DamageMultiplier { get; private set; } = 1.0f;
     public float PhysicalDamageMultiplier { get; private set; } = 1.0f;
     public float MagicalDamageMultiplier { get; private set; } = 1.0f;
@@ -106,7 +125,7 @@ public partial class StatsManager : Node
     public bool IsInvincible { get; private set; } = false;
 
     // ═══════════════════════════════════════════════════════════════
-    // PRIVATE FIELDS
+    // PRIVATE FIELDS (Backing fields for attribute properties)
     // ═══════════════════════════════════════════════════════════════
     private int _strength = 0;
     private int _intelligence = 0;
@@ -114,7 +133,9 @@ public partial class StatsManager : Node
     private int _vitality = 0;
     private int _fortune = 0;
 
-    // ===== SIGNALS =====
+    // ═══════════════════════════════════════════════════════════════
+    // SIGNALS
+    // ═══════════════════════════════════════════════════════════════
     [Signal] public delegate void LeveledUpEventHandler();
     [Signal] public delegate void CharacterLeveledUpEventHandler();
     [Signal] public delegate void StatAllocatedEventHandler(int statType);
@@ -122,7 +143,9 @@ public partial class StatsManager : Node
     [Signal] public delegate void ExperienceChangedEventHandler(int currentXP, int requiredXP, int level);
     [Signal] public delegate void PlayerDiedEventHandler();
 
-    // ===== LIFECYCLE METHODS =====
+    // ═══════════════════════════════════════════════════════════════
+    // LIFECYCLE METHODS
+    // ═══════════════════════════════════════════════════════════════
     public override void _Ready()
     {
         LoadCharacterStatsFromConfig();
@@ -145,17 +168,23 @@ public partial class StatsManager : Node
         }
     }
 
-    // ===== PUBLIC API - Initialization =====
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - INITIALIZATION
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Initializes stats for new game (no save data).
+    /// Calculates initial derived stats and emits UI update signals.
+    /// </summary>
     public void Initialize()
     {
-        // Set initial stat values (no upgrades yet)
         RecalculateStats(new StatModifiers());
-
         EmitHealthUpdate();
         EmitExperienceUpdate();
     }
 
-    // ===== PUBLIC API - Combat =====
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - COMBAT
+    // ═══════════════════════════════════════════════════════════════
     public void TakeDamage(float damage)
     {
         if (IsInvincible)
@@ -177,7 +206,12 @@ public partial class StatsManager : Node
         }
     }
 
-    // ===== PUBLIC API - Progression =====
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - PROGRESSION
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Awards Power XP (per-run progression). Handles overflow for multiple level-ups.
+    /// </summary>
     public void AddPowerExperience(int amount)
     {
         PowerExperience += amount;
@@ -190,11 +224,13 @@ public partial class StatsManager : Node
         EmitExperienceUpdate();
     }
 
+    /// <summary>
+    /// Awards Character XP (permanent progression). Handles overflow for multiple level-ups.
+    /// </summary>
     public void AddCharacterExperience(int amount)
     {
         CharacterExperience += amount;
 
-        // Handle level ups (support multiple levels in one award)
         while (CharacterExperience >= CharacterExperienceRequired)
         {
             AddCharacterLevel(1);
@@ -206,9 +242,7 @@ public partial class StatsManager : Node
         CharacterExperience -= CharacterExperienceRequired;
         CharacterLevel += levels;
         AvailableStatPoints += levels;
-
         CalculateExperienceRequirements();
-
         EmitSignal(SignalName.CharacterLeveledUp);
     }
 
@@ -220,15 +254,23 @@ public partial class StatsManager : Node
         }
     }
 
-    // ===== PUBLIC API - Stats =====
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - STAT CALCULATION
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Recalculates all derived stats from base + attributes + modifiers.
+    /// Called by UpgradeManager whenever upgrades or buffs change.
+    /// Formula: FinalStat = (Base + Attributes + FlatMod) * (1 + PercentMod)
+    /// Preserves health percentage when MaxHealth changes.
+    /// </summary>
     public void RecalculateStats(StatModifiers modifiers)
     {
-        // Calculate health percentage BEFORE changing MaxHealth
+        // Preserve health percentage across MaxHealth changes
         float healthPercentage = CurrentMaxHealth > 0 ? CurrentHealth / CurrentMaxHealth : 1f;
         var config = GameBalance.Instance.Config.CharacterProgression;
 
         // ═══════════════════════════════════════════════════════════════
-        // STEP 1: Calculate Attribute Bonuses
+        // STEP 1: Calculate Attribute Bonuses (STR/INT/AGI/VIT/FOR)
         // ═══════════════════════════════════════════════════════════════
         // STR bonuses
         float strDamagePercent = Strength * config.StrengthDamagePerPoint;
@@ -322,11 +364,18 @@ public partial class StatsManager : Node
         EmitHealthUpdate();
     }
 
+    /// <summary>
+    /// Checks if player has unallocated stat points.
+    /// </summary>
     public bool CanAllocateStat()
     {
         return AvailableStatPoints > 0;
     }
 
+    /// <summary>
+    /// Allocates stat points to a specific attribute (STR/INT/AGI/VIT/FOR).
+    /// Called by StatAllocationPanel when player spends points.
+    /// </summary>
     public void AllocateStat(StatType statType, int amount = 1)
     {
         if (!CanAllocateStat())
@@ -365,23 +414,18 @@ public partial class StatsManager : Node
         EmitSignal(SignalName.StatAllocated, (int)statType);
     }
 
-    // New method for skill control
+    /// <summary>
+    /// Sets invincibility state for skills (Dash, Leap Slam).
+    /// Called by SkillEffectController during forced movement.
+    /// </summary>
     public void SetInvincible(bool invincible)
     {
         IsInvincible = invincible;
-
-        if (invincible)
-        {
-            // Trigger visual feedback (flash effect)
-            // _player?.EmitSignal("InvincibilityStarted");
-        }
-        else
-        {
-            // _player?.EmitSignal("InvincibilityEnded");
-        }
     }
 
-    // ===== PUBLIC API - Save/Load =====
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - SAVE/LOAD
+    // ═══════════════════════════════════════════════════════════════
     public SaveData GetSaveData()
     {
         return new SaveData
@@ -433,17 +477,21 @@ public partial class StatsManager : Node
         PowerExperience = 0;
         PowerExperienceRequired = (int)(100 * Mathf.Pow(1.5f, PowerLevel - 1));
 
-        // Recalculate base stats (upgrades will be applied separately by Game.cs)
+        // Recalculate base stats (upgrades applied separately by Dungeon.cs)
         RecalculateStats(new StatModifiers());
     }
 
-    // ===== PRIVATE HELPERS - Calculations =====
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - CALCULATIONS
+    // ═══════════════════════════════════════════════════════════════
     private float CalculateRunLevelHealthBonus()
     {
         return GameBalance.Instance.Config.CharacterProgression.PowerLevelHealthBonus * (PowerLevel - 1);
     }
 
-    // ===== PRIVATE HELPERS - Progression =====
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - PROGRESSION
+    // ═══════════════════════════════════════════════════════════════
     private void PowerLevelUp()
     {
         var config = GameBalance.Instance.Config.CharacterProgression;
@@ -451,14 +499,13 @@ public partial class StatsManager : Node
         PowerLevel++;
         CalculateExperienceRequirements();
 
-        // Recalculate MaxHealth with new run level (UpgradeManager will call RecalculateStats, but update now for heal)
+        // Full heal on level-up
         float characterHealthBonus = (Vitality * config.VitalityHealthPerPoint) + (Strength * config.StrengthHealthPerPoint);
         CurrentMaxHealth = BaseMaxHealth + CalculateRunLevelHealthBonus() + characterHealthBonus;
-        CurrentHealth = CurrentMaxHealth;  // Full heal on level up
+        CurrentHealth = CurrentMaxHealth;
 
         EmitHealthUpdate();
         EmitExperienceUpdate();
-
         EmitSignal(SignalName.LeveledUp);
     }
 
@@ -467,7 +514,9 @@ public partial class StatsManager : Node
         EmitSignal(SignalName.PlayerDied);
     }
 
-    // ===== PRIVATE HELPERS - Signals =====
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - SIGNAL EMISSION
+    // ═══════════════════════════════════════════════════════════════
     private void EmitHealthUpdate()
     {
         EmitSignal(SignalName.HealthChanged, CurrentHealth, CurrentMaxHealth);

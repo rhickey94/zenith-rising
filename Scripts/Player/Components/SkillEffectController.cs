@@ -9,25 +9,45 @@ using ZenithRising.Scripts.Skills.Entities.Zones;
 
 namespace ZenithRising.Scripts.PlayerScripts.Components;
 
+/// <summary>
+/// Animation callback handler for skill visual effects and spawning.
+/// Responsibilities:
+/// - Respond to AnimationPlayer Call Method tracks (frame-perfect timing)
+/// - Enable/disable hitboxes at precise animation frames
+/// - Spawn projectiles, explosions, visual effects
+/// - Manage forced movement (dash/leap) initiation and cleanup
+/// - Track current casting skill for callback context
+/// Pattern: AnimationPlayer calls methods → SkillEffectController spawns/enables effects
+/// Initialization order critical: Must Initialize() BEFORE AddChild() for spawned entities.
+/// Does NOT handle: Skill execution (SkillManager), buff application (BuffManager)
+/// </summary>
 [GlobalClass]
 public partial class SkillEffectController : Node
 {
-    // Injected dependencies
+    // ═══════════════════════════════════════════════════════════════
+    // DEPENDENCIES
+    // ═══════════════════════════════════════════════════════════════
     private Player _player;
     private StatsManager _statsManager;
-    private BuffManager _buffManager;
     private ForcedMovementController _forcedMovementController;
-
-    // Hitbox references
     private HitboxController _hitboxController;
+
+    // ═══════════════════════════════════════════════════════════════
+    // SKILL TRACKING (Set by Player.TryCastSkill)
+    // ═══════════════════════════════════════════════════════════════
     private Skill _currentCastingSkill;
     private Vector2 _currentAttackDirection;
 
-    // Exports
+    // ═══════════════════════════════════════════════════════════════
+    // EFFECT SCENE TEMPLATES (Configured in Godot editor)
+    // ═══════════════════════════════════════════════════════════════
     [Export] public PackedScene ProjectileScene { get; set; }
     [Export] public PackedScene WhirlwindVisualScene { get; set; }
     [Export] public PackedScene ExplosionEffectScene { get; set; }
 
+    // ═══════════════════════════════════════════════════════════════
+    // LIFECYCLE METHODS
+    // ═══════════════════════════════════════════════════════════════
     public void Initialize(Player player, StatsManager statsManager, ForcedMovementController forcedMovementController, HitboxController hitboxController)
     {
         _player = player;
@@ -40,32 +60,41 @@ public partial class SkillEffectController : Node
     {
         if (ProjectileScene == null)
         {
-            GD.PrintErr("SkillAnimationController: ProjectileScene not assigned!");
+            GD.PrintErr("SkillEffectController: ProjectileScene not assigned!");
         }
 
         if (WhirlwindVisualScene == null)
         {
-            GD.PrintErr("SkillAnimationController: WhirlwindVisualScene not assigned!");
+            GD.PrintErr("SkillEffectController: WhirlwindVisualScene not assigned!");
         }
 
         if (ExplosionEffectScene == null)
         {
-            GD.PrintErr("SkillAnimationController: ExplosionEffectScene not assigned!");
+            GD.PrintErr("SkillEffectController: ExplosionEffectScene not assigned!");
         }
     }
 
+    /// <summary>
+    /// Sets current casting skill for animation callbacks.
+    /// Called by Player.TryCastSkill() when skill begins.
+    /// </summary>
     public void SetCurrentSkill(Skill skill)
     {
         _currentCastingSkill = skill;
         _hitboxController?.SetCurrentSkill(skill);
     }
 
+    /// <summary>
+    /// Clears current skill reference. Called when animation finishes.
+    /// </summary>
     public void ClearCurrentSkill()
     {
         _currentCastingSkill = null;
     }
 
-    // ===== ANIMATION CALLBACKS (Called from AnimationPlayer) =====
+    // ═══════════════════════════════════════════════════════════════
+    // ANIMATION CALLBACKS - HITBOX MANAGEMENT
+    // ═══════════════════════════════════════════════════════════════
     public void EnableMeleeHitbox()
     {
         _hitboxController?.EnableHitbox("MeleeHitbox");
@@ -87,16 +116,30 @@ public partial class SkillEffectController : Node
         _hitboxController?.DisableHitbox("AOEHitbox");
     }
 
+    /// <summary>
+    /// Enables combo hitbox for multi-strike basic attacks.
+    /// Called from animation Call Method tracks.
+    /// </summary>
     public void EnableComboStrike(int strikeIndex)
     {
         _hitboxController?.EnableComboStrike(strikeIndex);
     }
 
+    /// <summary>
+    /// Disables combo hitbox after strike window ends.
+    /// </summary>
     public void DisableComboStrike(int strikeIndex)
     {
         _hitboxController?.DisableComboStrike(strikeIndex);
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // ANIMATION CALLBACKS - PROJECTILE SPAWNING
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Spawns multiple projectiles in a spread pattern (Energy Wave skill).
+    /// Called from animation Call Method track at frame-perfect timing.
+    /// </summary>
     public void SpawnWaveProjectiles()
     {
         if (_currentCastingSkill == null || _player == null)
@@ -131,6 +174,13 @@ public partial class SkillEffectController : Node
         }
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // ANIMATION CALLBACKS - VISUAL EFFECTS
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Spawns Whirlwind visual effect (spinning ring).
+    /// Critical: Initialize() BEFORE AddChild() to pass skill data to visual.
+    /// </summary>
     public void SpawnWhirlwindVisual()
     {
         if (WhirlwindVisualScene == null || _currentCastingSkill == null)
@@ -141,7 +191,6 @@ public partial class SkillEffectController : Node
 
         var visual = WhirlwindVisualScene.Instantiate<WhirlwindVisual>();
 
-        // Initialize BEFORE adding to scene tree (so _Ready has valid data)
         if (visual is WhirlwindVisual whirlwindVisual)
         {
             whirlwindVisual.Initialize(_currentCastingSkill);
@@ -151,12 +200,14 @@ public partial class SkillEffectController : Node
             GD.PrintErr($"WhirlwindVisual is wrong type! Type: {visual.GetType().FullName}");
         }
 
-        // NOW add to scene tree (triggers _Ready with initialized values)
         _player.GetParent().AddChild(visual);
         visual.GlobalPosition = _player.GlobalPosition;
     }
 
-    // Called from animation tracks for explosion effects (Leap Slam, Breaching Charge, etc.)
+    /// <summary>
+    /// Spawns explosion effect (Leap Slam, Breaching Charge).
+    /// Critical: Initialize() BEFORE AddChild() for skill data.
+    /// </summary>
     public void SpawnExplosionEffect()
     {
         if (ExplosionEffectScene == null || _currentCastingSkill == null)
@@ -166,22 +217,20 @@ public partial class SkillEffectController : Node
         }
 
         var explosion = ExplosionEffectScene.Instantiate<ExplosionEffect>();
-
-        // Explosions spawn at player position (can be overridden for projectile explosions)
         Vector2 spawnPosition = _player.GlobalPosition;
 
-        // Initialize BEFORE adding to tree
         explosion.Initialize(_currentCastingSkill, _player, Vector2.Zero);
-
-        // Set position BEFORE adding to tree
         explosion.GlobalPosition = spawnPosition;
-
-        // Add to world (not as child of player)
         _player.GetParent().AddChild(explosion);
     }
 
-    // ===== DASH CALLBACKS (Called from AnimationPlayer) =====
-
+    // ═══════════════════════════════════════════════════════════════
+    // ANIMATION CALLBACKS - FORCED MOVEMENT (Dash, Leap Slam)
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Initiates dash movement with invincibility.
+    /// Called from Dash skill animation Call Method track.
+    /// </summary>
     public void StartDash()
     {
         if (_statsManager == null || _forcedMovementController == null)
@@ -190,12 +239,15 @@ public partial class SkillEffectController : Node
             return;
         }
 
-        // Calculate smart target position (clamped to range)
         Vector2 targetPosition = CalculateForcedMovementTarget(_currentCastingSkill.Range);
         _forcedMovementController.StartDashToTarget(targetPosition, _currentCastingSkill.Duration);
         _statsManager.SetInvincible(true);
     }
 
+    /// <summary>
+    /// Ends dash movement and removes invincibility.
+    /// Called from Dash skill animation Call Method track.
+    /// </summary>
     public void EndDash()
     {
         if (_statsManager == null || _forcedMovementController == null)
@@ -209,9 +261,44 @@ public partial class SkillEffectController : Node
     }
 
     /// <summary>
-    /// Calculates the target position for a forced movement skill.
-    /// If mouse is within range, moves to mouse.
-    /// If mouse is outside range, moves max distance toward mouse.
+    /// Initiates leap movement with invincibility (Leap Slam skill).
+    /// Uses arc trajectory instead of linear dash.
+    /// </summary>
+    public void StartLeapSlam()
+    {
+        if (_statsManager == null || _forcedMovementController == null)
+        {
+            GD.PrintErr("StartLeapSlam: StatsManager or MovementController not found!");
+            return;
+        }
+
+        Vector2 targetPosition = CalculateForcedMovementTarget(_currentCastingSkill.Range);
+        _forcedMovementController.StartLeapToTarget(targetPosition, _currentCastingSkill.CastTime);
+        _statsManager.SetInvincible(true);
+    }
+
+    /// <summary>
+    /// Ends leap movement and removes invincibility.
+    /// </summary>
+    public void EndLeapSlam()
+    {
+        if (_statsManager == null || _forcedMovementController == null)
+        {
+            GD.PrintErr("EndLeapSlam: StatsManager or MovementController not found!");
+            return;
+        }
+
+        _forcedMovementController.EndMovement();
+        _statsManager.SetInvincible(false);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Calculates dash/leap target position toward mouse, clamped to skill range.
+    /// If mouse within range: Move to exact mouse position.
+    /// If mouse outside range: Move max distance toward mouse.
     /// </summary>
     private Vector2 CalculateForcedMovementTarget(float maxRange)
     {
@@ -239,47 +326,14 @@ public partial class SkillEffectController : Node
         }
     }
 
-    // ===== LEAP SLAM CALLBACKS (Called from AnimationPlayer) =====
-
-    public void StartLeapSlam()
-    {
-        if (_statsManager == null || _forcedMovementController == null)
-        {
-            GD.PrintErr("StartLeapSlam: StatsManager or MovementController not found!");
-            return;
-        }
-
-        Vector2 targetPosition = CalculateForcedMovementTarget(_currentCastingSkill.Range);
-
-        // Calculate smart target position (clamped to Leap Slam's range)
-        // Vector2 targetPosition = CalculateForcedMovementTarget(_currentCastingSkill.Range);
-
-        // Use leap-specific method
-        _forcedMovementController.StartLeapToTarget(targetPosition, _currentCastingSkill.CastTime);
-
-        // Leap Slam also has invincibility during jump
-        _statsManager.SetInvincible(true);
-    }
-
-    public void EndLeapSlam()
-    {
-        if (_statsManager == null || _forcedMovementController == null)
-        {
-            GD.PrintErr("EndLeapSlam: StatsManager or MovementController not found!");
-            return;
-        }
-
-        _forcedMovementController.EndMovement();
-        _statsManager.SetInvincible(false);
-
-        // Future: Trigger explosion effect on landing
-        // if (_currentCastingSkill.Explosion != null)
-        // {
-        //     SpawnExplosionEffect();
-        // }
-    }
-
-    // ===== COLLISION HANDLERS =====
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Spawns a single projectile with spread angle calculation.
+    /// Used by SpawnWaveProjectiles() to create projectile spreads.
+    /// Calculates angle offset based on index position in spread pattern.
+    /// </summary>
     private void SpawnSingleProjectile(Vector2 spawnPos, float baseAngle, int index, int totalCount, float spreadAngle)
     {
         float angleOffset = 0f;

@@ -4,16 +4,43 @@ using ZenithRising.Scripts.Skills.Base;
 
 namespace ZenithRising.Scripts.PlayerScripts.Components;
 
+/// <summary>
+/// Input handling component for player character.
+/// Responsibilities:
+/// - Movement input polling (WASD keys via GetMovementInput)
+/// - Skill input events (mouse buttons, number keys, spacebar)
+/// - Signal emission to Player for skill execution
+/// Pattern: Converts Godot input events → SkillPressed signals with SkillSlot enum
+/// Does NOT handle: Input buffering (SkillManager), skill execution (Player)
+/// </summary>
 [GlobalClass]
 public partial class InputManager : Node
 {
-    // Called every frame for polling-based input (movement)
+    // ═══════════════════════════════════════════════════════════════
+    // SIGNALS
+    // ═══════════════════════════════════════════════════════════════
+    [Signal] public delegate void SkillPressedEventHandler(int skillSlot);
+
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - MOVEMENT INPUT
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Returns normalized movement vector from WASD input.
+    /// Called every frame from Player._PhysicsProcess().
+    /// </summary>
     public Vector2 GetMovementInput()
     {
         return Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
     }
 
-    // Called from _UnhandledInput for event-based input (skills, UI)
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - SKILL INPUT
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Processes skill input events (mouse clicks, keyboard presses).
+    /// Called from Player._UnhandledInput().
+    /// Emits SkillPressed signal with appropriate SkillSlot.
+    /// </summary>
     public void HandleInputEvent(InputEvent @event)
     {
         if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
@@ -26,6 +53,13 @@ public partial class InputManager : Node
         }
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - INPUT ROUTING
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Routes mouse button inputs to skill slots.
+    /// LMB = BasicAttack, RMB = SpecialAttack.
+    /// </summary>
     private void HandleMouseInput(InputEventMouseButton mouseEvent)
     {
         if (mouseEvent.ButtonIndex == MouseButton.Left)
@@ -38,6 +72,10 @@ public partial class InputManager : Node
         }
     }
 
+    /// <summary>
+    /// Routes keyboard inputs to skill slots.
+    /// 1 = Primary, 2 = Secondary, 3 = Ultimate, Space = Utility.
+    /// </summary>
     private void HandleKeyInput(InputEventKey keyEvent)
     {
         switch (keyEvent.Keycode)
@@ -56,7 +94,4 @@ public partial class InputManager : Node
                 break;
         }
     }
-
-    // Signals
-    [Signal] public delegate void SkillPressedEventHandler(int skillSlot);
 }

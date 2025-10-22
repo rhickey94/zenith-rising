@@ -3,20 +3,40 @@ using ZenithRising.Scripts.Skills.Base;
 
 namespace ZenithRising.Scripts.PlayerScripts.Components;
 
+/// <summary>
+/// Skill execution orchestrator for player character.
+/// Responsibilities:
+/// - Cooldown tracking (6 skill slots)
+/// - Input buffering (recovery window: last 15% of animation accepts early inputs)
+/// - Animation lock enforcement (first 85% blocks non-dash inputs)
+/// - Skill validation (class restrictions, slot validation)
+/// - CDR (Cooldown Reduction) application
+/// - Routing: Animation-driven skills → Player.TryCastSkill(), Instant skills → ExecuteInstantSkill()
+/// - Combo tracking integration (basic attack chains)
+/// - Instant skill effects (buff application, visual spawning)
+/// Does NOT handle: Animation callbacks (SkillEffectController), buff lifecycle (BuffManager)
+/// </summary>
 [GlobalClass]
 public partial class SkillManager : Node
 {
-    [Export] public Skill BasicAttackSkill { get; set; }
-    [Export] public Skill SpecialAttackSkill { get; set; }
+    // ═══════════════════════════════════════════════════════════════
+    // SKILL SLOTS (6 total - configured in Godot editor)
+    // ═══════════════════════════════════════════════════════════════
+    [Export] public Skill BasicAttackSkill { get; set; }      // LMB
+    [Export] public Skill SpecialAttackSkill { get; set; }    // RMB
+    [Export] public Skill PrimarySkill { get; set; }          // 1 Key
+    [Export] public Skill SecondarySkill { get; set; }        // 2 Key
+    [Export] public Skill UltimateSkill { get; set; }         // 3 Key
+    [Export] public Skill UtilitySkill { get; set; }          // Spacebar
 
-    [Export] public Skill PrimarySkill { get; set; }
-    [Export] public Skill SecondarySkill { get; set; }
-    [Export] public Skill UltimateSkill { get; set; }
+    // ═══════════════════════════════════════════════════════════════
+    // INPUT BUFFERING CONFIG
+    // ═══════════════════════════════════════════════════════════════
+    [Export] public float BufferWindowSeconds = 0.15f; // Input buffer duration
 
-    [Export] public Skill UtilitySkill { get; set; }
-
-    [Export] public float BufferWindowSeconds = 0.15f;
-
+    // ═══════════════════════════════════════════════════════════════
+    // COOLDOWN TIMERS (counted down in Update())
+    // ═══════════════════════════════════════════════════════════════
     private float _basicAttackCooldownTimer = 0.0f;
     private float _specialAttackCooldownTimer = 0.0f;
     private float _primarySkillCooldownTimer = 0.0f;
@@ -24,17 +44,26 @@ public partial class SkillManager : Node
     private float _ultimateSkillCooldownTimer = 0.0f;
     private float _utilitySkillCooldownTimer = 0.0f;
 
+    // ═══════════════════════════════════════════════════════════════
+    // INPUT BUFFER STATE
+    // ═══════════════════════════════════════════════════════════════
     private SkillSlot? _bufferedSkillSlot = null;
     private double _bufferTimestamp = 0.0;
 
+    // ═══════════════════════════════════════════════════════════════
+    // DEPENDENCIES
+    // ═══════════════════════════════════════════════════════════════
     private Player _player;
     private BuffManager _buffManager;
     private StatsManager _statsManager;
     private AnimationController _animationController;
 
+    // ═══════════════════════════════════════════════════════════════
+    // LIFECYCLE METHODS
+    // ═══════════════════════════════════════════════════════════════
     public override void _Ready()
     {
-        // Don't call GetNode here - wait for Initialize()
+        // Wait for Initialize() - dependencies injected by Player._Ready()
     }
 
     public void Initialize(Player player, StatsManager statsManager, AnimationController animationController, BuffManager buffManager)
@@ -44,6 +73,7 @@ public partial class SkillManager : Node
         _animationController = animationController;
         _buffManager = buffManager;
 
+        // Validate all equipped skills
         ValidateSkill(PrimarySkill, SkillSlot.Primary);
         ValidateSkill(SecondarySkill, SkillSlot.Secondary);
         ValidateSkill(UltimateSkill, SkillSlot.Ultimate);
@@ -51,6 +81,7 @@ public partial class SkillManager : Node
         ValidateSkill(SpecialAttackSkill, SkillSlot.SpecialAttack);
         ValidateSkill(UtilitySkill, SkillSlot.Utility);
 
+        // Load skill data from SkillBalanceDatabase
         InitializeAllSkills();
     }
 
@@ -89,24 +120,27 @@ public partial class SkillManager : Node
         ProcessInputBuffer(delta);
     }
 
-    // Public method - routes to appropriate skill based on slot
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - SKILL EXECUTION
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Primary entry point for skill execution. Called by InputManager via Player.OnSkillPressed().
+    /// Handles: Animation lock checking, input buffering, cooldown routing.
+    /// </summary>
     public void UseSkill(SkillSlot slot)
     {
-        // === INPUT CANCELLATION ===
-        // Latest input always wins - cancel buffered skill
+        // Input Cancellation: Latest input always wins
         if (_bufferedSkillSlot.HasValue && _bufferedSkillSlot.Value != slot)
         {
             ClearInputBuffer();
         }
 
-        // === ANIMATION LOCK CHECK ===
-        // During first 85% of animation, ignore inputs (except Dash)
-        bool isDash = (slot == SkillSlot.Utility); // Assuming Dash is utility slot
+        // Animation Lock: During first 85% of animation, ignore inputs (except Dash)
+        bool isDash = (slot == SkillSlot.Utility);
 
         if (_player.IsInAnimationLock() && !isDash)
         {
-            // Input ignored - player committed to animation
-            return;
+            return; // Player committed to animation
         }
 
         bool success = false;
@@ -133,26 +167,28 @@ public partial class SkillManager : Node
                 break;
         }
 
-        // If skill failed to execute, buffer the input for retry
+        // Input Buffer: If skill failed during recovery window, buffer for retry
         if (!success)
         {
-            // Check if in recovery window
             if (_player.IsInRecoveryWindow())
             {
-                // Buffer for smooth chaining
                 _bufferedSkillSlot = slot;
                 _bufferTimestamp = Time.GetTicksMsec() / 1000.0;
             }
-            // Otherwise: Input ignored (cooldown, busy, etc.)
         }
         else
         {
-            // Skill succeeded - clear buffer
             ClearInputBuffer();
         }
     }
 
-    // Private method - attempts to execute a skill (renamed from UseSkill to TryUseSkill)
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - SKILL EXECUTION
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Attempts to execute a skill if cooldown allows.
+    /// Handles: Database initialization, combo tracking, CDR application, routing to Player/ExecuteInstantSkill.
+    /// </summary>
     private bool TryUseSkill(Skill skill, ref float cooldownRemaining)
     {
         if (skill == null || _statsManager == null)
@@ -165,12 +201,11 @@ public partial class SkillManager : Node
             return false;
         }
 
-        // Initialize skill from database
+        // Load skill data from SkillBalanceDatabase
         skill.Initialize();
 
-        // === NEW: Combo handling for basic attacks ===
-        int strikeNumber = 1; // Default to strike 1
-
+        // Combo tracking: Get next strike number for basic attack chains
+        int strikeNumber = 1;
         if (skill.Slot == SkillSlot.BasicAttack)
         {
             var comboTracker = _player.GetComboTracker();
@@ -180,49 +215,43 @@ public partial class SkillManager : Node
             }
         }
 
-        // Calculate actual cooldown (if skill has one)
+        // Apply CDR (Cooldown Reduction) from Intelligence stat
         float actualCooldown = 0f;
         if (skill.Cooldown > 0)
         {
-            // Apply CDR to cooldown
             actualCooldown = skill.Cooldown * (1 - _statsManager.CooldownReduction);
         }
 
-        // Route based on CastBehavior
+        // Route based on CastBehavior (AnimationDriven vs Instant)
         bool success = false;
 
         if (skill.CastBehavior == CastBehavior.AnimationDriven)
         {
-            // Request player to play animation
             if (_player.TryCastSkill(skill, strikeNumber))
             {
                 success = true;
 
-                // If skill has cooldown, apply it
                 if (actualCooldown > 0)
                 {
                     cooldownRemaining = actualCooldown;
                 }
                 else
                 {
-                    // If no cooldown, limit by attack rate (for Attack category skills)
+                    // No-cooldown attacks limited by attack rate stat
                     if (skill.Category == SkillCategory.Attack)
                     {
                         cooldownRemaining = 1.0f / _statsManager.CurrentAttackRate;
                     }
-                    // Spells with no cooldown don't have artificial delay
                 }
             }
         }
         else // CastBehavior.Instant
         {
-            // Check if player is dead (FSM validation)
             if (_player.IsDead())
             {
                 return false;
             }
 
-            // Execute instant skill effects
             if (ExecuteInstantSkill(skill))
             {
                 success = true;
@@ -233,15 +262,19 @@ public partial class SkillManager : Node
         return success;
     }
 
+    /// <summary>
+    /// Executes instant (non-interrupting) skill effects.
+    /// Currently supports: Buff application + visual spawning.
+    /// Future: Heals, summons, teleports.
+    /// </summary>
     private bool ExecuteInstantSkill(Skill skill)
     {
-        // Reset combo tracker (non-basic-attack skills)
         if (skill.Slot != SkillSlot.BasicAttack)
         {
             _player.GetComboTracker()?.ResetCombo();
         }
 
-        // Apply buff if skill has one (data-driven!)
+        // Data-driven buff application
         if (skill.BuffDuration > 0)
         {
             _buffManager?.ApplyBuff(
@@ -255,7 +288,6 @@ public partial class SkillManager : Node
                 damageReductionBonus: skill.BuffDamageReduction
             );
 
-            // Spawn visual effect if skill has one
             if (skill.SkillEffectScene != null)
             {
                 var effect = skill.SkillEffectScene.Instantiate<Node2D>();
@@ -266,15 +298,14 @@ public partial class SkillManager : Node
             return true;
         }
 
-        // Future instant skill types:
-        // if (skill.HealAmount > 0) { _statsManager.Heal(skill.HealAmount); return true; }
-        // if (skill.SummonScene != null) { SpawnSummon(skill.SummonScene); return true; }
-
+        // Future: Heals, summons, teleports
         GD.PrintErr($"ExecuteInstantSkill: Skill {skill.SkillId} has no instant effect data!");
         return false;
     }
 
-
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - VALIDATION
+    // ═══════════════════════════════════════════════════════════════
     private void ValidateSkill(Skill skill, SkillSlot expectedSlot)
     {
         if (skill == null)
@@ -294,8 +325,11 @@ public partial class SkillManager : Node
         }
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - COOLDOWN QUERIES (Used by SkillBarHUD)
+    // ═══════════════════════════════════════════════════════════════
     /// <summary>
-    /// Gets the remaining cooldown time for a skill slot.
+    /// Gets remaining cooldown time for UI display.
     /// </summary>
     public float GetCooldownRemaining(SkillSlot slot)
     {
@@ -312,14 +346,13 @@ public partial class SkillManager : Node
     }
 
     /// <summary>
-    /// Gets the total cooldown duration for a skill slot.
+    /// Gets total cooldown duration (after CDR) for UI display.
     /// </summary>
     public float GetCooldownTotal(SkillSlot slot)
     {
         var skill = GetSkill(slot);
         if (skill == null) return 0f;
 
-        // Apply CDR to get actual cooldown
         if (_statsManager != null && skill.Cooldown > 0)
         {
             return skill.Cooldown * (1 - _statsManager.CooldownReduction);
@@ -328,6 +361,13 @@ public partial class SkillManager : Node
         return skill.Cooldown;
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - INPUT BUFFERING
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Processes buffered input if within buffer window.
+    /// Called every frame from Update().
+    /// </summary>
     public void ProcessInputBuffer(double delta)
     {
         if (_bufferedSkillSlot == null) return;
@@ -335,15 +375,12 @@ public partial class SkillManager : Node
         double currentTime = Time.GetTicksMsec() / 1000.0;
         double age = currentTime - _bufferTimestamp;
 
-        // Check if buffer expired
         if (age > BufferWindowSeconds)
         {
             ClearInputBuffer();
             return;
         }
 
-        // Try to execute buffered input
-        // (temporarily restore mouse position for directional skills)
         UseSkill(_bufferedSkillSlot.Value);
     }
 
@@ -353,9 +390,9 @@ public partial class SkillManager : Node
         _bufferTimestamp = 0.0;
     }
 
-    /// <summary>
-    /// Gets the skill equipped in a specific slot.
-    /// </summary>
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - SKILL QUERIES
+    // ═══════════════════════════════════════════════════════════════
     private Skill GetSkill(SkillSlot slot)
     {
         return slot switch
@@ -371,8 +408,8 @@ public partial class SkillManager : Node
     }
 
     /// <summary>
-    /// Initializes all equipped skills by loading their data from the balance database.
-    /// Called during _Ready() to ensure skill metadata is available before UI needs it.
+    /// Loads skill data from SkillBalanceDatabase for all equipped skills.
+    /// Called during Initialize() to ensure metadata available before first use.
     /// </summary>
     private void InitializeAllSkills()
     {
@@ -384,3 +421,4 @@ public partial class SkillManager : Node
         UtilitySkill?.Initialize();
     }
 }
+

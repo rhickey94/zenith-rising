@@ -6,22 +6,40 @@ using ZenithRising.Scripts.Progression.Upgrades;
 
 namespace ZenithRising.Scripts.PlayerScripts.Components;
 
+/// <summary>
+/// Permanent upgrade management for per-run progression (resets on death/victory).
+/// Responsibilities:
+/// - Upgrade pool generation (8 upgrade types from GameBalance config)
+/// - Upgrade selection and stacking (values accumulate per stack)
+/// - Stat modifier aggregation (upgrades + buffs combined)
+/// - Triggering stat recalculation when upgrades/buffs change
+/// - Save/load active upgrades for run persistence
+/// Pattern: Collects upgrade + buff modifiers → StatsManager.RecalculateStats()
+/// Signal flow: BuffManager.BuffsChanged → OnBuffsChanged → RecalculateAllStats
+/// Does NOT handle: Buff lifecycle (BuffManager), stat calculation (StatsManager)
+/// </summary>
 [GlobalClass]
 public partial class UpgradeManager : Node
 {
+    // ═══════════════════════════════════════════════════════════════
+    // UPGRADE TRACKING
+    // ═══════════════════════════════════════════════════════════════
     private readonly Dictionary<UpgradeType, float> _activeUpgrades = [];
-
-    // Available upgrades pool
     private readonly List<Upgrade> _availableUpgrades = [];
 
+    // ═══════════════════════════════════════════════════════════════
+    // DEPENDENCIES
+    // ═══════════════════════════════════════════════════════════════
     private Player _player;
     private StatsManager _statsManager;
     private BuffManager _buffManager;
 
+    // ═══════════════════════════════════════════════════════════════
+    // LIFECYCLE METHODS
+    // ═══════════════════════════════════════════════════════════════
     public override void _Ready()
     {
-        // Don't call GetNode here - wait for Initialize()
-        // Only do initialization that doesn't need dependencies
+        // Dependencies injected via Initialize() - no initialization needed here
     }
 
     public void Initialize(Player player, StatsManager statsManager, BuffManager buffManager)
@@ -38,6 +56,14 @@ public partial class UpgradeManager : Node
         InitializeUpgradeList();
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - UPGRADE APPLICATION
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Applies an upgrade (stacks value if already active).
+    /// Triggers immediate stat recalculation.
+    /// Called by Player when user selects upgrade from level-up panel.
+    /// </summary>
     public void ApplyUpgrade(Upgrade upgrade)
     {
         // Track upgrade (stack values)
@@ -54,6 +80,13 @@ public partial class UpgradeManager : Node
         RecalculateAllStats();
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - UPGRADE SELECTION
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Returns random upgrades for level-up panel choices.
+    /// Uses lazy initialization if upgrade list not ready.
+    /// </summary>
     public List<Upgrade> GetRandomUpgrades(int count)
     {
         // Lazy initialize if not done in _Ready() due to timing
@@ -66,6 +99,13 @@ public partial class UpgradeManager : Node
         return [.. shuffled.Take(count)];
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - UPGRADE POOL INITIALIZATION
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Initializes upgrade pool from GameBalance config.
+    /// 8 upgrade types: Damage, Attack Speed, Movement Speed, Max Health, Pickup Radius, Pierce, Crit Chance, Regen.
+    /// </summary>
     private void InitializeUpgradeList()
     {
         if (GameBalance.Instance == null || GameBalance.Instance.Config == null)
@@ -89,11 +129,26 @@ public partial class UpgradeManager : Node
     ]);
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - UPGRADE QUERIES
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Gets current stacked value for an upgrade type.
+    /// Returns 0 if upgrade not active.
+    /// </summary>
     public float GetUpgradeValue(UpgradeType type)
     {
         return _activeUpgrades.GetValueOrDefault(type, 0f);
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - STAT RECALCULATION
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Recalculates all player stats from upgrades + buffs.
+    /// Called when: Upgrades applied, buffs change (via BuffManager.BuffsChanged signal).
+    /// Pattern: Collects upgrade modifiers + buff modifiers → combines additively → StatsManager.RecalculateStats().
+    /// </summary>
     public void RecalculateAllStats()
     {
         if (_statsManager == null)
@@ -138,11 +193,21 @@ public partial class UpgradeManager : Node
         _statsManager.RecalculateStats(combined);
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - SAVE/LOAD
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Returns copy of active upgrades for save system.
+    /// </summary>
     public Dictionary<UpgradeType, float> GetActiveUpgrades()
     {
         return new Dictionary<UpgradeType, float>(_activeUpgrades);
     }
 
+    /// <summary>
+    /// Loads saved upgrades and recalculates stats.
+    /// Called when loading active run from save file.
+    /// </summary>
     public void LoadActiveUpgrades(Dictionary<UpgradeType, float> upgrades)
     {
         _activeUpgrades.Clear();
@@ -159,11 +224,21 @@ public partial class UpgradeManager : Node
         }
     }
 
+    /// <summary>
+    /// Clears all active upgrades (used when starting new run).
+    /// </summary>
     public void ClearUpgrades()
     {
         _activeUpgrades.Clear();
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - MODIFIER AGGREGATION
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Converts active upgrades to StatModifiers structure.
+    /// Called by RecalculateAllStats() to combine with buff modifiers.
+    /// </summary>
     private StatModifiers GetUpgradeModifiers()
     {
         float movementSpeedPercent = GetUpgradeValue(UpgradeType.MovementSpeed);
@@ -197,6 +272,13 @@ public partial class UpgradeManager : Node
         };
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - EVENT HANDLERS
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Signal handler for BuffManager.BuffsChanged.
+    /// Triggers stat recalculation when buffs are added/removed/expired.
+    /// </summary>
     private void OnBuffsChanged()
     {
         RecalculateAllStats();

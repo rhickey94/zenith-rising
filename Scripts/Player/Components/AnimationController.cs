@@ -3,13 +3,30 @@ using ZenithRising.Scripts.Skills.Base;
 
 namespace ZenithRising.Scripts.PlayerScripts.Components;
 
+/// <summary>
+/// Animation playback controller for player character.
+/// Responsibilities:
+/// - Locomotion animation (walk/idle in 4 directions)
+/// - Skill animation playback (with combo support for multi-strike attacks)
+/// - Mouse-aimed directional animation selection
+/// - Attack speed/cast speed scaling via SpeedScale
+/// - Animation duration queries for recovery window calculation
+/// Pattern: Mouse cursor determines facing direction (twin-stick controls)
+/// Does NOT handle: Animation callbacks (SkillEffectController), FSM state management (Player)
+/// </summary>
 [GlobalClass]
 public partial class AnimationController : Node
 {
+    // ═══════════════════════════════════════════════════════════════
+    // DEPENDENCIES
+    // ═══════════════════════════════════════════════════════════════
     private AnimationPlayer _animationPlayer;
     private Player _player;
     private Vector2 _lastDirection = Vector2.Down;
 
+    // ═══════════════════════════════════════════════════════════════
+    // LIFECYCLE METHODS
+    // ═══════════════════════════════════════════════════════════════
     public void Initialize(Player player, AnimationPlayer animationPlayer)
     {
         _player = player;
@@ -26,6 +43,13 @@ public partial class AnimationController : Node
         }
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - ANIMATION PLAYBACK
+    // ═══════════════════════════════════════════════════════════════
+    /// <summary>
+    /// Plays locomotion animations (walk/idle) based on movement input.
+    /// Uses mouse direction for facing, not movement direction (twin-stick controls).
+    /// </summary>
     public void PlayLocomotion(PlayerState state, Vector2 movementInput)
     {
         if (_animationPlayer == null)
@@ -47,7 +71,11 @@ public partial class AnimationController : Node
         }
     }
 
-    // Modify PlaySkillAnimation to accept strike number:
+    /// <summary>
+    /// Plays skill animation with speed scaling and combo support.
+    /// speedScale: Multiplier from attack rate (attacks) or cast speed (spells).
+    /// strikeNumber: For combo attacks (1 = first strike, 2 = second strike, etc.).
+    /// </summary>
     public void PlaySkillAnimation(Skill skill, int strikeNumber, float speedScale)
     {
         if (_animationPlayer == null || skill == null)
@@ -68,7 +96,10 @@ public partial class AnimationController : Node
         _animationPlayer.Play(animationName);
     }
 
-    // NEW: Get animation duration for recovery window tracking
+    /// <summary>
+    /// Gets animation duration in seconds for recovery window calculation.
+    /// Used by Player to determine when input buffering begins (last 15% of animation).
+    /// </summary>
     public float GetSkillAnimationDuration(Skill skill, int strikeNumber)
     {
         string animName = GetStrikeAnimationName(skill, strikeNumber);
@@ -81,8 +112,9 @@ public partial class AnimationController : Node
         return 0.5f; // Default fallback
     }
 
-    // ===== PUBLIC API - Direction Queries =====
-
+    // ═══════════════════════════════════════════════════════════════
+    // PUBLIC API - DIRECTION QUERIES
+    // ═══════════════════════════════════════════════════════════════
     /// <summary>
     /// Gets the direction the player is facing (mouse direction).
     /// Used for skill execution and animation selection.
@@ -115,8 +147,9 @@ public partial class AnimationController : Node
         return direction.Normalized();
     }
 
-    // ===== PRIVATE HELPERS - Animation Playback =====
-
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - ANIMATION PLAYBACK
+    // ═══════════════════════════════════════════════════════════════
     private void PlayWalkAnimation(Vector2 direction)
     {
         string animName = GetDirectionalAnimationName("walk", direction);
@@ -137,8 +170,9 @@ public partial class AnimationController : Node
         }
     }
 
-    // ===== PRIVATE HELPERS - Animation Name Building =====
-
+    // ═══════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS - ANIMATION NAME BUILDING
+    // ═══════════════════════════════════════════════════════════════
     /// <summary>
     /// Builds directional animation name (e.g., "walk_down", "idle_left").
     /// </summary>
@@ -175,9 +209,13 @@ public partial class AnimationController : Node
             : skill.AnimationBaseName;
     }
 
+    /// <summary>
+    /// Gets animation name for combo attacks with strike number support.
+    /// Example: warrior_attack_down_1, warrior_attack_down_2, etc.
+    /// </summary>
     private string GetStrikeAnimationName(Skill skill, int strikeNumber)
     {
-        // For combo attacks, animations are named: warrior_attack_down_1, warrior_attack_down_2, etc.
+        // Combo attacks append strike number to directional animation name
         if (skill.Slot == SkillSlot.BasicAttack && strikeNumber > 1)
         {
             string direction = GetDirectionSuffix();
@@ -188,12 +226,12 @@ public partial class AnimationController : Node
         return GetSkillAnimationName(skill);
     }
 
+    /// <summary>
+    /// Returns directional suffix string ("down", "up", "left", "right") based on facing direction.
+    /// Used for combo attack animation naming.
+    /// </summary>
     private string GetDirectionSuffix()
     {
-        // Returns "down", "up", "left", or "right" based on facing direction
-        // This method should already exist in your AnimationController
-        // If not, you need to implement it based on GetFacingDirection()
-
         Vector2 facing = GetFacingDirection();
 
         if (Mathf.Abs(facing.Y) > Mathf.Abs(facing.X))
