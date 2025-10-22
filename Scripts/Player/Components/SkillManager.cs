@@ -28,6 +28,7 @@ public partial class SkillManager : Node
     private double _bufferTimestamp = 0.0;
 
     private Player _player;
+    private BuffManager _buffManager;
     private StatsManager _statsManager;
     private AnimationController _animationController;
 
@@ -36,11 +37,12 @@ public partial class SkillManager : Node
         // Don't call GetNode here - wait for Initialize()
     }
 
-    public void Initialize(Player player, StatsManager statsManager, AnimationController animationController)
+    public void Initialize(Player player, StatsManager statsManager, AnimationController animationController, BuffManager buffManager)
     {
         _player = player;
         _statsManager = statsManager;
         _animationController = animationController;
+        _buffManager = buffManager;
 
         ValidateSkill(PrimarySkill, SkillSlot.Primary);
         ValidateSkill(SecondarySkill, SkillSlot.Secondary);
@@ -214,15 +216,62 @@ public partial class SkillManager : Node
         }
         else // CastBehavior.Instant
         {
-            if (_player.TryInstantSkill(skill))
+            // Check if player is dead (FSM validation)
+            if (_player.IsDead())
+            {
+                return false;
+            }
+
+            // Execute instant skill effects
+            if (ExecuteInstantSkill(skill))
             {
                 success = true;
-                // Instant skills always use cooldown (if they have one)
                 cooldownRemaining = actualCooldown;
             }
         }
 
         return success;
+    }
+
+    private bool ExecuteInstantSkill(Skill skill)
+    {
+        // Reset combo tracker (non-basic-attack skills)
+        if (skill.Slot != SkillSlot.BasicAttack)
+        {
+            _player.GetComboTracker()?.ResetCombo();
+        }
+
+        // Apply buff if skill has one (data-driven!)
+        if (skill.BuffDuration > 0)
+        {
+            _buffManager?.ApplyBuff(
+                buffId: skill.SkillId,
+                duration: skill.BuffDuration,
+                attackSpeedBonus: skill.BuffAttackSpeed,
+                moveSpeedBonus: skill.BuffMoveSpeed,
+                castSpeedBonus: skill.BuffCastSpeed,
+                damageBonus: skill.BuffDamage,
+                cooldownReductionBonus: skill.BuffCDR,
+                damageReductionBonus: skill.BuffDamageReduction
+            );
+
+            // Spawn visual effect if skill has one
+            if (skill.SkillEffectScene != null)
+            {
+                var effect = skill.SkillEffectScene.Instantiate<Node2D>();
+                _player.GetParent().AddChild(effect);
+                effect.GlobalPosition = _player.GlobalPosition;
+            }
+
+            return true;
+        }
+
+        // Future instant skill types:
+        // if (skill.HealAmount > 0) { _statsManager.Heal(skill.HealAmount); return true; }
+        // if (skill.SummonScene != null) { SpawnSummon(skill.SummonScene); return true; }
+
+        GD.PrintErr($"ExecuteInstantSkill: Skill {skill.SkillId} has no instant effect data!");
+        return false;
     }
 
 

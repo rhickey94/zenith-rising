@@ -28,11 +28,10 @@ public partial class SkillEffectController : Node
     [Export] public PackedScene WhirlwindVisualScene { get; set; }
     [Export] public PackedScene ExplosionEffectScene { get; set; }
 
-    public void Initialize(Player player, StatsManager statsManager, BuffManager buffManager, ForcedMovementController forcedMovementController, HitboxController hitboxController)
+    public void Initialize(Player player, StatsManager statsManager, ForcedMovementController forcedMovementController, HitboxController hitboxController)
     {
         _player = player;
         _statsManager = statsManager;
-        _buffManager = buffManager;
         _forcedMovementController = forcedMovementController;
         _hitboxController = hitboxController;
     }
@@ -43,7 +42,6 @@ public partial class SkillEffectController : Node
         {
             GD.PrintErr("SkillAnimationController: ProjectileScene not assigned!");
         }
-
 
         if (WhirlwindVisualScene == null)
         {

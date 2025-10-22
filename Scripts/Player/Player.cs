@@ -59,6 +59,7 @@ public partial class Player : CharacterBody2D
     public bool IsInRecoveryWindow() => _isInRecoveryWindow;
     public bool IsInAnimationLock() => _currentState == PlayerState.CastingSkill && !_isInRecoveryWindow;
     public bool IsDashActive() => _isDashSkillActive;
+    public bool IsDead() => _currentState == PlayerState.Dead;
 
     // ===== LIFECYCLE METHODS =====
     public override void _Ready()
@@ -156,11 +157,11 @@ public partial class Player : CharacterBody2D
         _comboTracker = GetNode<ComboTracker>("ComboTracker");
 
         // Initialize SkillEffectController with ForcedMovementController
-        _skillEffectController.Initialize(this, _statsManager, _buffManager, _movementController, _hitboxController);
+        _skillEffectController.Initialize(this, _statsManager, _movementController, _hitboxController);
 
         // 🆕 Inject dependencies into managers
         _upgradeManager?.Initialize(this, _statsManager, _buffManager);
-        _skillManager?.Initialize(this, _statsManager, _animationController);
+        _skillManager?.Initialize(this, _statsManager, _animationController, _buffManager);
         _animationController?.Initialize(this, _animationPlayer);
         _visualFeedbackController?.Initialize(_sprite, _statsManager);
         _movementController?.Initialize(this);
@@ -341,66 +342,9 @@ public partial class Player : CharacterBody2D
         return true;
     }
 
-    public bool TryInstantSkill(Skill skill)
-    {
-        if (_currentState == PlayerState.Dead)
-        {
-            return false;
-        }
-
-        // Instant skills don't change FSM state (non-interrupting)
-        if (skill.Slot != SkillSlot.BasicAttack)
-        {
-            _comboTracker?.ResetCombo();
-        }
-
-        // Check if skill has buff data (data-driven!)
-
-        if (skill.BuffDuration > 0)
-        {
-            _buffManager?.ApplyBuff(
-                buffId: skill.SkillId,
-                duration: skill.BuffDuration,
-                attackSpeedBonus: skill.BuffAttackSpeed,
-                moveSpeedBonus: skill.BuffMoveSpeed,
-                castSpeedBonus: skill.BuffCastSpeed,
-                damageBonus: skill.BuffDamage,
-                cooldownReductionBonus: skill.BuffCDR,
-                damageReductionBonus: skill.BuffDamageReduction
-            );
-
-            // ✅ NEW: Spawn visual effect if skill has one
-            if (skill.SkillEffectScene != null)
-            {
-                var effect = skill.SkillEffectScene.Instantiate<Node2D>();
-                GetParent().AddChild(effect);
-                effect.GlobalPosition = GlobalPosition;
-            }
-
-            return true;
-        }
-
-        // Future: Check for other instant effect types
-        // if (skill.HealAmount > 0) { _statsManager.Heal(skill.HealAmount); return true; }
-        // if (skill.SummonScene != null) { SpawnSummon(skill.SummonScene); return true; }
-
-        GD.PrintErr($"TryInstantSkill: Skill {skill.SkillId} has no instant effect data!");
-        return false;
-    }
-
     public void ApplyUpgrade(Upgrade upgrade)
     {
         _upgradeManager?.ApplyUpgrade(upgrade);
-    }
-
-    public void StartDash(Vector2 direction, float distance, float duration)
-    {
-        _movementController?.StartDash(direction, distance, duration);
-    }
-
-    public void EndDash()
-    {
-        _movementController?.EndMovement();
     }
 
     // ===== PRIVATE HELPERS - Event Handlers =====
