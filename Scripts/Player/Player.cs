@@ -75,8 +75,9 @@ public partial class Player : CharacterBody2D
         {
             // Subscribe to level up event
             _statsManager.LeveledUp += OnLeveledUp;
-            _statsManager.HealthChanged += OnStatsManagerHealthChanged;       // 🆕 NEW
-            _statsManager.ExperienceChanged += OnStatsManagerExperienceChanged; // 🆕 NEW
+            _statsManager.HealthChanged += OnStatsManagerHealthChanged;
+            _statsManager.ExperienceChanged += OnStatsManagerExperienceChanged;
+            _statsManager.PlayerDied += OnPlayerDied;
         }
 
         _upgradeManager = GetNode<UpgradeManager>("UpgradeManager");
@@ -437,5 +438,20 @@ public partial class Player : CharacterBody2D
     private void OnStatsManagerExperienceChanged(int currentXP, int requiredXP, int level)
     {
         EmitSignal(SignalName.ExperienceChanged, currentXP, requiredXP, level);
+    }
+
+    private void OnPlayerDied()
+    {
+        // Player handles death flow (knows about game context)
+        var dungeon = GetTree().Root.GetNode<Dungeon>("Dungeon");
+        if (dungeon != null)
+        {
+            dungeon.OnPlayerDeath();
+        }
+        else
+        {
+            GD.PrintErr("Player: Could not find Dungeon node on death!");
+            GetTree().ReloadCurrentScene(); // Fallback
+        }
     }
 }

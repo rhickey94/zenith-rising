@@ -227,8 +227,9 @@ public partial class SkillEffectController : Node
             return;
         }
 
-        Vector2 dashDirection = _player.GetAttackDirection();
-        _forcedMovementController.StartDash(dashDirection, _currentCastingSkill.Range, _currentCastingSkill.Duration);
+        // Calculate smart target position (clamped to range)
+        Vector2 targetPosition = CalculateForcedMovementTarget(_currentCastingSkill.Range);
+        _forcedMovementController.StartDashToTarget(targetPosition, _currentCastingSkill.Duration);
         _statsManager.SetInvincible(true);
     }
 
@@ -242,6 +243,84 @@ public partial class SkillEffectController : Node
 
         _forcedMovementController.EndMovement();
         _statsManager.SetInvincible(false);
+    }
+
+    /// <summary>
+    /// Calculates the target position for a forced movement skill.
+    /// If mouse is within range, moves to mouse.
+    /// If mouse is outside range, moves max distance toward mouse.
+    /// </summary>
+    private Vector2 CalculateForcedMovementTarget(float maxRange)
+    {
+        if (_player == null)
+        {
+            GD.PrintErr("CalculateForcedMovementTarget: Player is null!");
+            return _player.GlobalPosition;
+        }
+
+        Vector2 playerPos = _player.GlobalPosition;
+        Vector2 mousePos = _player.GetGlobalMousePosition();
+        Vector2 directionToMouse = (mousePos - playerPos);
+        float distanceToMouse = directionToMouse.Length();
+
+        if (distanceToMouse <= maxRange)
+        {
+            // Mouse is within range - dash to mouse position
+            return mousePos;
+        }
+        else
+        {
+            // Mouse is outside range - dash max distance toward mouse
+            Vector2 normalizedDirection = directionToMouse.Normalized();
+            return playerPos + (normalizedDirection * maxRange);
+        }
+    }
+
+    // ===== LEAP SLAM CALLBACKS (Called from AnimationPlayer) =====
+
+    public void StartLeapSlam()
+    {
+        if (_statsManager == null || _forcedMovementController == null)
+        {
+            GD.PrintErr("StartLeapSlam: StatsManager or MovementController not found!");
+            return;
+        }
+
+        GD.Print($"[DEBUG] StartLeapSlam called");
+        GD.Print($"[DEBUG] Current skill: {_currentCastingSkill?.SkillName}");
+        GD.Print($"[DEBUG] Skill range: {_currentCastingSkill?.Range}");
+        GD.Print($"[DEBUG] Player position: {_player.GlobalPosition}");
+
+        Vector2 targetPosition = CalculateForcedMovementTarget(_currentCastingSkill.Range);
+        GD.Print($"[DEBUG] Calculated target: {targetPosition}");
+        GD.Print($"[DEBUG] Distance to target: {(_player.GlobalPosition - targetPosition).Length()}");
+
+        // Calculate smart target position (clamped to Leap Slam's range)
+        // Vector2 targetPosition = CalculateForcedMovementTarget(_currentCastingSkill.Range);
+
+        // Use leap-specific method
+        _forcedMovementController.StartLeapToTarget(targetPosition, _currentCastingSkill.CastTime);
+
+        // Leap Slam also has invincibility during jump
+        _statsManager.SetInvincible(true);
+    }
+
+    public void EndLeapSlam()
+    {
+        if (_statsManager == null || _forcedMovementController == null)
+        {
+            GD.PrintErr("EndLeapSlam: StatsManager or MovementController not found!");
+            return;
+        }
+
+        _forcedMovementController.EndMovement();
+        _statsManager.SetInvincible(false);
+
+        // Future: Trigger explosion effect on landing
+        // if (_currentCastingSkill.Explosion != null)
+        // {
+        //     SpawnExplosionEffect();
+        // }
     }
 
     // ===== COLLISION HANDLERS =====

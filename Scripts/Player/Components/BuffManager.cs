@@ -3,6 +3,7 @@ using Godot;
 
 namespace ZenithRising.Scripts.PlayerScripts.Components;
 
+[GlobalClass]
 public partial class BuffManager : Node
 {
     [Signal] public delegate void BuffsChangedEventHandler();

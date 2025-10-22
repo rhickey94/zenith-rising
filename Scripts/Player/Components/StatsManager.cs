@@ -120,6 +120,7 @@ public partial class StatsManager : Node
     [Signal] public delegate void StatAllocatedEventHandler(int statType);
     [Signal] public delegate void HealthChangedEventHandler(float currentHealth, float maxHealth);
     [Signal] public delegate void ExperienceChangedEventHandler(int currentXP, int requiredXP, int level);
+    [Signal] public delegate void PlayerDiedEventHandler();
 
     // ===== LIFECYCLE METHODS =====
     public override void _Ready()
@@ -463,17 +464,7 @@ public partial class StatsManager : Node
 
     private void Die()
     {
-        // Find Dungeon node and notify it
-        var dungeon = GetTree().Root.GetNode<Dungeon>("Dungeon");
-        if (dungeon != null)
-        {
-            dungeon.OnPlayerDeath();
-        }
-        else
-        {
-            GD.PrintErr("Could not find Dungeon node!");
-            GetTree().ReloadCurrentScene(); // Fallback
-        }
+        EmitSignal(SignalName.PlayerDied);
     }
 
     // ===== PRIVATE HELPERS - Signals =====

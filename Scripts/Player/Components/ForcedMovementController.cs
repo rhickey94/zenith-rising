@@ -153,6 +153,26 @@ public partial class ForcedMovementController : Node
     }
 
     /// <summary>
+    /// Starts a leap movement to an absolute target position.
+    /// Similar to dash but uses Leap movement type (future: add parabolic arc).
+    /// </summary>
+    public void StartLeapToTarget(Vector2 targetPosition, float duration)
+    {
+        if (_player == null)
+        {
+            GD.PrintErr("ForcedMovementController: Cannot start leap - Player reference is null!");
+            return;
+        }
+
+        _isActive = true;
+        _currentMovementType = MovementSkillType.Leap;  // Uses Leap, not Dash
+        _startPos = _player.GlobalPosition;
+        _targetPos = targetPosition;
+        _duration = duration;
+        _elapsed = 0f;
+    }
+
+    /// <summary>
     /// Starts a charge movement with linear motion and collision detection.
     /// Future implementation for charging skills.
     /// </summary>
@@ -191,6 +211,26 @@ public partial class ForcedMovementController : Node
         _isActive = false; // Instant, no update needed
     }
 
+    /// <summary>
+    /// Starts a dash movement to an absolute target position.
+    /// Used for mouse-targeted dashes where target is pre-calculated.
+    /// </summary>
+    public void StartDashToTarget(Vector2 targetPosition, float duration)
+    {
+        if (_player == null)
+        {
+            GD.PrintErr("ForcedMovementController: Cannot start dash - Player reference is null!");
+            return;
+        }
+
+        _isActive = true;
+        _currentMovementType = MovementSkillType.Dash;
+        _startPos = _player.GlobalPosition;
+        _targetPos = targetPosition;  // Use absolute position, not calculated offset
+        _duration = duration;
+        _elapsed = 0f;
+    }
+
     // ===== PRIVATE HELPERS - Movement Types =====
 
     private void UpdateDash(float delta)
@@ -219,13 +259,27 @@ public partial class ForcedMovementController : Node
 
     private void UpdateLeap(float delta)
     {
-        // Future implementation: Parabolic arc trajectory
-        // For now, use same logic as dash
-        UpdateDash(delta);
+        if (_player == null || _duration <= 0)
+        {
+            _isActive = false;
+            return;
+        }
 
-        // Future: Add vertical offset based on parabola
+        _elapsed += delta;
+        float t = Mathf.Clamp(_elapsed / _duration, 0f, 1f);
+
+        // ✅ LINEAR interpolation (no easing) - travels full distance
+        _player.GlobalPosition = _startPos.Lerp(_targetPos, t);
+
+        // Check if leap completed
+        if (t >= 1.0f)
+        {
+            _isActive = false;
+        }
+
+        // Future: Add parabolic arc
         // float heightOffset = CalculateParabolicHeight(t, maxHeight);
-        // _player.GlobalPosition = basePosition + Vector2(0, -heightOffset);
+        // _player.GlobalPosition += new Vector2(0, -heightOffset);
     }
 
     private void UpdateCharge(float delta)
