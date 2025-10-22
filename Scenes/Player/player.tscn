@@ -1042,16 +1042,15 @@ motion_mode = 1
 script = ExtResource("1_xpcdj")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(1.2571428, 1.2571428)
 texture = ExtResource("2_0u5uq")
 region_enabled = true
-region_rect = Rect2(192, 1664, 64, 64)
+region_rect = Rect2(0, 1664, 64, 64)
 
 [node name="Shadow" type="Sprite2D" parent="."]
-self_modulate = Color(0, 0, 0, 0.18573615)
+self_modulate = Color(0, 0, 0, 0.4)
 z_index = -1
 position = Vector2(0, 32)
-scale = Vector2(0.37142858, 0.18571429)
+scale = Vector2(0.2, 0.1)
 texture = ExtResource("3_h8ma5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

@@ -28,8 +28,9 @@
 | Phase 2 | Progression hooks players | 2 weeks | ✅ **COMPLETE** |
 | Phase 3 | Hub enables meta-progression | 1 week | ✅ **COMPLETE** |
 | **Phase 3.5-A** | **Balance systems enable tuning** | **1 week** | **✅ COMPLETE** |
-| **Phase 3.5-B** | **Warrior skills validate animation architecture** | **2 weeks** | **⏳ IN PROGRESS** |
-| Phase 4 | Gear & loot add variety | 2 weeks | 📝 Next |
+| **Phase 3.5-B** | **Warrior skills validate animation architecture** | **2 weeks** | **✅ VALIDATED** |
+| **Phase 3.75** | **UI systems improve feedback** | **1 week** | **✅ COMPLETE** |
+| **Phase 4** | **Gear & loot add variety** | **2 weeks** | **⏳ IN PROGRESS** |
 | Phase 5 | Idle adds value | 2 weeks | 📝 Planned |
 | Phase 6 | Depth increases retention | 2 weeks | 📝 Planned |
 | Phase 7 | Endgame sustains interest | 2+ weeks | 📝 Planned |
@@ -411,90 +412,68 @@ Validates second hitbox pattern (AOE vs Melee).
 
 ---
 
-## Phase 3.75: UI System Improvements ⏳ IN PROGRESS
+## Phase 3.75: UI System Improvements ✅ COMPLETE
 
 **Context:** After validating skill architecture with 5 warrior skills, identified UI/UX gaps that should be addressed before Phase 4 (Gear & Loot).
 
 **Hypothesis:** "Better UI feedback (cooldowns, pause menu, global panels) improves player experience and prepares architecture for inventory/gear systems"
 
-**Status:** ⏳ **IN PROGRESS**
+**Status:** ✅ **COMPLETE**
 
-### Goals
-
-1. **Improve Combat Feedback**
-   - Skill cooldown indicators
-   - Buff/debuff timers
-   - Visual clarity for skill states
-
-2. **Improve Accessibility**
-   - Pause menu accessible everywhere (hub + dungeon)
-   - Stat panel accessible everywhere
-   - Settings panel for volume/options
-
-3. **Establish UI Architecture**
-   - UIManager autoload for persistent UI
-   - Foundation for future panels (inventory, mastery, crafting)
-   - Clean separation: persistent vs scene-local UI
-
-### Tasks
+### Completed
 
 **UIManager Architecture:**
-- [ ] Create UIManager autoload singleton
-- [ ] Persistent CanvasLayer (Layer 100) for global UI
-- [ ] Input handling for ESC (pause) and C (stats)
+- ✅ Created UIManager.cs autoload singleton
+- ✅ Created ui_manager.tscn scene (CanvasLayer with Layer 200)
+- ✅ Input handling for ESC (pause) and C (stats)
+- ✅ Scene type detection (IsInHub/IsInDungeon helpers)
+- ✅ Fixed autoload path (pointed to .tscn, not .cs)
 
 **New UI Components:**
-- [ ] PauseMenu (ESC key, works in hub + dungeon)
-  - Resume, Character Stats, Settings, Return to Hub, Quit
-  - Context-aware (hide "Return to Hub" when already in hub)
-- [ ] SkillBarHUD (bottom-center skill bar)
-  - Skill icons/labels
-  - Keybind indicators (LMB, RMB, E, Space)
-  - Cooldown timers (visual + numeric)
-  - Ready state indicators (green glow)
-- [ ] SettingsPanel (volume controls)
-  - Master, SFX, Music volume sliders
-  - Placeholder for future settings
-- [ ] BuffIndicatorContainer (optional)
-  - Active buff icons near health bar
-  - Duration timers
+- ✅ PauseMenu (ESC key, works in hub + dungeon)
+  - Resume, Return to Hub, Main Menu buttons
+  - Context-aware (hides "Return to Hub" when in hub)
+  - Signal-based communication with UIManager
+- ✅ SkillBarHUD (bottom-center skill bar)
+  - 6 skill slots (Primary, Secondary, Ultimate, BasicAttack, SpecialAttack, Utility)
+  - Keybind indicators (LMB, RMB, 1, 2, 3, Space)
+  - Cooldown progress bars + numeric timers
+  - Dynamic skill name display
+- ✅ SkillSlotUI component
+  - Reusable skill slot UI element
+  - Cooldown visualization
+  - Keybind + skill name labels
 
 **Refactoring:**
-- [ ] Move StatAllocationPanel to UIManager ownership
-- [ ] Update Player.cs to use UIManager.ShowStatPanel()
-- [ ] Add SkillManager cooldown signals
-- [ ] Add GetCooldownRemaining() helper methods
+- ✅ Moved StatAllocationPanel to UIManager ownership
+- ✅ Stat panel accessible via C key globally (hub + dungeon)
+- ✅ Added SkillManager.GetCooldownRemaining(slot) method
+- ✅ Added SkillManager.GetCooldownTotal(slot) method
 
-### Success Criteria
+### Success Criteria ✅ Met
 
-- [ ] ESC opens pause menu in both hub and dungeon
-- [ ] C key opens stat panel in both hub and dungeon
-- [ ] Skill bar shows accurate cooldown timers
-- [ ] Players can see when skills are ready
-- [ ] Volume controls work in settings
-- [ ] No UI duplication between scenes
-
-### Time Estimate
-~2.5 hours total
-- UIManager core: 20 min
-- PauseMenu: 30 min
-- StatAllocationPanel refactor: 15 min
-- SettingsPanel: 20 min
-- SkillBarHUD: 45 min
-- Buff indicators (optional): 20 min
+- ✅ ESC opens pause menu in both hub and dungeon
+- ✅ C key opens stat panel in both hub and dungeon
+- ✅ Skill bar shows accurate cooldown timers
+- ✅ Players can see when skills are ready
+- ✅ No UI duplication between scenes
+- ✅ UIManager ready for Phase 4 (inventory, forge panels)
 
 ### Deferred to Later
+- Settings panel with volume controls (Phase 4+)
+- Buff indicator UI (Phase 4+)
 - Tooltip system (Phase 4+)
-- Inventory panel (Phase 4)
 - Mastery info panel (Phase 4+)
 - Keybind remapping (Phase 7 polish)
 - Boss health bar (Phase 7 polish)
 
 ---
 
-## Phase 4: Gear & Forge System 📝 NEXT
+## Phase 4: Gear & Forge System ⏳ IN PROGRESS
 
 **Hypothesis:** "Forge crafting creates optimization puzzles without mandatory grind"
+
+**Status:** ⏳ **IN PROGRESS** - Starting with Inventory UI
 
 ### Planned Tasks
 
@@ -698,18 +677,24 @@ Validates second hitbox pattern (AOE vs Melee).
 
 ## Current Focus
 
-**Phase 3.5 - Phases B-E (Remaining Warrior Skills)**
+**Phase 4: Gear & Loot System** ⏳ **IN PROGRESS**
 
-Phase A (Balance Systems) is complete! Now implementing the remaining 3 warrior skills using the established patterns and centralized balance database.
+After completing Phase 3.75 (UI Systems), we now have UIManager architecture ready to host new panels. Starting Phase 4 with inventory UI to create the foundation for item management.
 
 **Current Status:**
-- ✅ Phase A Complete: Balance infrastructure ready
-- ✅ Basic Attack (Fusion Cutter) functional - Melee Pattern
-- ✅ Whirlwind functional - Instant AOE Pattern + visual effect
-- ✅ Energy Wave functional - Hybrid Pattern (melee + 3 projectiles)
-- 📝 Leap Slam - Database entry added (not implemented)
-- 📝 Combat Stim - Planned (Buff Pattern)
-- 📝 Breaching Charge - Planned (Cast-Spawn Pattern)
+- ✅ Phase 3.75 Complete: UIManager, pause menu, skill bar with cooldowns
+- ⏳ Phase 4.1 Starting: Inventory UI implementation
+- 📝 Phase 4.2 Planned: Gear system (data structures, affixes, FP)
+- 📝 Phase 4.3 Planned: Material drops
+- 📝 Phase 4.4 Planned: Forge interface
+- 📝 Phase 4.5 Planned: Save integration for gear
+
+**Phase 4.1 Tasks (Inventory UI):**
+- Create InventoryPanel.cs and inventory_panel.tscn
+- Grid-based item display
+- Equipment slots (4 slots: Weapon, Armor, Accessory 1, Accessory 2)
+- Add I key shortcut to UIManager
+- Item tooltip system foundation
 
 **See [`../../CLAUDE.md`](../../CLAUDE.md) for current session progress and next tasks.**
 

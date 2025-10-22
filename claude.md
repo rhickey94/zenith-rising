@@ -52,15 +52,16 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 
 ## Current Status: Be Honest
 
-**Phase:** UI System Improvements (Phase 3.75) - ⏳ **IN PROGRESS**
+**Phase:** Gear & Loot System (Phase 4) - ⏳ **IN PROGRESS**
 
-**🎉 PHASES 1, 2, 3, 3.5-A, & 3.5-B VALIDATED! 🎉**
+**🎉 PHASES 1, 2, 3, 3.5-A, 3.5-B, & 3.75 COMPLETE! 🎉**
 
 **Phase 1 - Combat:** Proven fun and engaging through multiple playtests
 **Phase 2 - Progression:** Character stats, save/load, stat allocation working
 **Phase 3 - Hub World:** Scene flow and player initialization working
 **Phase 3.5-A - Balance Systems:** Centralized config infrastructure complete
 **Phase 3.5-B - Warrior Skills:** Architecture validated with 5 working skills
+**Phase 3.75 - UI Systems:** UIManager, pause menu, skill bar with cooldowns complete
 
 ### ✅ Actually Working
 
@@ -136,6 +137,15 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 - ✅ Mouse-aimed twin-stick controls working
 - ✅ Buff system working (BuffManager integration)
 
+**UI Systems (Phase 3.75):**
+- **UIManager autoload** - Persistent CanvasLayer (Layer 200) for global UI
+- **PauseMenu** - ESC key, context-aware (hides "Return to Hub" when in hub)
+- **SkillBarHUD** - Bottom-center skill bar with cooldown timers and keybinds
+- **SkillSlotUI** - Reusable skill slot component (icon, cooldown bar, keybind label)
+- **Global stat panel** - C key works in both hub and dungeon
+- **Cooldown tracking** - SkillManager.GetCooldownRemaining/Total() methods
+- **Input handling** - ESC for pause, C for stats, handled in UIManager
+
 ### 📝 Deferred (Post-MVP)
 
 **Remaining Warrior Skills (Not needed for architecture validation):**
@@ -159,53 +169,62 @@ A bullet hell roguelite with idle mechanics. Players fight through tower floors 
 
 ## Current Phase Focus
 
-**Phase 3.75: UI System Improvements** ⏳ **IN PROGRESS**
+**Phase 4: Gear & Loot System** ⏳ **IN PROGRESS**
 
 ### Context
 
-After validating the skill system architecture with 5 working warrior skills, we're shifting focus to UI/UX improvements before tackling the gear/loot system in Phase 4. The skill architecture has proven robust enough to handle complex patterns (melee, AOE, hybrid, instant buffs, dash) - remaining skills can be added later.
+After completing Phase 3.75 (UI Systems), we now have the foundation needed for inventory management and item display. UIManager is ready to host new panels (inventory, equipment, forge). Starting with inventory UI to create a place for items before implementing the gear drop and forge systems.
 
 ### Goals
 
-1. **Improve player feedback** - Cooldown indicators, buff timers, visual clarity
-2. **Improve accessibility** - Pause menu everywhere, global stat panel access
-3. **Establish UI architecture** - UIManager autoload for future panels (inventory, mastery, crafting)
+1. **Create inventory system** - Foundation for item management
+2. **Implement gear drops** - Equipment with randomized stats
+3. **Build forge UI** - Crafting interface for improving gear
+4. **Enable gear persistence** - Save/load equipped items and inventory
 
-### Tasks
+### Phase 4 Breakdown (from phase-plan.md)
 
-**UIManager Architecture:**
-- Create UIManager autoload singleton
-- Persistent UI layer (pause, stats, settings, tooltips)
-- Scene-specific UI stays local (HUD, skill bar in dungeon)
+**Phase 4.1: Inventory UI** (Current)
+- Create InventoryPanel.cs and inventory_panel.tscn
+- Grid-based item display (icon, name, stats tooltip)
+- Equipment slots (4 slots: Weapon, Armor, Accessory 1, Accessory 2)
+- Add to UIManager (I key to toggle)
+- Item tooltip system
 
-**New UI Components:**
-- Pause Menu (ESC key, accessible in hub + dungeon)
-- Skill Bar HUD (cooldown timers, keybind indicators)
-- Settings Panel (volume controls, basic options)
-- Buff Indicators (active buff icons + timers)
+**Phase 4.2: Gear System**
+- Gear data structures (Item, Equipment classes)
+- Stat affixes (T1-T7 tiers)
+- Forging Potential (FP) system
+- Drop table configuration
 
-**Refactoring:**
-- Move StatAllocationPanel to UIManager ownership
-- Make stat panel accessible globally (C key works everywhere)
-- Add input handling to UIManager (ESC, C key)
+**Phase 4.3: Material Drops**
+- 5 material types (Essence, Ore, Fragments, Souls, Crystals)
+- Drop rates tied to enemy types
+- Material inventory integration
+
+**Phase 4.4: Forge Interface**
+- Forge panel UI (FP bar, affix list, cost preview)
+- Add Affix action (choose stat, costs FP + materials)
+- Upgrade Affix action (T1→T2→T3, costs FP + materials)
+- Gear comparison tooltips
+
+**Phase 4.5: Save Integration**
+- Persist equipped gear and inventory
+- Track FP remaining per item
+- Material counts in save file
 
 ### Architecture Notes
 
-**Skill Implementation Pattern (Validated):**
-- **AnimationDriven skills:** Player.TryCastSkill() → Animation plays → Call Method tracks control hitboxes/spawning
-- **Instant skills:** Player.TryInstantSkill() → Data-driven checks (BuffDuration, etc.) → Apply effects
-- **Database-driven:** All skill parameters loaded from SkillBalanceDatabase (zero hardcoding)
-- **Composition pattern:** Skills use sub-resources (ProjectileData, MeleeData, AOEData, BuffData, ExplosionData)
-
-**UI Architecture (New):**
-- **UIManager autoload:** Owns persistent UI (pause, stats, settings)
+**UI Architecture (Established in Phase 3.75):**
+- **UIManager autoload:** Owns persistent UI (pause, stats, inventory, forge)
 - **Scene-local UI:** HUD, skill bar, victory/death screens stay in dungeon.tscn
-- **InputManager:** Player component handles movement/skills, UIManager handles UI inputs (ESC, C)
+- **Input handling:** ESC (pause), C (stats), I (inventory - to be added)
+- **CanvasLayer layering:** 200 for UIManager, 100 for scene-local HUD
 
-**After Phase 3.75 Complete:**
-- Move to Phase 4 (Gear & Loot)
-- Skill patterns already validated - can add remaining skills anytime
-- UIManager ready for inventory, mastery panels, tooltips
+**Skill System (Proven in Phase 3.5-B):**
+- Data-driven with SkillBalanceDatabase
+- Animation-driven combat with Call Method tracks
+- Remaining warrior skills can be added anytime (architecture validated)
 
 **See:** [`Docs/02-IMPLEMENTATION/phase-plan.md`](Docs/02-IMPLEMENTATION/phase-plan.md) for full phase details.
 
@@ -834,6 +853,88 @@ After Session 15 discussion, identified UI/UX improvements as next priority:
 - Create SkillBarHUD for cooldown indicators
 - Create SettingsPanel with volume controls
 
+### Session 16 - UI Systems Complete - PHASE 3.75 DONE! 🎨
+
+**Context:**
+After Session 15 planning, implemented all Phase 3.75 UI improvements. Created UIManager autoload architecture, pause menu, skill bar with cooldowns, and global keyboard shortcuts.
+
+**Completed:**
+
+**UIManager Architecture:**
+- ✅ Created UIManager.cs autoload singleton
+- ✅ Created ui_manager.tscn scene (CanvasLayer with Layer 200)
+- ✅ Added StatAllocationPanel and PauseMenu as children
+- ✅ Implemented global input handling (ESC for pause, C for stats)
+- ✅ Scene type detection (IsInHub/IsInDungeon helpers)
+- ✅ Proper pause/unpause flow
+- ✅ Fixed autoload configuration (project.godot pointed to .cs instead of .tscn)
+
+**PauseMenu Implementation:**
+- ✅ Created PauseMenu.cs + pause_menu.tscn
+- ✅ Context-aware UI (hides "Return to Hub" button when in hub)
+- ✅ Resume, Return to Hub, Main Menu buttons
+- ✅ Signal-based communication with UIManager
+- ✅ Proper pause tree integration
+
+**SkillBarHUD Implementation:**
+- ✅ Created SkillBarHud.cs + skill_bar_hud.tscn
+- ✅ 6 skill slots (Primary, Secondary, Ultimate, BasicAttack, SpecialAttack, Utility)
+- ✅ Cooldown progress bars (visual + numeric countdown)
+- ✅ Keybind labels (LMB, RMB, 1, 2, 3, Space)
+- ✅ Dynamic skill name display
+- ✅ Created SkillSlotUI.cs component for reusable slot UI
+
+**SkillManager Enhancements:**
+- ✅ Added GetCooldownRemaining(SkillSlot) method
+- ✅ Added GetCooldownTotal(SkillSlot) method
+- ✅ Full cooldown tracking infrastructure for UI integration
+
+**StatAllocationPanel Refactoring:**
+- ✅ Moved to UIManager ownership (no longer in dungeon.tscn)
+- ✅ Accessible globally via C key (works in hub and dungeon)
+- ✅ Proper pause behavior (pauses in dungeon, doesn't pause in hub)
+
+**Bug Fixes:**
+- ✅ Fixed UIManager autoload path (res://Scripts/Core/UIManager.cs → res://Scenes/Core/ui_manager.tscn)
+- ✅ Fixed "StatAllocationPanel not found" error
+- ✅ Fixed "PauseMenu not found" error
+
+**Achievements:**
+
+- 🎉 **Phase 3.75 COMPLETE!** All UI systems implemented and working
+- 🎨 **Professional UX!** ESC for pause, C for stats, proper cooldown indicators
+- 🏗️ **Scalable architecture!** UIManager ready for inventory, forge, mastery panels
+- 🎯 **Foundation laid!** Ready to build Phase 4 (Gear & Loot) on top of this
+
+**Lessons Learned:**
+
+- Autoloads for UI must point to .tscn scenes (not .cs scripts) when scenes have child nodes
+- CanvasLayer layering (200 for UIManager, 100 for HUD) ensures proper rendering order
+- Context-aware UI (IsInHub checks) prevents confusing button states
+- CallDeferred needed for finding player components on scene load
+- UIManager singleton pattern provides clean global access to persistent UI
+
+**Architecture Insights:**
+
+- **UIManager Pattern:**
+  - Owns all persistent UI panels (pause, stats, inventory, forge)
+  - Scene-local UI stays in scene files (HUD, skill bar, victory/death screens)
+  - Input handling centralized (ESC, C, future I key for inventory)
+  - Type-based scene detection more robust than string matching
+
+- **UI Hierarchy:**
+  - UIManager (CanvasLayer, Layer 200) - Always on top
+  - Scene-local HUD (CanvasLayer, Layer 100) - Below UI
+  - Game world (Layer 0) - Below HUD
+
+**Next Session:**
+
+- Begin Phase 4: Gear & Loot System
+- Create InventoryPanel.cs and inventory_panel.tscn
+- Design equipment slot UI (4 slots: Weapon, Armor, Accessory 1, Accessory 2)
+- Add I key shortcut to UIManager
+- Item tooltip system foundation
+
 ### Session 8 - Victory & Death Screens - PHASE 1 COMPLETE! 🎉
 
 **Completed:**
@@ -959,6 +1060,7 @@ zenith-rising/
 │   ├── Core/
 │   │   ├── hub.tscn (Safe zone with portal)
 │   │   ├── dungeon.tscn (Combat zone)
+│   │   ├── ui_manager.tscn (UIManager singleton autoload)
 │   │   └── game_balance.tscn (Balance singleton autoload)
 │   ├── Player/player.tscn
 │   ├── Enemies/ (enemy.tscn, fast_melee_enemy.tscn, slow_ranged_enemy.tscn, boss.tscn)
@@ -968,12 +1070,13 @@ zenith-rising/
 │   │   ├── whirlwind_visual.tscn
 │   │   └── buff_activation_effect.tscn
 │   └── UI/
-│       ├── Menus/ (main_menu.tscn, floor_transition_panel.tscn)
+│       ├── Menus/ (main_menu.tscn, pause_menu.tscn, floor_transition_panel.tscn)
 │       ├── Panels/ (level_up_panel.tscn, victory_screen.tscn, death_screen.tscn, stat_allocation_panel.tscn)
-│       └── hud.tscn
+│       └── HUD/ (hud.tscn, skill_bar_hud.tscn)
 ├── Scripts/
 │   ├── Core/
 │   │   ├── Hub.cs, Dungeon.cs, DungeonPortal.cs
+│   │   ├── UIManager.cs (Singleton autoload)
 │   │   ├── GameBalance.cs (Singleton autoload)
 │   │   ├── CombatSystem.cs
 │   │   ├── SaveManager.cs, SaveData.cs
@@ -993,7 +1096,10 @@ zenith-rising/
 │   │   │   ├── SkillBalanceEntry.cs
 │   │   │   └── Data/ (5 sub-resource types: ProjectileData, MeleeData, AOEData, BuffData, ExplosionData)
 │   │   └── Effects/ (DamageEntityBase.cs, EnergyProjectile.cs, WhirlwindVisual.cs)
-│   ├── UI/ (Panels/, HUD/)
+│   ├── UI/
+│   │   ├── Menus/ (MainMenu.cs, PauseMenu.cs)
+│   │   ├── Panels/ (StatAllocationPanel.cs, LevelUpPanel.cs, VictoryScreen.cs, DeathScreen.cs, FloorTransitionPanel.cs)
+│   │   └── HUD/ (Hud.cs, SkillBarHud.cs, SkillSlotUI.cs)
 │   └── Enemies/Base/Enemy.cs
 └── Resources/
     ├── Balance/
@@ -1063,5 +1169,5 @@ For complete stat formulas and progression details, see [`Docs/01-GAME-DESIGN/sy
 
 ---
 
-_Last updated: Session 15 - Architecture Decision: Skills Validated, Moving to UI_
-_🎉 PHASES 1, 2, 3, 3.5-A, & 3.5-B VALIDATED - Skill architecture proven, moving to Phase 3.75 (UI Improvements)! 🎉_
+_Last updated: Session 16 - UI Systems Complete, Moving to Phase 4 (Gear & Loot)_
+_🎉 PHASES 1, 2, 3, 3.5-A, 3.5-B, & 3.75 COMPLETE - UI foundation ready, beginning inventory system! 🎉_

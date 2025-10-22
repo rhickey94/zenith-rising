@@ -15,12 +15,18 @@ public partial class SkillManager : Node
 
     [Export] public Skill UtilitySkill { get; set; }
 
+    [Export] public float BufferWindowSeconds = 0.15f;
+
     private float _basicAttackCooldownTimer = 0.0f;
     private float _specialAttackCooldownTimer = 0.0f;
     private float _primarySkillCooldownTimer = 0.0f;
     private float _secondarySkillCooldownTimer = 0.0f;
     private float _ultimateSkillCooldownTimer = 0.0f;
     private float _utilitySkillCooldownTimer = 0.0f;
+
+    private SkillSlot? _bufferedSkillSlot = null;
+    private double _bufferTimestamp = 0.0;
+    private Vector2 _bufferedMousePosition = Vector2.Zero;
 
     private Player _player;
     private StatsManager _statsManager;
@@ -76,43 +82,62 @@ public partial class SkillManager : Node
         {
             _utilitySkillCooldownTimer -= delta;
         }
+
+        ProcessInputBuffer(delta);
     }
 
+    // Public method - routes to appropriate skill based on slot
     public void UseSkill(SkillSlot slot)
     {
+        bool success = false;
+
         switch (slot)
         {
             case SkillSlot.BasicAttack:
-                UseSkill(BasicAttackSkill, ref _basicAttackCooldownTimer);
+                success = TryUseSkill(BasicAttackSkill, ref _basicAttackCooldownTimer);
                 break;
             case SkillSlot.SpecialAttack:
-                UseSkill(SpecialAttackSkill, ref _specialAttackCooldownTimer);
+                success = TryUseSkill(SpecialAttackSkill, ref _specialAttackCooldownTimer);
                 break;
             case SkillSlot.Primary:
-                UseSkill(PrimarySkill, ref _primarySkillCooldownTimer);
+                success = TryUseSkill(PrimarySkill, ref _primarySkillCooldownTimer);
                 break;
             case SkillSlot.Secondary:
-                UseSkill(SecondarySkill, ref _secondarySkillCooldownTimer);
+                success = TryUseSkill(SecondarySkill, ref _secondarySkillCooldownTimer);
                 break;
             case SkillSlot.Ultimate:
-                UseSkill(UltimateSkill, ref _ultimateSkillCooldownTimer);
+                success = TryUseSkill(UltimateSkill, ref _ultimateSkillCooldownTimer);
                 break;
             case SkillSlot.Utility:
-                UseSkill(UtilitySkill, ref _utilitySkillCooldownTimer);
+                success = TryUseSkill(UtilitySkill, ref _utilitySkillCooldownTimer);
                 break;
+        }
+
+        // If skill failed to execute, buffer the input for retry
+        if (!success)
+        {
+            _bufferedSkillSlot = slot;
+            _bufferTimestamp = Time.GetTicksMsec() / 1000.0;
+            _bufferedMousePosition = _player.GetGlobalMousePosition();
+        }
+        else
+        {
+            // Clear buffer on successful execution
+            ClearInputBuffer();
         }
     }
 
-    private void UseSkill(Skill skill, ref float cooldownRemaining)
+    // Private method - attempts to execute a skill (renamed from UseSkill to TryUseSkill)
+    private bool TryUseSkill(Skill skill, ref float cooldownRemaining)
     {
         if (skill == null || _statsManager == null)
         {
-            return;
+            return false;
         }
 
         if (cooldownRemaining > 0)
         {
-            return;
+            return false;
         }
 
         // Initialize skill from database
@@ -127,11 +152,15 @@ public partial class SkillManager : Node
         }
 
         // Route based on CastBehavior
+        bool success = false;
+
         if (skill.CastBehavior == CastBehavior.AnimationDriven)
         {
             // Request player to play animation
             if (_player.TryCastSkill(skill))
             {
+                success = true;
+
                 // If skill has cooldown, apply it
                 if (actualCooldown > 0)
                 {
@@ -150,14 +179,17 @@ public partial class SkillManager : Node
         }
         else // CastBehavior.Instant
         {
-            bool success = _player.TryInstantSkill(skill);
-            if (success)
+            if (_player.TryInstantSkill(skill))
             {
+                success = true;
                 // Instant skills always use cooldown (if they have one)
                 cooldownRemaining = actualCooldown;
             }
         }
+
+        return success;
     }
+
 
     private void ValidateSkill(Skill skill, SkillSlot expectedSlot)
     {
@@ -210,6 +242,32 @@ public partial class SkillManager : Node
         }
 
         return skill.Cooldown;
+    }
+
+    public void ProcessInputBuffer(double delta)
+    {
+        if (_bufferedSkillSlot == null) return;
+
+        double currentTime = Time.GetTicksMsec() / 1000.0;
+        double age = currentTime - _bufferTimestamp;
+
+        // Check if buffer expired
+        if (age > BufferWindowSeconds)
+        {
+            ClearInputBuffer();
+            return;
+        }
+
+        // Try to execute buffered input
+        // (temporarily restore mouse position for directional skills)
+        UseSkill(_bufferedSkillSlot.Value);
+    }
+
+    private void ClearInputBuffer()
+    {
+        _bufferedSkillSlot = null;
+        _bufferTimestamp = 0.0;
+        _bufferedMousePosition = Vector2.Zero;
     }
 
     /// <summary>

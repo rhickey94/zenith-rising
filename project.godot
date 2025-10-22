@@ -18,6 +18,7 @@ config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 
 SaveManager="*res://Scripts/Core/SaveManager.cs"
 GameBalance="*res://Resources/Balance/game_balance.tscn"
+UiManager="*res://Scenes/Core/ui_manager.tscn"
 
 [display]
 
