@@ -1,4 +1,4 @@
-[gd_scene load_steps=52 format=3 uid="uid://jb1p3bafbe1"]
+[gd_scene load_steps=55 format=3 uid="uid://jb1p3bafbe1"]
 
 [ext_resource type="Script" uid="uid://bvjyaqpu6dell" path="res://Scripts/Player/Components/SkillManager.cs" id="1_a3d8c"]
 [ext_resource type="Script" uid="uid://bb11j86hcwmc5" path="res://Scripts/Player/Player.cs" id="1_xpcdj"]
@@ -21,9 +21,18 @@
 [ext_resource type="Script" uid="uid://bi4x5apap7d20" path="res://Scripts/Player/Components/AnimationController.cs" id="18_rcvs5"]
 [ext_resource type="Script" uid="uid://dtgjrcyj8fd1v" path="res://Scripts/Player/Components/VisualFeedbackController.cs" id="19_h8ma5"]
 [ext_resource type="Script" uid="uid://2xvtberx4hnj" path="res://Scripts/Player/Components/ForcedMovementController.cs" id="20_eksi1"]
+[ext_resource type="Script" uid="uid://b3niq6xc118lk" path="res://Scripts/Player/Components/HitboxController.cs" id="22_rqdc0"]
+[ext_resource type="Script" uid="uid://jryifp4tb6nb" path="res://Scripts/Player/Components/HurtboxController.cs" id="23_qr1w5"]
+[ext_resource type="Script" uid="uid://r4s52qt6vav7" path="res://Scripts/Player/Components/ComboTracker.cs" id="24_ythyg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
 size = Vector2(50, 62)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gk6dx"]
+size = Vector2(51, 38)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_jhyir"]
+radius = 150.0
 
 [sub_resource type="Animation" id="Animation_jlvik"]
 length = 0.001
@@ -1030,12 +1039,6 @@ _data = {
 &"warrior_whirlwind": SubResource("Animation_rcvs5")
 }
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_gk6dx"]
-size = Vector2(51, 38)
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_jhyir"]
-radius = 150.0
-
 [node name="Player" type="CharacterBody2D" groups=["player"]]
 collision_mask = 2
 motion_mode = 1
@@ -1103,27 +1106,41 @@ metadata/_custom_type_script = "uid://dtgjrcyj8fd1v"
 script = ExtResource("20_eksi1")
 metadata/_custom_type_script = "uid://2xvtberx4hnj"
 
+[node name="HitboxController" type="Node" parent="."]
+script = ExtResource("22_rqdc0")
+metadata/_custom_type_script = "uid://b3niq6xc118lk"
+
+[node name="HurtboxController" type="Node" parent="."]
+script = ExtResource("23_qr1w5")
+metadata/_custom_type_script = "uid://jryifp4tb6nb"
+
+[node name="ComboTracker" type="Node" parent="."]
+script = ExtResource("24_ythyg")
+metadata/_custom_type_script = "uid://r4s52qt6vav7"
+
+[node name="HitboxContainer" type="Node2D" parent="."]
+
+[node name="MeleeHitbox" type="Area2D" parent="HitboxContainer"]
+collision_layer = 0
+collision_mask = 2
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxContainer/MeleeHitbox"]
+position = Vector2(25.5, 11)
+shape = SubResource("RectangleShape2D_gk6dx")
+
+[node name="AOEHitbox" type="Area2D" parent="HitboxContainer"]
+collision_layer = 0
+collision_mask = 2
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxContainer/AOEHitbox"]
+shape = SubResource("CircleShape2D_jhyir")
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 reset_on_save = false
 libraries = {
 &"": SubResource("AnimationLibrary_r5xpd")
 }
-
-[node name="MeleeHitbox" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 2
-monitoring = false
-monitorable = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MeleeHitbox"]
-position = Vector2(25.5, 11)
-shape = SubResource("RectangleShape2D_gk6dx")
-
-[node name="AOEHitbox" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 2
-monitoring = false
-monitorable = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="AOEHitbox"]
-shape = SubResource("CircleShape2D_jhyir")

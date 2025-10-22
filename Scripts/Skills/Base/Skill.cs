@@ -2,6 +2,7 @@ using Godot;
 using ZenithRising.Scripts.Core;
 using ZenithRising.Scripts.PlayerScripts;
 using ZenithRising.Scripts.Skills.Balance;
+using ZenithRising.Scripts.Skills.Balance.Data;
 
 namespace ZenithRising.Scripts.Skills.Base;
 
@@ -87,6 +88,9 @@ public partial class Skill : Resource
     public float GoldDamageBonus { get; private set; }
     public float DiamondDamageBonus { get; private set; }
 
+    // Combo System
+    public ComboStrikeData[] ComboStrikes { get; private set; }
+
     private bool _initialized = false;
 
     private static readonly int[] _masteryThresholds = [100, 500, 2000, 10000];
@@ -145,6 +149,7 @@ public partial class Skill : Resource
         LoadAOEData(entry);
         LoadExplosionData(entry);
         LoadBuffData(entry);
+        LoadComboSkillData(entry);
         _initialized = true;
     }
 
@@ -156,6 +161,20 @@ public partial class Skill : Resource
     {
         KillCount++;
         CheckMasteryTierUp();
+    }
+
+    /// <summary>
+    /// Gets the configuration for a specific strike in a combo.
+    /// </summary>
+    /// <param name="strikeIndex">0-indexed strike number (0 = first strike)</param>
+    /// <returns>ComboStrikeData or null if not found</returns>
+    public ComboStrikeData GetStrikeConfig(int strikeIndex)
+    {
+        if (ComboStrikes == null || strikeIndex < 0 || strikeIndex >= ComboStrikes.Length)
+        {
+            return null;
+        }
+        return ComboStrikes[strikeIndex];
     }
 
     /// <summary>
@@ -272,6 +291,13 @@ public partial class Skill : Resource
         ExplosionDamage = entry.Explosion.ExplosionDamage;
         ExplosionRadius = entry.Explosion.ExplosionRadius;
         ExplosionKnockback = entry.Explosion.ExplosionKnockback;
+    }
+
+    private void LoadComboSkillData(SkillBalanceEntry entry)
+    {
+        if (entry.ComboStrikes == null) return;
+
+        ComboStrikes = entry.ComboStrikes;
     }
 }
 

@@ -47,17 +47,38 @@ public partial class AnimationController : Node
         }
     }
 
-    public void PlaySkillAnimation(Skill skill, float speedScale)
+    // Modify PlaySkillAnimation to accept strike number:
+    public void PlaySkillAnimation(Skill skill, int strikeNumber, float speedScale)
     {
         if (_animationPlayer == null || skill == null)
         {
-            GD.PrintErr("AnimationController: Cannot play skill animation - missing dependencies!");
+            GD.PrintErr("PlaySkillAnimation: Missing AnimationPlayer or Skill!");
             return;
         }
 
-        string animName = GetSkillAnimationName(skill);
-        _animationPlayer.Play(animName);
+        string animationName = GetStrikeAnimationName(skill, strikeNumber);
+
+        if (string.IsNullOrEmpty(animationName))
+        {
+            GD.PrintErr($"PlaySkillAnimation: No animation found for {skill.SkillName} strike {strikeNumber}");
+            return;
+        }
+
         _animationPlayer.SpeedScale = speedScale;
+        _animationPlayer.Play(animationName);
+    }
+
+    // NEW: Get animation duration for recovery window tracking
+    public float GetSkillAnimationDuration(Skill skill, int strikeNumber)
+    {
+        string animName = GetStrikeAnimationName(skill, strikeNumber);
+
+        if (_animationPlayer.HasAnimation(animName))
+        {
+            return (float)_animationPlayer.GetAnimation(animName).Length;
+        }
+
+        return 0.5f; // Default fallback
     }
 
     // ===== PUBLIC API - Direction Queries =====
@@ -152,5 +173,36 @@ public partial class AnimationController : Node
         return skill.UsesDirectionalAnimation
             ? GetDirectionalAnimationName(skill.AnimationBaseName, GetMouseDirection())
             : skill.AnimationBaseName;
+    }
+
+    private string GetStrikeAnimationName(Skill skill, int strikeNumber)
+    {
+        // For combo attacks, animations are named: warrior_attack_down_1, warrior_attack_down_2, etc.
+        if (skill.Slot == SkillSlot.BasicAttack && strikeNumber > 1)
+        {
+            string direction = GetDirectionSuffix();
+            return $"{skill.AnimationBaseName}_{direction}_{strikeNumber}";
+        }
+
+        // Non-combo skills use standard naming
+        return GetSkillAnimationName(skill);
+    }
+
+    private string GetDirectionSuffix()
+    {
+        // Returns "down", "up", "left", or "right" based on facing direction
+        // This method should already exist in your AnimationController
+        // If not, you need to implement it based on GetFacingDirection()
+
+        Vector2 facing = GetFacingDirection();
+
+        if (Mathf.Abs(facing.Y) > Mathf.Abs(facing.X))
+        {
+            return facing.Y > 0 ? "down" : "up";
+        }
+        else
+        {
+            return facing.X > 0 ? "right" : "left";
+        }
     }
 }

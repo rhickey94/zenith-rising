@@ -19,11 +19,7 @@ public partial class SkillEffectController : Node
     private ForcedMovementController _forcedMovementController;
 
     // Hitbox references
-    private Area2D _meleeHitbox;
-    private Area2D _aoeHitbox;
-
-    // State
-    private readonly HashSet<Enemy> _hitEnemiesThisCast = [];
+    private HitboxController _hitboxController;
     private Skill _currentCastingSkill;
     private Vector2 _currentAttackDirection;
 
@@ -32,29 +28,17 @@ public partial class SkillEffectController : Node
     [Export] public PackedScene WhirlwindVisualScene { get; set; }
     [Export] public PackedScene ExplosionEffectScene { get; set; }
 
-    public void Initialize(Player player, StatsManager statsManager, BuffManager buffManager, ForcedMovementController forcedMovementController)
+    public void Initialize(Player player, StatsManager statsManager, BuffManager buffManager, ForcedMovementController forcedMovementController, HitboxController hitboxController)
     {
         _player = player;
         _statsManager = statsManager;
         _buffManager = buffManager;
         _forcedMovementController = forcedMovementController;
+        _hitboxController = hitboxController;
     }
 
     public override void _Ready()
     {
-        // Get hitbox nodes from parent Player
-        _meleeHitbox = GetParent().GetNode<Area2D>("MeleeHitbox");
-        if (_meleeHitbox != null)
-        {
-            _meleeHitbox.BodyEntered += OnMeleeHitboxBodyEntered;
-        }
-
-        _aoeHitbox = GetParent().GetNode<Area2D>("AOEHitbox");
-        if (_aoeHitbox != null)
-        {
-            _aoeHitbox.BodyEntered += OnAOEHitboxBodyEntered;
-        }
-
         if (ProjectileScene == null)
         {
             GD.PrintErr("SkillAnimationController: ProjectileScene not assigned!");
@@ -75,6 +59,7 @@ public partial class SkillEffectController : Node
     public void SetCurrentSkill(Skill skill)
     {
         _currentCastingSkill = skill;
+        _hitboxController?.SetCurrentSkill(skill);
     }
 
     public void ClearCurrentSkill()
@@ -83,55 +68,35 @@ public partial class SkillEffectController : Node
     }
 
     // ===== ANIMATION CALLBACKS (Called from AnimationPlayer) =====
-
     public void EnableMeleeHitbox()
     {
-        if (_meleeHitbox == null || _currentCastingSkill == null)
-        {
-            GD.PrintErr("EnableMeleeHitbox: Hitbox or skill not ready!");
-            return;
-        }
-
-        _hitEnemiesThisCast.Clear();
-
-        // Get attack direction and position hitbox accordingly
-        _currentAttackDirection = _player.GetAttackDirection();
-        UpdateMeleeHitboxPosition(_currentAttackDirection);
-
-        _meleeHitbox.Monitoring = true;
+        _hitboxController?.EnableHitbox("MeleeHitbox");
     }
 
     public void DisableMeleeHitbox()
     {
-        if (_meleeHitbox == null || _currentCastingSkill == null)
-        {
-            GD.PrintErr("DisableMeleeHitbox: Hitbox or skill not ready!");
-            return;
-        }
-
-        _meleeHitbox.Monitoring = false;
+        _hitboxController?.DisableHitbox("MeleeHitbox");
     }
 
     public void EnableAOEHitbox()
     {
-        if (_aoeHitbox == null || _currentCastingSkill == null)
-        {
-            GD.PrintErr("EnableAOEHitbox: Hitbox or skill not ready!");
-            return;
-        }
-        _hitEnemiesThisCast.Clear();
-        _aoeHitbox.Monitoring = true;
+        // Whirlwind follows player
+        _hitboxController?.EnableHitbox("AOEHitbox", followPlayer: true);
     }
 
     public void DisableAOEHitbox()
     {
-        if (_aoeHitbox == null || _currentCastingSkill == null)
-        {
-            GD.PrintErr("DisableAOEHitbox: Hitbox or skill not ready!");
-            return;
-        }
+        _hitboxController?.DisableHitbox("AOEHitbox");
+    }
 
-        _aoeHitbox.Monitoring = false;
+    public void EnableComboStrike(int strikeIndex)
+    {
+        _hitboxController?.EnableComboStrike(strikeIndex);
+    }
+
+    public void DisableComboStrike(int strikeIndex)
+    {
+        _hitboxController?.DisableComboStrike(strikeIndex);
     }
 
     public void SpawnWaveProjectiles()
@@ -324,72 +289,6 @@ public partial class SkillEffectController : Node
     }
 
     // ===== COLLISION HANDLERS =====
-    private void UpdateMeleeHitboxPosition(Vector2 direction)
-    {
-        // Position hitbox in front of player based on attack direction
-        float distance = 40f; // How far in front of player
-        _meleeHitbox.Position = direction * distance;
-
-        // Rotate hitbox to match direction
-        _meleeHitbox.Rotation = direction.Angle();
-    }
-
-    private void OnMeleeHitboxBodyEntered(Node2D body)
-    {
-        if (body is not Enemy enemy)
-        {
-            return;
-        }
-
-        if (_hitEnemiesThisCast.Contains(enemy))
-        {
-            return;
-        }
-
-        _hitEnemiesThisCast.Add(enemy);
-        ApplyHitboxDamage(enemy);
-    }
-
-    private void OnAOEHitboxBodyEntered(Node2D body)
-    {
-        if (body is not Enemy enemy)
-        {
-            return;
-        }
-
-        if (_hitEnemiesThisCast.Contains(enemy))
-        {
-            return;
-        }
-
-        _hitEnemiesThisCast.Add(enemy);
-        ApplyHitboxDamage(enemy);
-    }
-
-    private void ApplyHitboxDamage(Enemy enemy)
-    {
-        if (_currentCastingSkill == null || _statsManager == null)
-        {
-            GD.PrintErr("ApplyHitboxDamage: No active skill or stats!");
-            return;
-        }
-
-        float baseDamage = _currentCastingSkill.BaseDamage;
-        float damage = CombatSystem.CalculateDamage(
-            baseDamage,
-            _statsManager,
-            _currentCastingSkill.DamageType
-        );
-
-        float healthBefore = enemy.Health;
-        enemy.TakeDamage(damage);
-
-        if (healthBefore > 0 && enemy.Health <= 0)
-        {
-            _currentCastingSkill.RecordKill();
-        }
-    }
-
     private void SpawnSingleProjectile(Vector2 spawnPos, float baseAngle, int index, int totalCount, float spreadAngle)
     {
         float angleOffset = 0f;

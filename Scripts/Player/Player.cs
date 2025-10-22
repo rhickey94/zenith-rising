@@ -37,12 +37,28 @@ public partial class Player : CharacterBody2D
     private AnimationController _animationController;
     private VisualFeedbackController _visualFeedbackController;
     private ForcedMovementController _movementController;
+    private HitboxController _hitboxController;
+    private HurtboxController _hurtboxController;
+    private ComboTracker _comboTracker;
+
     private Sprite2D _sprite;
     private AnimationPlayer _animationPlayer;
     private PlayerState _currentState = PlayerState.Idle;
     private Skill _currentCastingSkill;
     private bool _isCastingWhileMoving = false;
     private PlayerState _previousState = PlayerState.Idle;
+
+    // Add to Player.cs
+    private double _currentSkillStartTime = 0.0;
+    private float _currentSkillDuration = 0.0f;
+    private const float RecoveryWindowPercent = 0.15f; // Last 15% of animation
+    private bool _isInRecoveryWindow = false;
+    private bool _isDashSkillActive = false; // Special flag for dash
+
+    public ComboTracker GetComboTracker() => _comboTracker;
+    public bool IsInRecoveryWindow() => _isInRecoveryWindow;
+    public bool IsInAnimationLock() => _currentState == PlayerState.CastingSkill && !_isInRecoveryWindow;
+    public bool IsDashActive() => _isDashSkillActive;
 
     // ===== LIFECYCLE METHODS =====
     public override void _Ready()
@@ -135,16 +151,22 @@ public partial class Player : CharacterBody2D
         {
             GD.PrintErr("Player: ForcedMovementController not found!");
         }
+        _hitboxController = GetNode<HitboxController>("HitboxController");
+        _hurtboxController = GetNode<HurtboxController>("HurtboxController");
+        _comboTracker = GetNode<ComboTracker>("ComboTracker");
 
         // Initialize SkillEffectController with ForcedMovementController
-        _skillEffectController.Initialize(this, _statsManager, _buffManager, _movementController);
+        _skillEffectController.Initialize(this, _statsManager, _buffManager, _movementController, _hitboxController);
 
         // 🆕 Inject dependencies into managers
         _upgradeManager?.Initialize(this, _statsManager, _buffManager);
-        _skillManager?.Initialize(this, _statsManager);
+        _skillManager?.Initialize(this, _statsManager, _animationController);
         _animationController?.Initialize(this, _animationPlayer);
         _visualFeedbackController?.Initialize(_sprite, _statsManager);
         _movementController?.Initialize(this);
+        _hitboxController?.Initialize(this, _statsManager);
+        _hurtboxController?.Initialize(this, _statsManager);
+        _comboTracker?.Initialize(this, _skillManager);
 
     }
 
@@ -177,6 +199,18 @@ public partial class Player : CharacterBody2D
             direction = Vector2.Zero;
         }
 
+        // NEW: Update recovery window state
+        if (_currentState == PlayerState.CastingSkill && _currentSkillDuration > 0.0f)
+        {
+            double elapsed = (Time.GetTicksMsec() / 1000.0) - _currentSkillStartTime;
+            double progress = elapsed / _currentSkillDuration;
+            _isInRecoveryWindow = progress >= (1.0 - RecoveryWindowPercent);
+        }
+        else
+        {
+            _isInRecoveryWindow = false;
+        }
+
         if (_statsManager != null)
         {
             Velocity = direction * _statsManager.CurrentSpeed;
@@ -196,6 +230,8 @@ public partial class Player : CharacterBody2D
                 ChangeState(PlayerState.Idle);
             }
         }
+
+        _hitboxController?.UpdateFollowingHitboxes();
 
         _skillManager?.Update((float)delta);
         MoveAndSlide();
@@ -242,7 +278,8 @@ public partial class Player : CharacterBody2D
         return _animationController?.GetFacingDirection() ?? Vector2.Down;
     }
 
-    public bool TryCastSkill(Skill skill)
+    // Modify TryCastSkill signature to accept strike number:
+    public bool TryCastSkill(Skill skill, int strikeNumber = 1)
     {
         if (_currentState == PlayerState.Dead)
         {
@@ -259,7 +296,7 @@ public partial class Player : CharacterBody2D
         _currentCastingSkill = skill;
         _skillEffectController?.SetCurrentSkill(skill);
 
-        // Handle movement based on skill's MovementBehavior
+        // Check if can cast
         if (_currentState != PlayerState.Idle && _currentState != PlayerState.Running)
         {
             return false;
@@ -267,12 +304,18 @@ public partial class Player : CharacterBody2D
 
         ChangeState(PlayerState.CastingSkill);
 
-        // Set movement flags based on behavior
+        if (skill.Slot != SkillSlot.BasicAttack)
+        {
+            _comboTracker?.ResetCombo();
+        }
+
+        // Set movement flags
         if (skill.MovementBehavior == MovementBehavior.Allowed)
         {
             _isCastingWhileMoving = true;
         }
 
+        // Calculate speed scaling
         float speedScale = 1.0f;
         if (_statsManager != null)
         {
@@ -280,14 +323,20 @@ public partial class Player : CharacterBody2D
             {
                 speedScale = _statsManager.CurrentAttackRate / _statsManager.BaseAttackRate;
             }
-            else // SkillCategory.Spell
+            else
             {
                 speedScale = _statsManager.CurrentCastSpeed / _statsManager.BaseCastSpeed;
             }
         }
 
-        // Delegate animation playback to AnimationController
-        _animationController?.PlaySkillAnimation(skill, speedScale);
+        // === MODIFIED: Pass strike number to animation controller ===
+        _animationController?.PlaySkillAnimation(skill, strikeNumber, speedScale);
+
+        // === NEW: Track timing for recovery window ===
+        _currentSkillStartTime = Time.GetTicksMsec() / 1000.0;
+        _currentSkillDuration = _animationController.GetSkillAnimationDuration(skill, strikeNumber);
+
+        _isDashSkillActive = (skill.Slot == SkillSlot.Utility && skill.SkillId.Contains("dash"));
 
         return true;
     }
@@ -300,6 +349,10 @@ public partial class Player : CharacterBody2D
         }
 
         // Instant skills don't change FSM state (non-interrupting)
+        if (skill.Slot != SkillSlot.BasicAttack)
+        {
+            _comboTracker?.ResetCombo();
+        }
 
         // Check if skill has buff data (data-driven!)
 
@@ -414,6 +467,7 @@ public partial class Player : CharacterBody2D
             _isCastingWhileMoving = false;
             _currentCastingSkill = null;
             _skillEffectController.ClearCurrentSkill();
+            _isDashSkillActive = false;
 
             // Return to previous state
             if (_currentState == PlayerState.CastingSkill)

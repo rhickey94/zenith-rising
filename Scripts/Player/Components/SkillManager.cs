@@ -26,20 +26,21 @@ public partial class SkillManager : Node
 
     private SkillSlot? _bufferedSkillSlot = null;
     private double _bufferTimestamp = 0.0;
-    private Vector2 _bufferedMousePosition = Vector2.Zero;
 
     private Player _player;
     private StatsManager _statsManager;
+    private AnimationController _animationController;
 
     public override void _Ready()
     {
         // Don't call GetNode here - wait for Initialize()
     }
 
-    public void Initialize(Player player, StatsManager statsManager)
+    public void Initialize(Player player, StatsManager statsManager, AnimationController animationController)
     {
         _player = player;
         _statsManager = statsManager;
+        _animationController = animationController;
 
         ValidateSkill(PrimarySkill, SkillSlot.Primary);
         ValidateSkill(SecondarySkill, SkillSlot.Secondary);
@@ -89,6 +90,23 @@ public partial class SkillManager : Node
     // Public method - routes to appropriate skill based on slot
     public void UseSkill(SkillSlot slot)
     {
+        // === INPUT CANCELLATION ===
+        // Latest input always wins - cancel buffered skill
+        if (_bufferedSkillSlot.HasValue && _bufferedSkillSlot.Value != slot)
+        {
+            ClearInputBuffer();
+        }
+
+        // === ANIMATION LOCK CHECK ===
+        // During first 85% of animation, ignore inputs (except Dash)
+        bool isDash = (slot == SkillSlot.Utility); // Assuming Dash is utility slot
+
+        if (_player.IsInAnimationLock() && !isDash)
+        {
+            // Input ignored - player committed to animation
+            return;
+        }
+
         bool success = false;
 
         switch (slot)
@@ -116,13 +134,18 @@ public partial class SkillManager : Node
         // If skill failed to execute, buffer the input for retry
         if (!success)
         {
-            _bufferedSkillSlot = slot;
-            _bufferTimestamp = Time.GetTicksMsec() / 1000.0;
-            _bufferedMousePosition = _player.GetGlobalMousePosition();
+            // Check if in recovery window
+            if (_player.IsInRecoveryWindow())
+            {
+                // Buffer for smooth chaining
+                _bufferedSkillSlot = slot;
+                _bufferTimestamp = Time.GetTicksMsec() / 1000.0;
+            }
+            // Otherwise: Input ignored (cooldown, busy, etc.)
         }
         else
         {
-            // Clear buffer on successful execution
+            // Skill succeeded - clear buffer
             ClearInputBuffer();
         }
     }
@@ -143,6 +166,18 @@ public partial class SkillManager : Node
         // Initialize skill from database
         skill.Initialize();
 
+        // === NEW: Combo handling for basic attacks ===
+        int strikeNumber = 1; // Default to strike 1
+
+        if (skill.Slot == SkillSlot.BasicAttack)
+        {
+            var comboTracker = _player.GetComboTracker();
+            if (comboTracker != null)
+            {
+                strikeNumber = comboTracker.GetNextComboStrike(skill);
+            }
+        }
+
         // Calculate actual cooldown (if skill has one)
         float actualCooldown = 0f;
         if (skill.Cooldown > 0)
@@ -157,7 +192,7 @@ public partial class SkillManager : Node
         if (skill.CastBehavior == CastBehavior.AnimationDriven)
         {
             // Request player to play animation
-            if (_player.TryCastSkill(skill))
+            if (_player.TryCastSkill(skill, strikeNumber))
             {
                 success = true;
 
@@ -267,7 +302,6 @@ public partial class SkillManager : Node
     {
         _bufferedSkillSlot = null;
         _bufferTimestamp = 0.0;
-        _bufferedMousePosition = Vector2.Zero;
     }
 
     /// <summary>
