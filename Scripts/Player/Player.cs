@@ -334,9 +334,9 @@ public partial class Player : CharacterBody2D
 
         // === NEW: Track timing for recovery window ===
         _currentSkillStartTime = Time.GetTicksMsec() / 1000.0;
-        _currentSkillDuration = _animationController.GetSkillAnimationDuration(skill, strikeNumber);
+        _currentSkillDuration = _animationController?.GetSkillAnimationDuration(skill, strikeNumber) ?? 0.5f;
 
-        _isDashSkillActive = (skill.Slot == SkillSlot.Utility && skill.SkillId.Contains("dash"));
+        _isDashSkillActive = skill.IsDashSkill && skill != null;
 
         return true;
     }

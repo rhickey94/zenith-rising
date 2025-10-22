@@ -37,6 +37,7 @@ public partial class SkillBalanceEntry : Resource
     [Export] public float Cooldown { get; set; } = 1.0f;
     [Export] public float CastTime { get; set; } = 0f; // For spells only
     [Export] public DamageType DamageType { get; set; } = DamageType.Physical;
+    [Export] public bool IsDashSkill { get; set; } = false;
 
     [ExportGroup("Scaling")]
     [Export] public float StrengthScaling { get; set; } = 0f; // Physical skills

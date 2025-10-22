@@ -41,6 +41,7 @@ public partial class Skill : Resource
     public float Cooldown { get; private set; }
     public float CastTime { get; private set; }
     public DamageType DamageType { get; private set; }
+    public bool IsDashSkill { get; private set; }
 
     // Scaling
 
@@ -128,6 +129,7 @@ public partial class Skill : Resource
         Cooldown = entry.Cooldown;
         CastTime = entry.CastTime;  // ✅ ADDED
         DamageType = entry.DamageType;
+        IsDashSkill = entry.IsDashSkill;
 
         // Load Scaling
         // StrengthScaling = entry.StrengthScaling;

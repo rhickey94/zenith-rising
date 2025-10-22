@@ -251,14 +251,7 @@ public partial class SkillEffectController : Node
             return;
         }
 
-        GD.Print($"[DEBUG] StartLeapSlam called");
-        GD.Print($"[DEBUG] Current skill: {_currentCastingSkill?.SkillName}");
-        GD.Print($"[DEBUG] Skill range: {_currentCastingSkill?.Range}");
-        GD.Print($"[DEBUG] Player position: {_player.GlobalPosition}");
-
         Vector2 targetPosition = CalculateForcedMovementTarget(_currentCastingSkill.Range);
-        GD.Print($"[DEBUG] Calculated target: {targetPosition}");
-        GD.Print($"[DEBUG] Distance to target: {(_player.GlobalPosition - targetPosition).Length()}");
 
         // Calculate smart target position (clamped to Leap Slam's range)
         // Vector2 targetPosition = CalculateForcedMovementTarget(_currentCastingSkill.Range);
